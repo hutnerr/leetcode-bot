@@ -1,6 +1,7 @@
 import discord
 from discord import app_commands
 
+# green = easy, yellow = medium, red = hard
 def assignColor(difficulty: str) -> discord.Color:
     if difficulty == "1":
         return discord.Color.green()
@@ -13,6 +14,7 @@ def assignColor(difficulty: str) -> discord.Color:
 
 def prettifyProblem(problem: list) -> str:
 
+    # send a special message if the problem is premium
     if problem[4] == 'True\n': # the /n is for how the csv file is setup since it is the last row
         print("here")
         return discord.Embed(title = f"**{problem[2]}: {problem[0]}**", description = problem[1] + "\n*This is a premium problem*", color = assignColor(problem[3]))
