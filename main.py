@@ -11,7 +11,6 @@ from discord.ext import commands
 
 ############################################################################################################################## CLIENT SETUP
 
-# Custom client setup
 class Client(commands.Bot):
     
     # Constructor that sets up the base client. 
@@ -27,8 +26,7 @@ class Client(commands.Bot):
             # "cogs.serverinfo"
         ]
 
-    # Allows for persistent views and loads cogs
-    # self.add_view() for persistent views here. 
+    # Loads cogs
     async def setup_hook(self) -> None:
         for ext in self.cogslist:
             await self.load_extension(ext)

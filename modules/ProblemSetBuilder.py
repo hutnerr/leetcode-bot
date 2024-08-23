@@ -3,8 +3,6 @@ import csv
 import json
 import os
 
-# this scraper should only handle scraping the problems. not random selection etc. 
-
 # this is an api endpoint i may be able to check if people have completed a problem
 # https://leetcode.com/graphql
 
@@ -47,10 +45,5 @@ def buildCSV(problems):
 def scrapeAndBuild():
     problems = buildList()
     buildCSV(problems)
-
-
-# Create 3 separate files. 
-# 1. all problems, only free, only premium
-# rn it is only the one
     
-scrapeAndBuild()
+# scrapeAndBuild()

@@ -2,8 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 
-import modules.problemgetter as pg
-import modules.problemformatter as pf
+import modules.ProblemTools as pt
 
 import random
 
@@ -28,8 +27,8 @@ class problems(commands.Cog):
         if paid is None:  # set to free by default. allows this to be an optional parameter
             paid = app_commands.Choice(name="Free", value="free_problems.csv")
 
-        problem = pg.getProblem(paid.value, difficulty.value)
-        await interaction.response.send_message(embed = pf.prettifyProblem(problem))
+        problem = pt.getProblem(paid.value, difficulty.value)
+        await interaction.response.send_message(embed = pt.prettifyProblem(problem))
 
 ######################################################################
 
