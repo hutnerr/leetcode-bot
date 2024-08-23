@@ -1,25 +1,56 @@
-# default status for opt is off, user must toggle them on. 
+############################################################################################################################## IMPORTS 
+import platform
+import time
+from typing import Literal
+import json
 
-# /contest <>
-    # /contests opt
-    # /contests toggle
-    # /contests time
-    # /contests selection <- weekly, biweekly, etc.
+import discord
+from colorama import Back, Fore, Style
+from discord import app_commands
+from discord.ext import commands
 
-# /p (problems)
-    # /p easy
-    # /p medium
-    # /p hard
-    # /p random
+############################################################################################################################## CLIENT SETUP
 
-# server dailies
-    # /daily opt
-    # /daily toggle
-    # /daily timeset
-    # /daily difficulty
+# Custom client setup
+class Client(commands.Bot):
+    
+    # Constructor that sets up the base client. 
+    def __init__(self):
+        intents = discord.Intents().all()
+        super().__init__(command_prefix = commands.when_mentioned_or("/"), intents = intents)
+        
+        self.cogslist = [
+            # "cogs.help",
+            # "cogs.contests",
+            # "cogs.daily",
+            "cogs.problems",
+            # "cogs.serverinfo"
+        ]
 
-# misc / functional
-    # /setup
-    # /help
-    # /about
-    # updatedata <- on a weekly loop, not a callable command 
+    # Allows for persistent views and loads cogs
+    # self.add_view() for persistent views here. 
+    async def setup_hook(self) -> None:
+        for ext in self.cogslist:
+            await self.load_extension(ext)
+
+    # Prints out system info, syncs slash commands to the tree, and changes the bots status
+    async def on_ready(self):
+        prfx = (Back.BLACK + Fore.GREEN + time.strftime("%H:%M:%S EST", time.localtime()) + Back.RESET + Fore.WHITE + Style.BRIGHT)
+        print(prfx + " Logged in as " + Fore.YELLOW + client.user.name)
+        print(prfx + " Bot ID " + Fore.YELLOW + str(client.user.id))
+        print(prfx + " Discord Version " + Fore.YELLOW + discord.__version__) 
+        print(prfx + " Python Version " + Fore.YELLOW + str(platform.python_version()))
+        synced = await client.tree.sync()
+        print(prfx + " Slash CMDs Sycned " + Fore.YELLOW + str(len(synced)))
+        await client.change_presence(activity = discord.Activity(type = discord.ActivityType.playing, name = "/help for commands"))
+
+# Create our main client ( Bot ) object   
+client = Client()
+client.remove_command("help") # remove default help so I can add custom one. 
+
+############################################################################################################################## Run the Bot
+
+with open("data.json", "r") as file:
+    temp = json.load(file)['key']
+
+client.run(temp)
