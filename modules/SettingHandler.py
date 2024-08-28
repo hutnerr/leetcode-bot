@@ -1,8 +1,8 @@
 import json
 import os
 
-fp = "serverdata/"
-basefilepath = "serverdata/serverbase.json"
+fp = "data/serverdata/"
+basefilepath = "data/serverdata/serverbase.json"
 
 def newServerFile(sid):
     with open(basefilepath, 'r') as basefile:

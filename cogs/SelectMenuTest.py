@@ -82,9 +82,6 @@ class ToggleBiweeklyContests(discord.ui.Select):
         sh.updateServerFile(interaction.guild_id, "contests", "biweekly", values)
         await interaction.response.send_message(content=f"Weekly Contests toggled to: **{values}** ")
 
-
-
-
 class Select(discord.ui.View):
     def __init__(self):
         super().__init__()

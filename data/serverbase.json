@@ -1,0 +1,15 @@
+{
+    "id" : 0,
+    "dailies" : {
+        "active" : "false",
+        "hour" : "12:00",
+        "timezone" : "UTC",
+        "channel" : "0",
+        "difficulty" : "1,2,3",
+        "premium" : "false"
+    },
+    "contests" : {
+        "weekly" : "false",
+        "biweekly" : "false"
+    }
+}
