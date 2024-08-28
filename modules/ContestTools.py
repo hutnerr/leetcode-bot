@@ -12,6 +12,8 @@ def increaseContestNum(contest):
         json.dump(data, f, indent=4)
         f.truncate()
 
+# yes
+
 # comment this and give better variable names 
 def getContestTime(contest):
 
