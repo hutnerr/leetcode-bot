@@ -5,7 +5,7 @@ import random
 import os
 import csv
 
-PATH = 'data/'
+PATH = 'data/problems'
 
 ##################################################################################### Retrieval 
 

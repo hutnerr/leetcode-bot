@@ -22,8 +22,9 @@ class Client(commands.Bot):
             # "cogs.help",
             # "cogs.contests",
             # "cogs.daily",
+            # "cogs.serverinfo",
             "cogs.problems",
-            # "cogs.serverinfo"
+            "cogs.SelectMenuTest"
         ]
 
     # Loads cogs
@@ -48,7 +49,7 @@ client.remove_command("help") # remove default help so I can add custom one.
 
 ############################################################################################################################## Run the Bot
 
-with open("data.json", "r") as file:
+with open("data/data.json", "r") as file:
     temp = json.load(file)['key']
 
 client.run(temp)
