@@ -4,7 +4,7 @@ from discord.ext import commands, tasks
 
 from datetime import datetime, timezone
 
-import modules.ProblemTools as pt
+import modules.ProblemsHandler as pt
 
 import random
 

@@ -19,10 +19,6 @@ class Client(commands.Bot):
         super().__init__(command_prefix = commands.when_mentioned_or("/"), intents = intents)
         
         self.cogslist = [
-            # "cogs.help",
-            # "cogs.contests",
-            # "cogs.daily",
-            # "cogs.serverinfo",
             "cogs.problems",
             "cogs.SelectMenuTest"
         ]

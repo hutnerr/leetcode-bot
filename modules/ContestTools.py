@@ -1,5 +1,5 @@
-import datetime
 import json
+from datetime import datetime, timezone
 
 filepath = "data/contests.json"
 
@@ -11,8 +11,6 @@ def increaseContestNum(contest):
         f.seek(0)
         json.dump(data, f, indent=4)
         f.truncate()
-
-# yes
 
 # comment this and give better variable names 
 def getContestTime(contest):
@@ -33,13 +31,13 @@ def getContestTime(contest):
         
     dayIndex = dow.index(contests["day"])
 
-    current_time = datetime.datetime.now()
+    current_time = datetime.now().astimezone(timezone.utc)
     current_day = current_time.strftime("%A")
     current_time = current_time.strftime("%H:%M:%S")
 
     daysLeft = (dayIndex - dow.index(current_day)) % 7
 
-    hoursLeft = (datetime.datetime.strptime(contests['time'], "%H:%M") - datetime.datetime.strptime(current_time, "%H:%M:%S")) # % datetime.timedelta(hours=24)
+    hoursLeft = (datetime.strptime(contests['time'], "%H:%M") - datetime.strptime(current_time, "%H:%M:%S")) # % datetime.timedelta(hours=24)
 
     if hoursLeft.days < 0:
         daysLeft -= 1
@@ -47,6 +45,6 @@ def getContestTime(contest):
 
     return [daysLeft, hoursLeft]
 
-out = getContestTime("weekly")
+out = getContestTime("biweekly")
 print(f"{out[0]} days and {out[1]} hours left") 
 

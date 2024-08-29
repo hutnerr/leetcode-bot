@@ -1,13 +1,12 @@
 {
-    "timezone": "EDT",
     "weekly": {
         "number": 413,
-        "time": "22:30",
-        "day": "Saturday"
+        "time": "02:30",
+        "day": "Sunday"
     },
     "biweekly": {
         "number": 138,
-        "time": "10:30",
+        "time": "14:30",
         "day": "Saturday"
     }
 }
