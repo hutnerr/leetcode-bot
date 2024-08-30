@@ -19,7 +19,7 @@ class Loooooping(commands.Cog):
         self.client = client
         self.dailyLeetcode.start()
 
-    @tasks.loop(seconds = 10) # Check every 10 seconds
+    @tasks.loop(minutes = 1) # Check every minute
     async def dailyLeetcode(self) -> None:
 
         # now = datetime.now()

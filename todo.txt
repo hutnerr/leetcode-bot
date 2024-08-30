@@ -127,3 +127,11 @@ Other
 - RN the dailies can only be true or false for premium problems. it needs to be only, none, or both
 - set a default channel once when settings is called to the first time to whatever channel it was called in,
 but after it is set it must only be changed by /setchannel
+- need a way so the loop only repeats once a minute 
+- the server.json files are going to have to go in the server folder of the id when i make that major change
+- make @messages configurable entirely have a settings command that lets you turn on for individuals, on for role, and off
+- make my message post way more info like the descriptions, and other stats of the problem
+
+Competetion
+- Make the bot focused around server competetion and interactions. 
+- 
