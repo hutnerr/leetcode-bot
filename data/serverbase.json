@@ -3,6 +3,7 @@
     "dailies" : {
         "active" : "false",
         "hour" : "12:00",
+        "hourfile" : "12.txt",
         "timezone" : "UTC",
         "channel" : "0",
         "difficulty" : "1,2,3",

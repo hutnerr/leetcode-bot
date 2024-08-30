@@ -5,15 +5,15 @@ import asyncio
 
 from datetime import datetime, timezone
 
-import modules.ProblemsHandler as pt
-import modules.SettingHandler as sh
+import modulesSmile.ProblemsHandler as ph
+import modulesSmile.SettingHandler as sh
 
 ######################################################################
 
 def makeTimes():
     options = []
 
-    options.append(discord.SelectOption(label = "12:00 (12:00 A.M.)", value = "00:00"))
+    options.append(discord.SelectOption(label = "12:00 (12:00 A.M.)", value = "0:00"))
 
     for i in range(1, 24):
         options.append(discord.SelectOption(label = f"{i}:00 ({i % 12 if i != 12 else 12}:00 {'A.M.' if i <= 12 else 'P.M.'})", value = f"{i}:00"))
@@ -25,7 +25,10 @@ class TimeMenu(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         values = ", ".join(self.values)
+        filename = values.split(":")[0] + ".txt"
+        sh.updateTimesFile(filename, interaction.guild.id)
         sh.updateServerFile(interaction.guild_id, "dailies", "hour", values)
+        sh.updateServerFile(interaction.guild.id, "dailies", "hourfile", filename)
         await interaction.response.send_message(content=f"Time changed to: **{values}** ")
 
 class TimeZoneMenu(discord.ui.Select):
@@ -100,6 +103,12 @@ class SelectMenuTest(commands.Cog):
         await interaction.response.send_message(content = "# Settings", view = Select())
         # await asyncio.sleep(1)
         # await interaction.response.send_message(content = interaction.user.mention, ephemeral = True)
+
+    @app_commands.command(name = 'setchannel', description='Test command')
+    async def setChannel(self, interaction: discord.Interaction):
+        sh.updateServerFile(interaction.guild_id, "dailies", "channel", interaction.channel_id)
+        await interaction.response.send_message(content = f"Channel set to: {interaction.channel_id}")
+
 
 ######################################################################
 

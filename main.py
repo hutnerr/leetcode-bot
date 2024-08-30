@@ -20,7 +20,8 @@ class Client(commands.Bot):
         
         self.cogslist = [
             "cogs.problems",
-            "cogs.SelectMenuTest"
+            "cogs.SelectMenuTest",
+            "cogs.Loooooping"
         ]
 
     # Loads cogs

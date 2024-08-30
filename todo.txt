@@ -124,3 +124,6 @@ Other
 - For when send out the contest messages. 
 - Maybe a selectbox for which notifications they want for contests. (1 hr before? 15 mins? 24 hours?)
 - Put the discord UI select menu in other folders / organizational 
+- RN the dailies can only be true or false for premium problems. it needs to be only, none, or both
+- set a default channel once when settings is called to the first time to whatever channel it was called in,
+but after it is set it must only be changed by /setchannel

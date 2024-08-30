@@ -12,13 +12,21 @@ PATH = 'data/problems'
 def getProblem(file:str, dif:str):
     with open(os.path.join(PATH, file), "r") as f:
         data = f.readlines()
-
-    # special case for any difficulty
-    if dif == "0":
-        return random.choice(data).split(",")
     
+    # list will be [1, 2, 3] for easy, medium, hard
+    # may only be one difficulty, maybe 2, maybe all 3
+
+    listDif = dif.split(",")
+
+    # if there is only one difficulty, return a random problem from that difficulty
+    if len(listDif) == 1:
+        filtered = [problem.split(",") for problem in data if problem.split(",")[3] == listDif[0]]
+    elif len(listDif) == 2:
+        filtered = [problem.split(",") for problem in data if problem.split(",")[3] == listDif[0] or problem.split(",")[3] == listDif[1]]
+    else:
+        return random.choice(data).split(",")
+
     # filter our problems into the difficulty then make the random choice. 
-    filtered = [problem.split(",") for problem in data if problem.split(",")[3] == dif]
     problem = random.choice(filtered)
     return problem
 
