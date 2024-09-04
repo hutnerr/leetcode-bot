@@ -15,6 +15,7 @@ By default nothing is turned on. You must use the `/settings` command to set the
 - `/tutorial` - Explains and walk you through feature setup.
 - `/settings <setting>` - Display a UI that allows for the modification of settings.
 - `/sinfo` - Displays the servers current config settings as well as other misc info.
+- `/about` - Displays some information about the bot itself. 
 - `/opt <event>` - Allows a user to opt in/out of server daily events & contest notifications.
 - `/toggleroles` - Creates roles to be used in notifcation messages. Deletes when toggled off.
 - `/setchannel` - Sets the channel for the bot output. 
