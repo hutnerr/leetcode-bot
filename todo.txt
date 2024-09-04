@@ -134,4 +134,6 @@ but after it is set it must only be changed by /setchannel
 
 Competetion
 - Make the bot focused around server competetion and interactions. 
-- 
+- if i can use the leetcode API then I can maybe check if the user had completed the daily problem i settings
+
+rename my file structure again. utils?
