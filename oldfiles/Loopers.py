@@ -3,7 +3,6 @@
 # read the file into a list
 # loop through the list while calling a function like applyDaily(serverID) for each server. 
 
-
 from modulesSmile import ProblemsHandler as ph
 from modulesSmile import SettingHandler as sh
 
@@ -25,7 +24,3 @@ def applyDaily(sid):
     problem = ph.getProblem(problemset, data['dailies']['difficulty'])
 
     return [sid, channelid, problem]
-
-
-
-

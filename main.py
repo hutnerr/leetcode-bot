@@ -1,12 +1,9 @@
 ############################################################################################################################## IMPORTS 
-import platform
 import time
-from typing import Literal
 import json
 
 import discord
 from colorama import Back, Fore, Style
-from discord import app_commands
 from discord.ext import commands
 
 ############################################################################################################################## CLIENT SETUP
@@ -19,9 +16,7 @@ class Client(commands.Bot):
         super().__init__(command_prefix = commands.when_mentioned_or("/"), intents = intents)
         
         self.cogslist = [
-            "cogs.problems",
-            "cogs.SelectMenuTest",
-            "cogs.Loooooping"
+            # "cogs.problems",
         ]
 
     # Loads cogs
@@ -33,9 +28,6 @@ class Client(commands.Bot):
     async def on_ready(self):
         prfx = (Back.BLACK + Fore.GREEN + time.strftime("%H:%M:%S EST", time.localtime()) + Back.RESET + Fore.WHITE + Style.BRIGHT)
         print(prfx + " Logged in as " + Fore.YELLOW + client.user.name)
-        print(prfx + " Bot ID " + Fore.YELLOW + str(client.user.id))
-        print(prfx + " Discord Version " + Fore.YELLOW + discord.__version__) 
-        print(prfx + " Python Version " + Fore.YELLOW + str(platform.python_version()))
         synced = await client.tree.sync()
         print(prfx + " Slash CMDs Sycned " + Fore.YELLOW + str(len(synced)))
         await client.change_presence(activity = discord.Activity(type = discord.ActivityType.playing, name = "/help for commands"))
