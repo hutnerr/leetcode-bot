@@ -32,3 +32,4 @@ By default nothing is turned on. You must use the `/settings` command to set the
     - Description
     - Accepted %
 - Add friendly server competition functionality.
+- Functionality regarding user-specific study plans. 
