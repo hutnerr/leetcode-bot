@@ -126,3 +126,4 @@ Other
 but after it is set it must only be changed by /setchannel
 - the server.json files are going to have to go in the server folder of the id when i make that major change
 - make @messages configurable entirely have a settings command that lets you turn on for individuals, on for role, and off
+- Instead of sending a link, make the title of the embed a hyperlink to the problem. 
