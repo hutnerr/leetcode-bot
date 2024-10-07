@@ -11,8 +11,3 @@ def openFile() -> dict:
     
 def key() -> str:
     return openFile()['key']
-
-def filepath() -> str:
-    return openFile()['filepath']
-
-print(filepath())

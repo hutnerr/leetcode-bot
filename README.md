@@ -3,7 +3,7 @@ The purpose of this bot is to encourage and enable LeetCoding within a Discord s
 
 There is also other functionality that will notify the server about upcoming contests. The timing of these notifications can be set and modified. 
 
-By default nothing is turned on. You must use the `/settings` command to set the server's config. If you want a full walkthrough use the `/tutorial` command. 
+By default nothing is turned on. You must use the `/settings` command to set the server's config and `/setchannel` to set an output channel. If you want a full walkthrough use the `/tutorial` command. 
 
 [Invite Link]()
 

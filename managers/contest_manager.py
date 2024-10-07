@@ -1,12 +1,12 @@
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 import json_reader as jr
 
 # This file contains helper functions that track contests. 
 
-filepath = os.path.join(jr.filepath(), "data", "contests.json")
+filepath = os.path.join("data", "contests.json")
 
 # This function exists due to the fact that I'm keeping track of the number of contests locally
 # It should be called whenever a contest is created
@@ -44,16 +44,17 @@ def getContestTime(contest: str) -> list:
     # If we have a negative number of days left, we need to adjust
     if timeLeft.days < 0:
         daysLeft -= 1
-        timeLeft = timeLeft + datetime.timedelta(hours = 24)
+        timeLeft = timeLeft + timedelta(hours=24)
 
     return [daysLeft, timeLeft]
 
-out = getContestTime("biweekly")
-print(f"{out[0]} days and {out[1]} hours left") 
-
-out = getContestTime("weekly")
-print(f"{out[0]} days and {out[1]} hours left") 
-
 ####################################################################################### NOTES / FIXES
-# This is throwing an error one weekly objects when its giving back -1
-# This also doesnt account for how biweekly contests can be more than 7 days away.
+# FIXME: This is throwing an error one weekly objects when its giving back -1
+# FIXME: This also doesnt account for how biweekly contests can be more than 7 days away.
+
+
+# out = getContestTime("biweekly")
+# print(f"{out[0]} days and {out[1]} hours left") 
+
+# out = getContestTime("weekly")
+# print(f"{out[0]} days and {out[1]} hours left") 

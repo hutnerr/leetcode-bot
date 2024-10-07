@@ -109,7 +109,6 @@ class SelectMenuTest(commands.Cog):
         sh.updateServerFile(interaction.guild_id, "dailies", "channel", interaction.channel_id)
         await interaction.response.send_message(content = f"Channel set to: {interaction.channel_id}")
 
-
 ######################################################################
 
 async def setup(client: commands.Bot) -> None: 
