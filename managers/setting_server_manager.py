@@ -1,53 +1,33 @@
-import json
 import os
 
-# FIXME
-# Review this whole file 
+# ----------------------------------------------------
+# Problem Time Functions 
+# ----------------------------------------------------
 
-fp = "data/serverdata/"
-basefilepath = "data/serverbase.json"
-
-def newServerFile(sid):
-    with open(basefilepath, 'r') as basefile:
-        data = json.load(basefile)
-        new_file_name = f"{fp}{sid}.json"
-        data['id'] = sid
-        with open(new_file_name, 'w') as new_file:
-            json.dump(data, new_file)
-    addToTimesFile('data/times/12.txt', sid)
-
-def updateServerFile(sid, key1, key2, value):
-    file_path = f"{fp}{sid}.json"
-    data = getServerFile(sid)
-    data[key1][key2] = value
-    with open(file_path, 'w') as file:
-        json.dump(data, file)
-
-def getServerFile(sid):
-    file_path = f"{fp}{sid}.json"
-    if not os.path.exists(file_path):
-        newServerFile(sid)
-    with open(file_path, 'r') as file:
-        return json.load(file)
+# This should allow for a server to have like 3 problems on the same day for example
+# and it should only remove one of them
+def toggleTime(serverID, day_of_week, hour):
+    filepath = os.path.join("data", "problem_times", day_of_week, f"{hour}.txt")
     
-def updateTimesFile(newtimefile, sid):
-    pathfront = 'data/times/'
-
-    oldtimefile = getServerFile(sid)['dailies']['hourfile']
-
-    removeFromTimesFile(pathfront + oldtimefile, sid)
-    addToTimesFile(pathfront + newtimefile, sid)
-
-def addToTimesFile(path, sid):
-    with open(path, 'a') as file:
-        file.write(f"{sid}\n")
-
-def removeFromTimesFile(path, sid):
-    with open(path, 'r') as file:
+    with open(filepath, "r+") as file:
         lines = file.readlines()
 
-    print(f"{sid}\n")
+        lines = [line.strip() for line in lines]
 
-    lines.remove(f"{sid}\n")
-    with open(path, 'w') as file:
+        # FIXME
+        # This wont work because I want to have more than
+        # 1 occurence allowed per file
+        if serverID in lines:            
+            lines.remove(serverID)
+        else:
+            lines.append(serverID)
+
+        # add the newlines back in as i retrieved them
+        lines = [line + "\n" for line in lines]
+
+        file.seek(0)
         file.writelines(lines)
+        file.truncate()
+
+
+
