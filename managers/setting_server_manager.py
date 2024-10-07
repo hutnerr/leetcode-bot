@@ -1,6 +1,9 @@
 import json
 import os
 
+# FIXME
+# Review this whole file 
+
 fp = "data/serverdata/"
 basefilepath = "data/serverbase.json"
 
