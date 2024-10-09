@@ -131,3 +131,32 @@ Use relative filepaths. I.E. one that do NOT start with a / and go from the dire
 I think the discord.Interaction.created_at parameter is in UTC, so maybe I can use that as a subtractor
 
 I want to be explicit where I can. Like explicit return types, explicit function args, etc. 
+
+# Databases
+
+import sqlite3
+
+create a problems table with 
+    - serverID (id of server)
+    - problemNum (what problem id is this for the server, eg 1 2 or 3)
+    - dow (days of week this problem is sent on)
+    - hour (what hour of the day is this problem sent)
+    - difficulty (what dif range, easy, med, hard)
+    - premium (only, none, include both prem and free)
+
+create a server table with
+    - serverid (id of server)
+    - channelid (id of channel to send output)
+    - problems (t/f if the server has problems active)
+    - weeklycontests (t/f if the server wants weekly contest notifs)
+    - biweeklycontests (t/f if the server wants biweekly notifs)
+    - timezone (what timezone is the server in)
+
+create a users table
+    - userid (the user id)
+    - serverid (the server id the user is in)
+    - weeklyopt (t/f if the user wants to be notif about weekly contests)
+    - biweeklyopt (t/f is the user wants to be notif about biweekly)
+    - problemsopt (t/f if the user wants to be notif about server problems)
+
+after i make all of the tables, i will have to design the proper database_tools.py file 
