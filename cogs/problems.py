@@ -2,8 +2,10 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-import managers.problem_info_manager as pim
-import managers.problem_distrubutor as pmd
+from managers import problem_info_manager as pim
+from managers import problem_distrubutor as pmd
+from managers import active_problems_manager as apm
+from managers import daily_problem_manager as dpm
 
 from tools.consts import Problemset as ps
 from tools.consts import Difficulty as difs
@@ -32,6 +34,20 @@ class problems(commands.Cog):
         problemInfo = pim.getProblemInfo(problem[0])
         
         await interaction.response.send_message(embed = ems.styleProblem(problemInfo, problem[0]))
+
+    @app_commands.command(name = "checkactive", description = "Checks the active problems for the server")
+    async def checkactive(self, interaction: discord.Interaction):
+        activeProblems = apm.getAndParseActiveProblems(interaction.guild.id)
+        await interaction.response.send_message(embed = ems.styleActiveProblems(activeProblems))
+
+    @app_commands.command(name = "daily", description = "Gets the official LeetCode daily problem")
+    async def daily(self, interaction: discord.Interaction):
+        slug = dpm.getOfficialDailyProblemSlug()
+        info = pim.getProblemInfo(slug)
+        try:
+            await interaction.response.send_message(embed = ems.styleProblem(info, slug))
+        except Exception as e:
+            await interaction.response.send_message(embed = ems.styleProblemSimple(info, slug))
 
 async def setup(client: commands.Bot) -> None: 
     await client.add_cog(problems(client))

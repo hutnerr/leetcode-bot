@@ -7,6 +7,7 @@ from managers import problem_distrubutor as pmd
 from managers import server_settings_manager as ssm
 from managers import problem_info_manager as pim
 from managers import problemset_manager as pm
+from managers import active_problems_manager as apm
 
 from ui import embed_styler as es
 
@@ -23,7 +24,7 @@ class looper(commands.Cog):
         # hour = time.strftime('%H')
         
         # for testing 
-        dow = '1'
+        dow = '2'
         hour = 1
         
         problems = lm.getAllProblems(dow, hour)
@@ -51,7 +52,7 @@ class looper(commands.Cog):
             except Exception as e:
                 await channel.send(embed = es.styleProblemSimple(pim.getProblemInfo(problemSlug), problemSlug))
                                 
-            pmd.updateActiveProblems(serverID, problemNum, problem[0])
+            apm.updateActiveProblems(serverID, problemNum, problem[0])
     
     @tasks.loop(hours=24)
     async def updateProblemset(self):

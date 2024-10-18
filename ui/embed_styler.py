@@ -1,6 +1,9 @@
 import discord
 
-import managers.problem_info_manager as pim
+
+from managers import problem_info_manager as pim
+from managers import daily_problem_manager as dpm
+
 from tools import time_helper as th
 
 # green = easy, yellow = medium, red = hard
@@ -82,3 +85,26 @@ def buildTimeString(timeDict:dict) -> str:
 
     return timeString
     
+def styleActiveProblems(activeProblems:dict) -> discord.Embed:
+    em = discord.Embed(
+        title = "Active Problems",
+        color = discord.Color.purple()
+    )
+    
+    officialDaily = dpm.getOfficialDailyProblemInfo()
+    em.add_field(name = "Official Daily", value = f'[{officialDaily["title"]}]({officialDaily["url"]})', inline = False)
+    
+    for problem in activeProblems:
+        problemInfo = pim.getProblemInfo(activeProblems[problem])
+        em.add_field(name = f'Problem {problem.replace("p", "")}', value = f'[{problemInfo["title"]}]({problemInfo["url"]})', inline = False)
+    
+    return em
+
+def styleSimpleEmbed(title:str, description:str, color:discord.Color) -> discord.Embed:
+    em = discord.Embed(
+        title = title,
+        description = description,
+        color = color
+    )
+    
+    return em

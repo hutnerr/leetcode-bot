@@ -1,13 +1,9 @@
+from managers import daily_problem_manager as dpm
+from managers import problem_info_manager as pim
 from tools import printer as pr
-from tools import time_helper as th
-from tools import database_helper as dbh
-from tools.consts import DatabaseTables as dbt
 
-from managers import contest_time_manager as ctm
+slug = dpm.getOfficialDailyProblemSlug()
+info = pim.getProblemInfo(slug)
 
-SID = 335526354206326786
-
-# dbh.updateRow(dbt.PROBLEMS.value, "dow", 1, f"serverID = {SID}")
-
-dbh.printRows(dbt.PROBLEMS.value)
+pr.printDict(info)
 

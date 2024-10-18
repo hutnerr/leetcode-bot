@@ -26,10 +26,6 @@ By default nothing is turned on. You must use the `/settings` command to set the
 - `/help <command>` - Explains and give details about an individual command.
 
 ## Future Goals
-- Swap to using the Leetcode API.
-- Display the official Leetcode daily problem.
-- Display more info in the output embed.
-    - Description
-    - Accepted %
 - Add friendly server competition functionality.
-- Functionality regarding user-specific study plans. 
+  - Badges, leaderboards, etc.
+

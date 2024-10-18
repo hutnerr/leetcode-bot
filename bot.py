@@ -36,7 +36,7 @@ class Client(commands.Bot):
 client = Client()
 client.remove_command("help") # remove default help so I can add custom one. 
 
-with open("key.json", "r") as file:
+with open("data/key.json", "r") as file:
     temp = json.load(file)['key']
 
 client.run(temp)

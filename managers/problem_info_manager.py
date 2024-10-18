@@ -27,6 +27,7 @@ def getProblemInfo(slug: str) -> dict:
         "difficulty" : problemInfo["difficulty"],
         "description" : "",
         "examples" : {},
+        "url" : buildLinkFromSlug(slug)
     }
     
     isPaid = problemInfo["isPaidOnly"]

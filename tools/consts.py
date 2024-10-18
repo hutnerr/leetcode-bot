@@ -24,12 +24,14 @@ class DatabaseTables(Enum):
     USERS = "users"
     SERVERS = "servers"
     CONTESTS = "contests"
+    ACTIVE_PROBLEMS = "active_problems"
 
 class DatabaseFields(Enum):
     PROBLEMS = ("serverID", "problemNum", "dow", "hour", "difficulty", "premium")
     USERS = ("userID", "leetcodeUsername", "serverID", "weeklyOpt", "biweeklyOpt", "problemsOpt")
     SERVERS = ("serverID", "channelID", "problems", "weeklyContests", "biweeklyContests", "timezone")
     CONTESTS = ("serverID", "15min", "30min", "1hr", "2hr30min", "6hr", "12hr", "24hr")
+    ACTIVE_PROBLEMS = ("serverID", "p1", "p2", "p3")
 
 class Premium(Enum):
     FREE = 1

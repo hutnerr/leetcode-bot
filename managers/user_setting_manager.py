@@ -1,3 +1,6 @@
+from tools import database_helper as dbh
+from tools.consts import DatabaseTables as dt
+
 def parseUserSettings(userRow:tuple):
     settings = {
         "userID": userRow[0],
@@ -9,3 +12,7 @@ def parseUserSettings(userRow:tuple):
     }
     
     return settings
+
+# TODO: Implement this function when I do the competition system
+def addPoints(userID:int, points:int) -> None:
+    pass

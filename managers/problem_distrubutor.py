@@ -2,10 +2,13 @@ import os
 
 from tools import file_helper as fh
 from tools import random_helper as rh
+from tools import database_helper as dbh
 
 from tools.consts import Difficulty as difs
 from tools.consts import Premium as prem
 from tools.consts import Problemset as ps
+from tools.consts import DatabaseTables as dbt
+from tools.consts import DatabaseFields as dbf
 
 from managers import problem_setting_manager as psm
 
@@ -48,18 +51,3 @@ def getProblemsFromSettings(serverID, problemID):
     problem = getProblem(determineProblemset(int(problemInfo["premium"])), problemInfo["difficulty"])
     return problem
     
-def addToActiveProblems(serverID, problemID, slug):
-    activeProblemPath = os.path.join("data", "active_problems", f"{serverID}.csv")
-    with open(activeProblemPath, mode='a', newline='', encoding="utf-8") as file:
-        file.write(f"{problemID},{slug}\n")
-
-def updateActiveProblems(serverID, problemID, slug):
-    activeProblemPath = os.path.join("data", "active_problems", f"{serverID}.csv")
-    problems = fh.fileToList(activeProblemPath)
-    for i in range(len(problems)):
-        if problems[i].split(",")[0] == str(problemID):
-            problems[i] = f"{problemID},{slug}"
-            break
-        else:
-            problems.append(f"{problemID},{slug}")
-    fh.listToFile(activeProblemPath, problems)
