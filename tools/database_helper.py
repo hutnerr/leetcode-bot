@@ -1,3 +1,18 @@
+""" 
+Helper module to work with SQlite3 databases.
+
+Functions: 
+    - connectDB(name: str) -> tuple: 
+    - addRow(table: str, columns: tuple, values: tuple) -> bool:
+    - updateRow(table: str, column: str, value: str, condition: str) -> bool:
+    - removeRow(table: str, condition: str, params: tuple) -> bool:
+    - getRow(table: str, condition: str, params: tuple) -> tuple:
+    - getRowsWhere(table: str, condition: str, params: tuple) -> tuple:
+    - getRows(table: str) -> tuple:
+    - wipeDB(table: str) -> bool:
+    - contains(table: str, condition: str, params: tuple) -> bool:
+"""
+
 import os
 import sqlite3
 

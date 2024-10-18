@@ -1,7 +1,5 @@
-import time
+from managers import problem_info_manager as pim
+from tools import printer as pr 
 
-dow = time.strftime('%A')
-hour = time.strftime('%H')
 
-print(str(dow))
-print(int(hour))
+pr.printDict(pim.getProblemInfo("two-sum"))

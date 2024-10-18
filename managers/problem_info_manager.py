@@ -1,23 +1,38 @@
-import json
+
 
 from tools import query_helper as qh
 from tools.consts import Query as q
 
 from bs4 import BeautifulSoup
 
-# --------------------------------- # 
-# Builder Functions
-# --------------------------------- #
 
 def buildLinkFromSlug(slug: str) -> str:
+    """
+    Build a leetcode problem link from a problem slug
+    Args:
+        slug (str): The problem slug
+    Returns:
+        str: The URL of the problem
+    """
     return f"https://leetcode.com/problems/{slug}/"
 
-# --------------------------------- # 
-# Problem info Functions
-# --------------------------------- #
 
 def getProblemInfo(slug: str) -> dict:
-    
+    """
+    Perform a query to get the problem info from leetcode then builds info dict
+    Args:
+        slug (str): The problem slug
+    Returns:
+        dict: The problemInfo dict. Contains:
+            - id (int): The problem ID. e.g 1
+            - title (str): The problem title. e.g "Two Sum"
+            - difficulty (str): The problem difficulty. e.g "Easy"
+            - description (str): The problem description / instruction. 
+            - examples (dict): The problem examples. e.g {1: "Example 1", 2: "Example 2"}
+            - slug (str): The problem slug. e.g "two-sum"
+            - url (str): The problem URL. e.g "https://leetcode.com/problems/two-sum/"
+            - isPaid (bool): True if the problem is a premium problem, False otherwise
+    """
     problemInfo = qh.performQuery(q.QUESTION_INFO.value, {"titleSlug" : slug})
     problemInfo = problemInfo["data"]["question"]
     
@@ -28,11 +43,13 @@ def getProblemInfo(slug: str) -> dict:
         "description" : "",
         "examples" : {},
         "slug" : slug,
-        "url" : buildLinkFromSlug(slug)
+        "url" : buildLinkFromSlug(slug),
+        "isPaid" : problemInfo["isPaidOnly"]
     }
     
     isPaid = problemInfo["isPaidOnly"]
         
+    # Since we can't get the content of a premium problem, we set an notif for the user
     if not isPaid:
         soup = BeautifulSoup(problemInfo["content"], "html.parser")
         tempContent = soup.get_text() # get the text from the html content
@@ -74,21 +91,4 @@ def getExamples(problemDescription: str) -> dict:
         i += 1
 
     return examples
-
-# --------------------------------- # 
-# Print Functions
-# --------------------------------- #
-
-def printjson(jsonString: str) -> None:
-    print(json.dumps(jsonString, indent=4))
-    
-def printProblemInfo(problemInfo: dict) -> None:
-    print(f"ID: {problemInfo['id']}")
-    print(f"Title: {problemInfo['title']}")
-    print(f"Difficulty: {problemInfo['difficulty']}")
-    print(f"Description: {problemInfo['description']}")
-    print("Examples:")
-    for i in problemInfo["examples"]:
-        print(f"{problemInfo['examples'][i]}")
-    
 
