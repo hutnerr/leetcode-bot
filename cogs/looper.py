@@ -39,8 +39,8 @@ class looper(commands.Cog):
         The main problems loop. Runs once a minute.
         It checks the day of the week and the hour of the day and sends problems to the appropriate channels.
         """
-        dow = time.strftime('%A')
-        hour = time.strftime('%H')
+        dow = str(time.strftime('%A'))
+        hour = int(time.strftime('%H'))
 
         problems = lm.getAllProblems(dow, hour)
         await self.sendProblems(problems)

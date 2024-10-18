@@ -3,6 +3,7 @@ A file that contains all the constants used in the bot
 
 Attributes:
     ImageFolders
+    Times
     DaysOfWeek
     Difficulty
     Boundaries
@@ -18,6 +19,10 @@ from enum import Enum
 # The names of the folders in the images director that contain other images 
 class ImageFolders(Enum):
     THUMBS_UP = "thumbs_up"
+
+# The time of the day 
+class Times(Enum):
+    OFFICIAL_DAILY_RESET = "20:00" # 8 pm est
 
 # Days of the week and their equivalent numbers
 class DaysOfWeek(Enum):

@@ -32,8 +32,7 @@ class problems(commands.Cog):
 
         problem = pmd.getProblem(paid.value, difficulty.value)
         problemInfo = pim.getProblemInfo(problem[0])
-        
-        await interaction.response.send_message(embed = ems.styleProblem(problemInfo, problem[0]))
+        await interaction.response.send_message(embed = ems.styleProblem(problemInfo))
 
     @app_commands.command(name = "checkactive", description = "Checks the active problems for the server")
     async def checkactive(self, interaction: discord.Interaction):

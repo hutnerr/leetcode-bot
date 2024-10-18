@@ -21,8 +21,15 @@ from tools import time_helper as th
 # Helper Functions
 # ############################################################
 
-# green = easy, yellow = medium, red = hard
 def assignColor(difficulty: str) -> discord.Color:
+    """
+    Gets a color based on the difficulty of the problem.\n
+    Easy = Green, Medium = Yellow, Hard = Red, Other = Blue
+    Args:
+        difficulty (str): The difficulty as a string. e.g. "Easy"
+    Returns:
+        discord.Color: The appropriate color 
+    """
     if difficulty == "Easy":
         return discord.Color.green()
     elif difficulty == "Medium":
@@ -32,7 +39,15 @@ def assignColor(difficulty: str) -> discord.Color:
     else:
         return discord.Color.blue()
 
-def buildTimeString(timeDict:dict) -> str:
+def buildTimeString(timeDict: dict) -> str:
+    """
+    Builds a string from a dictionary of time values.\n
+    Used for polish. e.g. accounts for pluralization and 0 values
+    Args:
+        timeDict (dict): The dictionary of time values. e.g. {"days": 1, "hours": 2, "minutes": 3}. Built from time_helper.timedeltaToDict
+    Returns:
+        str: The build string. e.g. "1 day, 2 hours, and 3 minutes away"
+    """
     timeString = ""
     if timeDict["days"] > 0:
         if timeDict["days"] == 1:
@@ -58,34 +73,51 @@ def buildTimeString(timeDict:dict) -> str:
 # Embed Styling Functions
 # ############################################################
 
-def styleProblem(problem:dict, problemSlug:str) -> str:
-    # send a special message if the problem is premium
-    
+def styleProblem(problemInfo: dict) -> discord.Embed:
+    """
+    Styles a problem into an embed for Discord. Includes the problem description and examples.
+    Args:
+        problemInfo (dict): The problemInfo dictionary from problem_info_manager.getProblemInfo()
+    Returns:
+        discord.Embed: The styled embed
+    """
     em = discord.Embed(
-        title = f"{problem['id']} - {problem['title']}",
-        color = assignColor(problem["difficulty"]),
-        url = pim.buildLinkFromSlug(problemSlug)
+        title = f"{problemInfo['id']} - {problemInfo['title']}",
+        color = assignColor(problemInfo["difficulty"]),
+        url = pim.buildLinkFromSlug(problemInfo["slug"])
     )
-    
-    em.add_field(name = "Description", value = problem["description"], inline = False)
-    
-    for i in problem["examples"]:
-        em.add_field(name = f"Example {i}", value = f"```{problem['examples'][i]}```", inline = False)
+    em.add_field(name = "Description", value = problemInfo["description"], inline = False)
+
+    for i in problemInfo["examples"]:
+        em.add_field(name = f"Example {i}", value = f"```{problemInfo['examples'][i]}```", inline = False)
 
     return em
 
-def styleProblemSimple(problem:dict, problemSlug:str) -> str:
+def styleProblemSimple(problemInfo: dict) -> discord.Embed:
+    """
+    Returns an embed with a simple message that says a problem occured when trying to send the full problem description.\nProvides the title and a link to the problem.
+    Args:
+        problemInfo (dict): The problemInfo dictionary from problem_info_manager.getProblemInfo()
+    Returns:
+        discord.Embed: The simply styled embed
+    """
     em = discord.Embed(
-        title = f"{problem['id']} - {problem['title']}",
-        color = assignColor(problem["difficulty"]),
-        url = pim.buildLinkFromSlug(problemSlug)
+        title = f"{problemInfo['id']} - {problemInfo['title']}",
+        color = assignColor(problemInfo["difficulty"]),
+        url = pim.buildLinkFromSlug(problemInfo["slug"])
     )
-    
-    em.add_field(name = "", value = "Error sending full problem description.\nEmbed size exceeded.", inline = False)
+    em.add_field(name = "", value = "Error sending full problem description. Please visit link.\nEmbed size exceeded.", inline = False)
     
     return em
 
-def styleContest(contestInfo:dict) -> discord.Embed:
+def styleContest(contestInfo: dict) -> discord.Embed:
+    """
+    Styles the contest times into an embed for Discord.
+    Args:
+        contestInfo (dict): The contest info dictionary from contest_manager.getAndParseContestsInfo()
+    Returns:
+        discord.Embed: The styled mebed of the contest times
+    """
     em = discord.Embed(
         title = "LeetCode Contests",
         color = discord.Color.blue(),
@@ -95,16 +127,21 @@ def styleContest(contestInfo:dict) -> discord.Embed:
     biweeklyTitle, biweeklyTime = contestInfo["biweekly"]
     biweeklyTimeDict = th.timedeltaToDict(biweeklyTime)
     em.add_field(name = biweeklyTitle, value = f"```{buildTimeString(biweeklyTimeDict)}```", inline = False)
-    
 
     weeklyTitle, weeklyTime = contestInfo["weekly"]
     weeklyTimeDict = th.timedeltaToDict(weeklyTime)
     em.add_field(name = weeklyTitle, value = f"```{buildTimeString(weeklyTimeDict)}```", inline = False)
-    
 
     return em
     
-def styleActiveProblems(activeProblems:dict) -> discord.Embed:
+def styleActiveProblems(activeProblems: dict) -> discord.Embed:
+    """
+    Styles the active problems into an embed for Discord. Includes the official daily problem. 
+    Args:
+        activeProblems (dict): The dict of the active problems from active_problems_manager.getAndParseActiveProblems()
+    Returns:
+        discord.Embed: The styles embed for the active problems within the server
+    """
     em = discord.Embed(
         title = "Active Problems",
         color = discord.Color.purple()
@@ -120,10 +157,18 @@ def styleActiveProblems(activeProblems:dict) -> discord.Embed:
     return em
 
 def styleSimpleEmbed(title:str, description:str, color:discord.Color) -> discord.Embed:
+    """
+    Simple template embed for Discord. Used for simple messages.
+    Args:
+        title (str): _description_
+        description (str): _description_
+        color (discord.Color): _description_
+    Returns:
+        discord.Embed: The simple embed 
+    """
     em = discord.Embed(
         title = title,
         description = description,
         color = color
     )
-    
     return em
