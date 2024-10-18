@@ -13,6 +13,9 @@ from ui import embed_styler as es
 
 import time
 
+# ADD ANOTHER LOOPER FOR THE OFFICIAL DAILY PROBLEMS 
+
+
 class looper(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client

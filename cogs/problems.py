@@ -49,5 +49,7 @@ class problems(commands.Cog):
         except Exception as e:
             await interaction.response.send_message(embed = ems.styleProblemSimple(info, slug))
 
+    # PROBLEM INFO 
+
 async def setup(client: commands.Bot) -> None: 
     await client.add_cog(problems(client))
