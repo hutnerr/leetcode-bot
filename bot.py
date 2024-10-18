@@ -1,13 +1,13 @@
+"""
+This is the main file for the bot. It will handle the setup of the bot, and the loading of the cogs.
+This is where the bot will be run from.
+"""
 import time
 import json
 
 import discord
 from colorama import Back, Fore, Style
 from discord.ext import commands
-
-# --------------------------------- # 
-# Client Class & Setup
-# --------------------------------- #
 
 class Client(commands.Bot):
     def __init__(self):
@@ -37,6 +37,6 @@ client = Client()
 client.remove_command("help") # remove default help so I can add custom one. 
 
 with open("data/key.json", "r") as file:
-    temp = json.load(file)['key']
+    key = json.load(file)['key']
 
-client.run(temp)
+client.run(key)

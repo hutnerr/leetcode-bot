@@ -16,5 +16,10 @@ class contests(commands.Cog):
         await interaction.response.send_message(embed = es.styleContest(contestInfo))
         
 async def setup(client: commands.Bot) -> None:
+    """
+    Adds the submitter cog to the client
+    Args:
+        client (commands.Bot): Our bot client
+    """
     await client.add_cog(contests(client))
     

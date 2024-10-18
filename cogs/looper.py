@@ -1,3 +1,10 @@
+""" 
+Handles the loops for the bot. There are no active commands. It is all automated. 
+
+Loops:
+    - Problems Loop: Sends problems to the appropriate channels at the appropriate times
+    - Update Problemset Loop: Updates the problemset every 24 hours
+"""
 import discord 
 from discord import app_commands
 from discord.ext import commands, tasks
@@ -13,8 +20,8 @@ from ui import embed_styler as es
 
 import time
 
-# ADD ANOTHER LOOPER FOR THE OFFICIAL DAILY PROBLEMS 
-
+# TODO: Add a looper for daily problems
+# TODO: Add a looper for contest alerts
 
 class looper(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -22,48 +29,78 @@ class looper(commands.Cog):
         self.loop.start()
         self.updateProblemset.start()
         
-    async def performLoop(self):
-        # dow = time.strftime('%A')
-        # hour = time.strftime('%H')
-        
-        # for testing 
-        dow = '2'
-        hour = 1
-        
+    # ############################################################
+    # Problems Loop 
+    # ############################################################
+
+    @tasks.loop(minutes = 1) # minutes = 1
+    async def loop(self) -> None:
+        """
+        The main problems loop. Runs once a minute.
+        It checks the day of the week and the hour of the day and sends problems to the appropriate channels.
+        """
+        dow = time.strftime('%A')
+        hour = time.strftime('%H')
+
         problems = lm.getAllProblems(dow, hour)
         await self.sendProblems(problems)
-        
-    @tasks.loop(minutes = 1) # minutes = 1
-    async def loop(self):
-        await self.performLoop()
 
     @loop.before_loop
-    async def before_loop(self):
+    async def before_loop(self) -> None:
+        """
+        Setup for the loop. Waits until the bot is ready before starting the loop.
+        """
         await self.client.wait_until_ready()
 
-    async def sendProblems(self, problems):
+    async def sendProblems(self, problems: list) -> None:
+        """
+        Iterates over the problems that need to be sent and sends them out
+        Args:
+            problems (list): The problems to send. Each problem is a string in the format serverID-problemNum
+        """
         for problem in problems:
-            serverID, problemNum = problem.split("-")
-            problem = pmd.getProblemsFromSettings(serverID, problemNum)
+            serverID, problemNum = problem.split("-") # serverID-problemNum
+            problem = pmd.getProblemFromSettings(serverID, problemNum) 
             channelID = ssm.getChannelToSendTo(serverID)
-            
             channel = self.client.get_channel(channelID)
             problemSlug = problem[0]
             
+            if channel is None:
+                print(f"Error: Could not find channel with ID {channelID}")
+                return
+        
+            # This try catch is here because some problems are too long to send in an embed and will throw an error
             try:
                 await channel.send(embed = es.styleProblem(pim.getProblemInfo(problemSlug), problemSlug))
             except Exception as e:
+                print(e)
                 await channel.send(embed = es.styleProblemSimple(pim.getProblemInfo(problemSlug), problemSlug))
                                 
-            apm.updateActiveProblems(serverID, problemNum, problem[0])
+            # We need to keep track of what problems are active in the server
+            apm.updateActiveProblems(serverID, problemNum, problem[0]) 
     
+    # ############################################################
+    # Update Problemset Loop
+    # ############################################################
+
     @tasks.loop(hours=24)
     async def updateProblemset(self):
+        """
+        Updates the problemset every 24 hours
+        """
         pm.scrapeAndBuild()
     
     @updateProblemset.before_loop
     async def before_updateProblemset(self):
+        """
+        Setup for the loop. Waits until the bot is ready before starting the loop.
+        """
         await self.client.wait_until_ready()
     
 async def setup(client: commands.Bot) -> None: 
+    """
+    Adds the submitter cog to the client
+    Args:
+        client (commands.Bot): Our bot client
+    """
     await client.add_cog(looper(client))

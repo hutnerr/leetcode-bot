@@ -1,9 +1,17 @@
+"""
+This is a simple helper utility for various file operations
+
+Functions:
+    fileToList(filepath: str) -> list
+"""
+
 def fileToList(filepath: str) -> list:
+    """
+    Opens a file and converts its lines into a list
+    Args:
+        filepath (str): The path to the file
+    Returns:
+        list: The lines of the file at filepath
+    """
     with open(filepath, "r") as file:
         return file.read().splitlines()
-
-def listToFile(filepath: str, data: list):
-    with open(filepath, "w") as file:
-        file.truncate(0)  # Wipe the file content
-        for line in data:
-            file.write(f"{line}\n")

@@ -46,7 +46,7 @@ def determineProblemset(premium:int) -> str:
     else:
         return ps.BOTH.value
 
-def getProblemsFromSettings(serverID, problemID):
+def getProblemFromSettings(serverID, problemID):
     problemInfo = psm.parseProblemSettings(psm.getProblem(serverID, problemID))
     problem = getProblem(determineProblemset(int(problemInfo["premium"])), problemInfo["difficulty"])
     return problem

@@ -52,4 +52,9 @@ class problems(commands.Cog):
     # PROBLEM INFO 
 
 async def setup(client: commands.Bot) -> None: 
+    """
+    Adds the submitter cog to the client
+    Args:
+        client (commands.Bot): Our bot client
+    """
     await client.add_cog(problems(client))

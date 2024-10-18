@@ -1,5 +1,25 @@
+"""
+A file that contains all the constants used in the bot
+
+Attributes:
+    ImageFolders
+    DaysOfWeek
+    Difficulty
+    Boundaries
+    DatabaseTables
+    DatabaseFields
+    Premium
+    Problemset
+    Contests
+    Query
+"""
 from enum import Enum
 
+# The names of the folders in the images director that contain other images 
+class ImageFolders(Enum):
+    THUMBS_UP = "thumbs_up"
+
+# Days of the week and their equivalent numbers
 class DaysOfWeek(Enum):
     SUNDAY = "1"
     MONDAY = "2"
@@ -9,16 +29,19 @@ class DaysOfWeek(Enum):
     FRIDAY = "6"
     SATURDAY = "7"
 
+# The difficulty and its equivalent number
 class Difficulty(Enum):
     EASY = "1"
     MEDIUM = "2"
     HARD = "3"
     RANDOM = "4"
 
+# The Min / Max problems allowed 
 class Boundaries(Enum):
     MAX_PROBLEMS = 3
     MIN_PROBLEMS = 0
 
+# The names of the database tables and their respective file name
 class DatabaseTables(Enum):
     PROBLEMS = "problems"
     USERS = "users"
@@ -26,6 +49,7 @@ class DatabaseTables(Enum):
     CONTESTS = "contests"
     ACTIVE_PROBLEMS = "active_problems"
 
+# The tuples of the database fields for each table
 class DatabaseFields(Enum):
     PROBLEMS = ("serverID", "problemNum", "dow", "hour", "difficulty", "premium")
     USERS = ("userID", "leetcodeUsername", "serverID", "weeklyOpt", "biweeklyOpt", "problemsOpt")
@@ -33,6 +57,7 @@ class DatabaseFields(Enum):
     CONTESTS = ("serverID", "15min", "30min", "1hr", "2hr30min", "6hr", "12hr", "24hr")
     ACTIVE_PROBLEMS = ("serverID", "p1", "p2", "p3")
 
+# Flags for what type of premium problems to get
 class Premium(Enum):
     FREE = 1
     PAID = 2

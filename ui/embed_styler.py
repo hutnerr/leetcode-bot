@@ -1,10 +1,25 @@
-import discord
+"""
+UI Styler for Discord Embeds
 
+Functions:
+    assignColor(difficulty: str) -> discord.Color
+    buildTimeString(timeDict:dict) -> str
+    styleProblem(problem:dict, problemSlug:str) -> str
+    styleProblemSimple(problem:dict, problemSlug:str) -> str
+    styleContest(contestInfo:dict) -> discord.Embed
+    styleActiveProblems(activeProblems:dict) -> discord.Embed
+    styleSimpleEmbed(title:str, description:str, color:discord.Color) -> discord.Embed
+"""
+import discord
 
 from managers import problem_info_manager as pim
 from managers import daily_problem_manager as dpm
 
 from tools import time_helper as th
+
+# ############################################################
+# Helper Functions
+# ############################################################
 
 # green = easy, yellow = medium, red = hard
 def assignColor(difficulty: str) -> discord.Color:
@@ -16,6 +31,32 @@ def assignColor(difficulty: str) -> discord.Color:
         return discord.Color.red()
     else:
         return discord.Color.blue()
+
+def buildTimeString(timeDict:dict) -> str:
+    timeString = ""
+    if timeDict["days"] > 0:
+        if timeDict["days"] == 1:
+            timeString += f"{timeDict['days']} day, "
+        else:
+            timeString += f"{timeDict['days']} days, "
+        
+    if timeDict["hours"] > 0:
+        if timeDict["hours"] == 1:
+            timeString += f"{timeDict['hours']} hour, "
+        else:
+            timeString += f"{timeDict['hours']} hours, "
+    
+    if timeDict["minutes"] > 0:
+        if timeDict["minutes"] == 1:
+            timeString += f"and {timeDict['minutes']} minute away"
+        else:
+            timeString += f"and {timeDict['minutes']} minutes away"
+
+    return timeString
+
+# ############################################################
+# Embed Styling Functions
+# ############################################################
 
 def styleProblem(problem:dict, problemSlug:str) -> str:
     # send a special message if the problem is premium
@@ -62,28 +103,6 @@ def styleContest(contestInfo:dict) -> discord.Embed:
     
 
     return em
-    
-def buildTimeString(timeDict:dict) -> str:
-    timeString = ""
-    if timeDict["days"] > 0:
-        if timeDict["days"] == 1:
-            timeString += f"{timeDict['days']} day, "
-        else:
-            timeString += f"{timeDict['days']} days, "
-        
-    if timeDict["hours"] > 0:
-        if timeDict["hours"] == 1:
-            timeString += f"{timeDict['hours']} hour, "
-        else:
-            timeString += f"{timeDict['hours']} hours, "
-    
-    if timeDict["minutes"] > 0:
-        if timeDict["minutes"] == 1:
-            timeString += f"and {timeDict['minutes']} minute away"
-        else:
-            timeString += f"and {timeDict['minutes']} minutes away"
-
-    return timeString
     
 def styleActiveProblems(activeProblems:dict) -> discord.Embed:
     em = discord.Embed(
