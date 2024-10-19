@@ -12,7 +12,6 @@ Functions:
     - wipeDB(table: str) -> bool:
     - contains(table: str, condition: str, params: tuple) -> bool:
 """
-
 import os
 import sqlite3
 

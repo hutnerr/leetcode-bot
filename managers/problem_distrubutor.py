@@ -7,11 +7,11 @@ Functions:
 """
 import os
 
+from managers import problem_setting_manager as psm
+
 from tools import file_helper as fh
 from tools import random_helper as rh
 from tools.consts import Difficulty as difs
-
-from managers import problem_setting_manager as psm
 
 def getProblem(file:str, dif:str) -> list:
     """

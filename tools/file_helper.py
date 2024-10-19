@@ -4,7 +4,6 @@ This is a simple helper utility for various file operations
 Functions:
     fileToList(filepath: str) -> list
 """
-
 def fileToList(filepath: str) -> list:
     """
     Opens a file and converts its lines into a list

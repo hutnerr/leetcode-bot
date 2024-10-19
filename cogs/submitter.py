@@ -10,13 +10,13 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from managers import user_setting_manager as usm
+from managers import active_problems_manager as apm
+from managers import problem_setting_manager as psm 
+from managers import daily_problem_manager as dpm
+
 from tools import image_helper as ih
 from tools.consts import ImageFolders as imgf
-
-from managers import user_activity_manager as uam
-from managers import active_problems_manager as apm
-from managers import problem_info_manager as pim
-from managers import daily_problem_manager as dpm
 
 from ui import embed_styler as es
 
@@ -47,8 +47,8 @@ class submitter(commands.Cog):
             activeProblems = apm.getAndParseActiveProblems(interaction.guild.id)
             slug = activeProblems[problem.value]
 
-        recentlySolved = uam.checkIfRecentlySolved(interaction.user.id, slug)        
-        problemInfo = pim.getProblemInfo(slug)
+        recentlySolved = usm.checkIfRecentlySolved(interaction.user.id, slug)        
+        problemInfo = psm.getProblemInfo(slug)
         
         # Eventually I want this to become a friendly comp between users
         # problem is that submissions must be unique and not repeatable so you can't get infinite points 

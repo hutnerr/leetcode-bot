@@ -2,91 +2,118 @@
 A file that contains all the constants used in the bot
 
 Attributes:
-    ImageFolders
-    Times
-    DaysOfWeek
-    Difficulty
-    Boundaries
-    DatabaseTables
-    DatabaseFields
-    Premium
-    Problemset
-    Contests
-    Query
+    URLS - The urls used in the bot
+    ImageFolders - The names of the folders in the images director that contain other images
+    Times - Relevant static times
+    Difficulty - The difficulty of the problems
+    Boundaries - Static boundaries for the bot
+    DatabaseTables - The names of the database tables
+    DatabaseFields - Tuples of the respective fields for the database tables
+    Problemset - The CSV filenames for the problemsets
+    Query - Query Strings for the leetcode graphql api
 """
 from enum import Enum
 
-# Relevant URLS
 class URLS(Enum):
+    """
+    The urls used in the bot. Has:
+    - LEETCODE_API: The graphql api for leetcode
+    - LEETCODE_PROBLEMS: The url to get all the problems from leetcode json
+    - LEETCODE_CONTESTS: The link to the contests page 
+    """
     LEETCODE_API = "https://leetcode.com/graphql"
     LEETCODE_PROBLEMS = "https://leetcode.com/api/problems/all/"
     LEETCODE_CONTESTS = "https://leetcode.com/contest/"
     
-# The names of the folders in the images director that contain other images 
 class ImageFolders(Enum):
+    """ 
+    The names of the folders in the images director that contain other images. Has:
+    - THUMBS_UP: The folder that contains the thumbs up images. e.g. "thumbs_up"
+    """
     THUMBS_UP = "thumbs_up"
 
-# The time of the day 
 class Times(Enum):
-    OFFICIAL_DAILY_RESET = "20:00" # 8 pm est
+    """ 
+    Relevant static times. Has:
+    - OFFICIAL_DAILY_RESET: The time the official daily problem resets e.g. "20:00"
+    - CONTEST_TIME_ALERTS: The times to alert for contests. e.g. ["15min", "30min", "1hour", "2hour30min", "6hour", "12hour", "24hour"]
+    """
+    OFFICIAL_DAILY_RESET = "20:00" # 8 pm est since its where im based, easier for calcs 
+    CONTEST_TIME_ALERTS = ["t15min", "t30min", "t1hour", "t2hour30min", "t6hour", "t12hour", "t24hour"]
 
-# Days of the week and their equivalent numbers
-class DaysOfWeek(Enum):
-    SUNDAY = "1"
-    MONDAY = "2"
-    TUESDAY = "3"
-    WEDNESDAY = "4"
-    THURSDAY = "5"
-    FRIDAY = "6"
-    SATURDAY = "7"
 
-# The difficulty and its equivalent number
 class Difficulty(Enum):
-    EASY = "1"
-    MEDIUM = "2"
-    HARD = "3"
-    RANDOM = "4"
+    """
+    The difficulty of the problems. Has:
+    - EASY: "Easy"
+    - MEDIUM: "Medium"
+    - Hard: "Hard"
+    - RANDOM: "Random"
+    """
+    EASY = "Easy"
+    MEDIUM = "Medium"
+    HARD = "Hard"
+    RANDOM = "Random"
 
-# The Min / Max problems allowed 
 class Boundaries(Enum):
+    """ 
+    Static boundaries for the bot. Has
+    - MAX_PROBLEMS: The max amount of problems allowed. e.g. 3
+    - MIN_PROBLEMS: The min amount of problems allowed. e.g. 0
+    """
     MAX_PROBLEMS = 3
     MIN_PROBLEMS = 0
 
-# The names of the database tables and their respective file name
 class DatabaseTables(Enum):
+    """ 
+    The names of the database tables. Has:
+    - PROBLEMS: "problems"
+    - USERS: "users"
+    - SERVERS: "servers"
+    - CONTESTS: "contests"
+    - ACTIVE_PROBLEMS: "active_problems"
+    """
     PROBLEMS = "problems"
     USERS = "users"
     SERVERS = "servers"
     CONTESTS = "contests"
     ACTIVE_PROBLEMS = "active_problems"
 
-# The tuples of the database fields for each table
 class DatabaseFields(Enum):
-    PROBLEMS = ("serverID", "problemNum", "dow", "hour", "difficulty", "premium")
+    """
+    Tuples of the respective fields for the database tables. Has:
+    - USERS: ("userID", "leetcodeUsername", "serverID", "weeklyOpt", "biweeklyOpt", "problemsOpt")
+    - SERVERS: ("serverID", "channelID", "problemsActive", "weeklyOpt", "biweeklyOpt", "officialDaily", "notifType", "timezone")
+    - PROBLEMS: ("serverID", "problemID", "dow", "hour", "difficulty", "premium")
+    - CONTESTS: ("serverID", "15min", "30min", "1hour", "2hour30min", "6hour", "12hour", "24hour")
+    - ACTIVE_PROBLEMS: ("serverID", "p1", "p2", "p3")
+    """
     USERS = ("userID", "leetcodeUsername", "serverID", "weeklyOpt", "biweeklyOpt", "problemsOpt")
-    SERVERS = ("serverID", "channelID", "problems", "weeklyContests", "biweeklyContests", "timezone")
-    CONTESTS = ("serverID", "15min", "30min", "1hr", "2hr30min", "6hr", "12hr", "24hr")
+    SERVERS = ("serverID", "channelID", "problemsActive", "weeklyOpt", "biweeklyOpt", "officialDaily", "notifType", "timezone")
+    PROBLEMS = ("serverID", "problemID", "dow", "hour", "difficulty", "premium")
+    CONTESTS = ("serverID", "t15min", "t30min", "t1hour", "t2hour30min", "t6hour", "t12hour", "t24hour")
     ACTIVE_PROBLEMS = ("serverID", "p1", "p2", "p3")
 
-# Flags for what type of premium problems to get
-class Premium(Enum):
-    FREE = 1
-    PAID = 2
-    BOTH = 3
-
-# the csv files of the related problemsets
 class Problemset(Enum):
+    """ 
+    The CSV filenames for the problemsets. Has:
+    - FREE: "free.csv"
+    - PAID: "paid.csv"
+    - BOTH: "all.csv"
+    """
     FREE = "free.csv"
     PAID = "paid.csv"
     BOTH = "all.csv"
 
-# the UTC times the contests occur
-class Contests(Enum):
-    WEEKLY = "24:00"
-    BIWEEKLY = "12:00"
-
-# query strings for the leetcode graphql api
 class Query(Enum):
+    """ 
+    Query Strings for the leetcode graphql api. Has:
+    - DAILY_PROBLEM: Retrieves info about the daily problem
+    - RECENT_SUBMISSIONS: Retrieves the recent submissions of a user
+    - USER_PROFILE: Retrieves the profile of a user
+    - QUESTION_INFO: Retrieves the info of a question
+    - UPCOMING_CONTESTS: Retrieves the upcoming contests info 
+    """
     DAILY_PROBLEM = """
     query daily {
         challenge: activeDailyCodingChallengeQuestion {

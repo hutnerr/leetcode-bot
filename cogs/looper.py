@@ -12,8 +12,8 @@ from discord.ext import commands, tasks
 from managers import loop_manager as lm
 from managers import problem_distrubutor as pmd
 from managers import server_settings_manager as ssm
-from managers import problem_info_manager as pim
-from managers import problemset_manager as pm
+from managers import problemset_builder as pm
+from managers import problem_setting_manager as psm 
 from managers import active_problems_manager as apm
 
 from ui import embed_styler as es
@@ -23,7 +23,7 @@ import time
 # TODO: Add a looper for daily problems
 # TODO: Add a looper for contest alerts
 
-class looper(commands.Cog):
+class Looper(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
         self.loop.start()
@@ -71,10 +71,10 @@ class looper(commands.Cog):
         
             # This try catch is here because some problems are too long to send in an embed and will throw an error
             try:
-                await channel.send(embed = es.styleProblem(pim.getProblemInfo(problemSlug), problemSlug))
+                await channel.send(embed = es.styleProblem(psm.getProblemInfo(problemSlug), problemSlug))
             except Exception as e:
                 print(e)
-                await channel.send(embed = es.styleProblemSimple(pim.getProblemInfo(problemSlug), problemSlug))
+                await channel.send(embed = es.styleProblemSimple(psm.getProblemInfo(problemSlug), problemSlug))
                                 
             # We need to keep track of what problems are active in the server
             apm.updateActiveProblems(serverID, problemNum, problem[0]) 
@@ -83,7 +83,7 @@ class looper(commands.Cog):
     # Update Problemset Loop
     # ############################################################
 
-    @tasks.loop(hours=24)
+    @tasks.loop(hours = 24)
     async def updateProblemset(self):
         """
         Updates the problemset every 24 hours
@@ -96,11 +96,15 @@ class looper(commands.Cog):
         Setup for the loop. Waits until the bot is ready before starting the loop.
         """
         await self.client.wait_until_ready()
-    
+
+# ############################################################
+# Setup Below
+# ############################################################
+
 async def setup(client: commands.Bot) -> None: 
     """
     Adds the submitter cog to the client
     Args:
         client (commands.Bot): Our bot client
     """
-    await client.add_cog(looper(client))
+    await client.add_cog(Looper(client))

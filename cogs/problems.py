@@ -10,7 +10,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from managers import problem_info_manager as pim
+from managers import problem_setting_manager as psm
 from managers import problem_distrubutor as pmd
 from managers import active_problems_manager as apm
 from managers import daily_problem_manager as dpm
@@ -46,7 +46,7 @@ class problems(commands.Cog):
             paid = app_commands.Choice(name = "Free", value = ps.FREE.value)
 
         problem = pmd.getProblem(paid.value, difficulty.value)
-        problemInfo = pim.getProblemInfo(problem[0])
+        problemInfo = psm.getProblemInfo(problem[0])
         try:
             await interaction.response.send_message(embed = ems.styleProblem(problemInfo))
         except Exception as e:
@@ -71,7 +71,7 @@ class problems(commands.Cog):
             interaction (discord.Interaction): The interaction that triggered this command
         """
         slug = dpm.getOfficialDailyProblemSlug()
-        info = pim.getProblemInfo(slug)
+        info = psm.getProblemInfo(slug)
         try:
             await interaction.response.send_message(embed = ems.styleProblem(info, slug))
         except Exception as e:

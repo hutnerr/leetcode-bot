@@ -6,9 +6,9 @@ Functions:
     - problemsAtTheTime(dow: str, hour: int) -> tuple
     - convertProblemRowToSendInfoList(problems: tuple) -> list
 """
-from tools import database_helper as dbh
-
 from managers import problem_setting_manager as psm
+
+from tools import database_helper as dbh
 
 def getAllProblems(dow: str, hour: int) -> list:
     """
@@ -31,7 +31,7 @@ def problemsAtTheTime(dow: str, hour: int) -> tuple:
     Returns:
         tuple: The rows that are schedules
     """
-    return dbh.getRowsWhere("problems", "dow LIKE ?", (f"%{dow}%", hour))
+    return dbh.getRowsWhere("problems", "dow LIKE ? AND hour = ?", (f"%{dow}%", hour))
 
 def convertProblemRowToSendInfoList(problems: tuple) -> list:
     """

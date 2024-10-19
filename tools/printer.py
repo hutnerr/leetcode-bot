@@ -8,6 +8,7 @@ Functions:
     - printDatabaseRows(table: str) -> None
 """
 import json
+
 from tools import database_helper as dbh
 
 def printDict(dictionary: dict) -> None:

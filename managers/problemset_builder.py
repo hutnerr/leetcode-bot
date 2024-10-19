@@ -1,3 +1,11 @@
+"""
+Handles building the problem sets from the leetcode api
+
+Functions:
+    - buildList() -> list
+    - buildCSV(problems: list) -> None
+    - scrapeAndBuild() -> None
+"""
 import requests
 import csv
 import json
@@ -61,7 +69,6 @@ def buildCSV(problems: list) -> None:
             writer = csv.writer(file)
             writer.writerow(("Slug", "Difficulty", "Paid"))
             writer.writerows(rows)
-
 
 def scrapeAndBuild() -> None:
     """

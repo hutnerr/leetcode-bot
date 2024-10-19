@@ -6,14 +6,14 @@ Functions:
     - getOfficialDailyProblemInfo() -> dict:
     - getTimeLeftUntilOfficialDailyReset() -> str:
 """
+from datetime import datetime
+
+from managers import problem_setting_manager as psm 
+
 from tools import query_helper as qh
 from tools import time_helper as th
 from tools.consts import Query as q
 from tools.consts import Times as t
-
-from managers import problem_info_manager as pim
-
-from datetime import datetime
 
 def getOfficialDailyProblemSlug() -> str:
     """
@@ -30,7 +30,7 @@ def getOfficialDailyProblemInfo() -> dict:
     Returns:
         dict: The dict of the problemInfo of the daily problem. From problem_info_manager.getProblemInfo
     """
-    return pim.getProblemInfo(getOfficialDailyProblemSlug())
+    return psm.getProblemInfo(getOfficialDailyProblemSlug())
 
 def getTimeLeftUntilOfficialDailyReset() -> str:
     """

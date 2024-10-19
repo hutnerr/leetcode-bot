@@ -28,4 +28,5 @@ By default nothing is turned on. You must use the `/settings` command to set the
 ## Future Goals
 - Add friendly server competition functionality.
   - Badges, leaderboards, etc.
+- Optional alert types and ways. 
 

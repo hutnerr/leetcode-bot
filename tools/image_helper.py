@@ -4,8 +4,9 @@ Simple utility to work with and retieve images
 Functions: 
     getRandomImage(parentFolder: str) -> str
 """
-from tools import random_helper as rh
 import os
+
+from tools import random_helper as rh
 
 def getRandomImage(parentFolder: str) -> str:
     """
