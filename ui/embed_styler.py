@@ -16,6 +16,7 @@ from managers import problem_info_manager as pim
 from managers import daily_problem_manager as dpm
 
 from tools import time_helper as th
+from tools.consts import URLS as urls
 
 # ############################################################
 # Helper Functions
@@ -121,7 +122,7 @@ def styleContest(contestInfo: dict) -> discord.Embed:
     em = discord.Embed(
         title = "LeetCode Contests",
         color = discord.Color.blue(),
-        url = "https://leetcode.com/contest/"
+        url = urls.LEETCODE_CONTESTS.value
     )
 
     biweeklyTitle, biweeklyTime = contestInfo["biweekly"]

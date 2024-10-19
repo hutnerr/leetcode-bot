@@ -6,7 +6,9 @@ Functions:
 """
 import requests
 
-URL = "https://leetcode.com/graphql"
+from tools.consts import URLS as urls
+
+URL = urls.LEETCODE_API.value
 
 def performQuery(query: str, variables: dict) -> dict:
     """

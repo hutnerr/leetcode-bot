@@ -16,6 +16,12 @@ Attributes:
 """
 from enum import Enum
 
+# Relevant URLS
+class URLS(Enum):
+    LEETCODE_API = "https://leetcode.com/graphql"
+    LEETCODE_PROBLEMS = "https://leetcode.com/api/problems/all/"
+    LEETCODE_CONTESTS = "https://leetcode.com/contest/"
+    
 # The names of the folders in the images director that contain other images 
 class ImageFolders(Enum):
     THUMBS_UP = "thumbs_up"

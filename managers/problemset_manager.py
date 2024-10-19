@@ -3,41 +3,69 @@ import csv
 import json
 import os
 
-scrapeURL = "https://leetcode.com/api/problems/all/"
+from tools.consts import URLS as urls
+from tools.consts import Problemset as ps
 
-# This method will scrape the leetcode api page and build a list of all problems.
-def buildList():
-    problemList = json.loads(requests.get(scrapeURL).content)
+def buildList() -> list:
+    """
+    This method will scrape the leetcode api page and build a list of all problems.
+    Returns:
+        list: The tuple of scraped problems in the form of a tuple where
+            - ('titleSlug', 'difficulty', paid)
+            - ('two-sum', 'Easy', False)
+    """
+    problemList = json.loads(requests.get(urls.LEETCODE_PROBLEMS.value).content)
     problems = []
-    for child in problemList["stat_status_pairs"]:                   # proper name
-        titleSlug = child["stat"]["question__title_slug"]    # for building URL
-        difficulty = child["difficulty"]["level"]                       # difficulty level. 1 = easy, 2 = medium, 3 = hard
-        paid = child["paid_only"]                                       # true if it's a premium question
-        problems.append([titleSlug, difficulty, paid])
+    for child in problemList["stat_status_pairs"]:
+        titleSlug = child["stat"]["question__title_slug"]
+        difficulty = child["difficulty"]["level"]
+        
+        if difficulty == 1:
+            difficulty = "Easy"
+        elif difficulty == 2:
+            difficulty = "Medium"
+        elif difficulty == 3:
+            difficulty = "Hard"
+        else:
+            difficulty = "Unknown"
+        
+        paid = child["paid_only"]
+        problems.append((titleSlug, difficulty, paid))
     return problems
 
 # This method will use the list of problems and build three separate CSV files with the data
-def buildCSV(problems):
+def buildCSV(problems: list) -> None:
+    """
+    Uses the list of scraped problems to build three separate CSV files with the data.
+    Args:
+        problems (list): The scraped problems list
+    """
     path = os.path.join("data", "problem_sets")
     
-    with open(os.path.join(path, "all.csv"), mode='w', newline='', encoding="utf-8") as all_file:
-        with open(os.path.join(path, "paid.csv"), mode='w', newline='', encoding="utf-8") as paid_file:
-            with open(os.path.join(path, "free.csv"), mode='w', newline='', encoding="utf-8") as free_file:
-                all_writer = csv.writer(all_file)
-                paid_writer = csv.writer(paid_file)
-                free_writer = csv.writer(free_file)
-                all_writer.writerow(("Slug", "Difficulty", "Paid"))
-                paid_writer.writerow(("Slug", "Difficulty", "Paid"))
-                free_writer.writerow(("Slug", "Difficulty", "Paid"))
-                for problem in problems:
-                    all_writer.writerow(problem)
-                    if problem[2]:  # check if the problem is paid
-                        paid_writer.writerow(problem)
-                    else:
-                        free_writer.writerow(problem)
+    # open and write to the csv files
+    files = {
+        ps.FREE.value: [],
+        ps.PAID.value: [],
+        ps.BOTH.value: []
+    }
 
-# This method will scrape the leetcode website and update a CSV file with the data
-# This is the only method i want people to be able to use from this class 
-def scrapeAndBuild():
+    for problem in problems:
+        files[ps.BOTH.value].append(problem)
+        if problem[2]:  # check if the problem is paid
+            files[ps.PAID.value].append(problem)
+        else:
+            files[ps.FREE.value].append(problem)
+
+    for filename, rows in files.items():
+        with open(os.path.join(path, filename), mode = 'w', newline = '', encoding = "utf-8") as file:
+            writer = csv.writer(file)
+            writer.writerow(("Slug", "Difficulty", "Paid"))
+            writer.writerows(rows)
+
+
+def scrapeAndBuild() -> None:
+    """
+    Gets the list of problems and then builds the CSV files.
+    """
     problems = buildList()
     buildCSV(problems)

@@ -1,10 +1,15 @@
+"""
+Managers for getting problem info from leetcode
 
-
+Functions: 
+    - buildLinkFromSlug(slug: str) -> str
+    - getProblemInfo(slug: str) -> dict
+    - getExamples(problemDescription: str) -> dict
+"""
 from tools import query_helper as qh
 from tools.consts import Query as q
 
 from bs4 import BeautifulSoup
-
 
 def buildLinkFromSlug(slug: str) -> str:
     """
@@ -65,6 +70,15 @@ def getProblemInfo(slug: str) -> dict:
     return info
 
 def getExamples(problemDescription: str) -> dict:
+    """
+    Separates the examples from the description. 
+    Args:
+        problemDescription (str): The problem description
+    Returns:
+        dict: A dictionary of examples. Contains:
+            - key (int): The example number. e.g 1
+            - value (str): The example. e.g "Example 1 Content"
+    """
     examples = {}
     
     i = 1

@@ -1,5 +1,3 @@
-from managers import problem_info_manager as pim
-from tools import printer as pr 
+from managers import problemset_manager as psm 
 
-
-pr.printDict(pim.getProblemInfo("two-sum"))
+psm.scrapeAndBuild()
