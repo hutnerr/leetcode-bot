@@ -1,0 +1,64 @@
+# ############################################################
+# name 
+# ############################################################
+
+----------------------------------
+
+Make the setup commands 
+
+Setting reset command 
+
+----------------------------------
+
+Notification System 
+- Server Settings
+    - toggleRoles(): Turns on roles
+        - on
+            - Turns on the role flag
+            - Creates a role and adds it to all opted users in the server 
+        - off 
+            - Turns off the role flag
+            - Deletes the role 
+    - getServerProdSetting(): Gets what type of alerts you want.
+    - optToggle(id, event)
+    - getOptedUsers(id): 
+- User Settings 
+    - optToggle(id, event)
+- Looper
+    - Needs to account for the prod type 
+
+
+# opt command
+# lets the user opt into / out of an event. works as a toggle. 
+# can opt into the problems or opt into the contests. 
+# output that signals the change should be ephemeral. 
+# will add / remove a role if roles are active. 
+# sends an error if server isn't setup. 
+
+
+
+Point / Competition System
+- submitter cog 
+
+-----------------------------------
+
+5. Looper Updates
+    - Contest reminders
+    - Official dailies reminders 
+    - I should be able to make my notifier general enough to handle both of these 
+
+7. UI Elements
+    - Prod Selector
+        - roles <- toggleroles. 
+        - individual @messages
+        - none
+    - Problem Config Selector 
+        - Unsure if I want to select for an individual problem or all at once. 
+        - Allows the selection of multiple values for a difficulty string. i.e. if you have dif easy and med select its 1,2
+    - Contest Alert Selector 
+        - Multiple select window
+        - First field is which contest 
+        - Select all of the possible times the server should have enabled 
+
+8. Discord Commands
+    - The Discord Commands themselves 

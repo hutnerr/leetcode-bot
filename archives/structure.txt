@@ -1,0 +1,134 @@
+------------------------------ MANAGERS ------------------------------
+More specific purposes and higher coupling. Makes usages of the tools. 
+The main functionality. Generally what is called by the discord commands. 
+
+user_setting_manager --- Working with the users database & queries
+- getUserSettings(id)           : Gets a tuple from the database using the id
+- parseUserSettings(tuple)      : Converts a row from the db into a dict 
+- getAndParseUserSettings(id)   : Combines the two functions above
+- getUsernameFromID(id)         : Returns the leetcodeUsername
+- optToggle(id, event)          : For the notif system, toggles the opt flags by event 
+- addNewUser(uid, lcuser, sid)  : Adds a new user w/ some defaults 
+- removeUser(id)                : Removes a user 
+- userExists(id)                : True if the user exists in the db 
+- changeLeetcodeUsername(id, user) : Changes the users lc username 
+- getRecentProblemsSolved(lcuser)  : Get the 5 more recent problems solved 
+- checkIfRecentlySolved(uid, slug) : Check if a user has solved the slug prob 
+
+server_settings_manager --- Working with the servers database & queries
+- getServerSettings(id)         : Gets a tuple from the database using the id
+- parseServerSettings(tuple)    : Converts a row from the db into a dict 
+- getAndParseServerSettings(id) : Combines the two functions above
+- getChannelToSendTo(id)        : Retrieves the output channel for server
+- optToggle(id, event)          : What events should be sent 
+- getOptedUsers(id)             : For notif system. Return a dict of the opted users by event 
+- updateServer(sid, col, val)   : Updates the server col with val 
+- serverExists(sid)             : Checks if the server exists within the db 
+
+problem_settings_manager --- Working with the problems database & queries
+- getProblemCount(sid)          : Gets the number of problems a server has set
+- increaseProblemCount(sid)     : Increases the prob count 
+- decreaseProblemCount(sid)     : Decreases the prob count
+- getProblem(sid, pid)          : Get the corresponding problem from db
+- parseProblemSettings(tuple)   : Parse a db row into a dict
+- getAndParseProblem(sid, pid)  : Combines two above 
+- getProblems(sid)              : Get all problems from the database 
+- buildLinkFromSlug(slug)       : Builds a URL from a slug
+- getProblemInfo(slug)          : Performs a query to get problem info. Ret a dict 
+- getExamples(probDesc)         : Used by above, populates a dict field 
+- removeProblem(sid, pid)       : Removes a problem from the database
+- updateProblem(sid, pid, col, val)           : Updates a problem 
+- addProblem(sid, pid, dow, hr, dif, premium) : Add a problem to the server
+
+contests_manager --- Working with the contests database and queries
+- getContestInfo()              : Does a query to get the contest info 
+- parseContestInfo(json)        : Takes the query result and turns it into a dict
+- getAndParseContestInfo()      : Combines the two above 
+- getServersForContestTime(col) : Gets a list of the servers that want the Alert
+
+active_problems_manager --- Working with the active problems database 
+- getActiveProblems(sid)        : Gets the active problems for this server from the db 
+- parseActiveProblems(tuple)    : Converts the row into a dict
+- getAndParseActiveProblems     : Combines the two above 
+- updateActiveProblems(sid, pid, slug) : Updates the active problem with this id to slug 
+
+daily_problem_manager --- Working with the official leetcode daily problem
+- getOfficialDailyProblemInfo() : Gets the info dict of the daily problem
+- getOfficialDailyProblemSlug() : Performs a query to get the slug of the daily 
+- getTimeLeftUntilOfficialDailyReset() : Calculates how much time is left until the daily resets 
+
+loop_manager --- Functions that are used in the looper 
+- problemsAtTheTime(dow, hour)           : Gets problems that fit dow and hour 
+- convertProblemRowToSendInfoList(tuple) : Converts tuple to list where its serverid-problemid 
+- getAllProblems(dow, hour)              : Combines the two above and returns problems we need to retrieve 
+
+problem_distributor --- Distrubutes / Finds the problems to send 
+- getProblem(problemsetfilename, csvdifstring) : Gets the problem acc to params
+- getProblemFromSettings(sid, pid)             : Uses the database to retrieve a prob
+
+problemset_builder --- Working with scraping and making the problemset csvs 
+- buildList()                   : Scrapes the JSON page and makes a problemList
+- buildCSV(list)                : Converts the list from above into the csv files
+- scrapeAndBuild()              : Combines the two functions above 
+
+
+------------------------------  TOOLS   ------------------------------
+Tools are general purpose with low coupling that allows me to 
+use them for a large variety of purposes, at least generally. 
+
+consts --- Enums for variable names 
+- URLS           : URLS used within the bot
+- ImageFolders   : Folders that contain images in the images/ director 
+- Times          : Relevant static times 
+- Difficulty     : Difficulty strings 
+- Boundaries     : Set boundary values 
+- DatabaseTables : The table names 
+- DatabaseFields : Tuples of the fields in the tables 
+- Problemset     : The CSV file names of the problemsets 
+- Query          : The query strings 
+
+database_helper --- Working with the databases
+- connectDB(table)                  : Use SQLite3 to connect to the table  
+- addRow(table, cols, vals)         : Add a row to a table  
+- updateRow(table, col, val, cond)  : Updates a col in a table under a condition
+- removeRow(table, cond, params)    : Removes a row under conditions 
+- getRow(table, cond, params)       : Get an individual row under a cond 
+- getRowsWhere(table, cond, params) : Get multiple rows under a condition
+- getRows(table)                    : Get all rows of a table 
+- wipeDB(table)                     : Wipe all values from a table 
+- contains(table, cond, params)     : Check if a table contains a value 
+
+query_helper --- Working with the API and quiries 
+- performQuery(querystring, variables) : Performs a query
+
+time_helper --- Working with time
+- timeDifference(then, now) : Calculates the dif between then and now
+- distanceAway(then)        : Calculates the distance away from now
+- fromTimestamp(timestamp)  : Converts a POSTIX timestamp to a datetime 
+- getCurrentTime()          : Gets the current time object
+- timedeltaToDict(datetime) : Converts a datetime object to a dictionary 
+
+random_helper --- Working with random values 
+- getRandom(list)           : Gets a random item from the list provided
+- getRange(start, end)      : Gets a random number from the provided range 
+
+printer --- Print functions for debugging 
+- printDict(dict)           : Prints a dict in a readable format
+- printList(list)           : Iterates over and prints a list
+- printJSON(dict)           : Prints a JSON file out. Typically gotten from a query
+- printDatabaseRows(table)  : Prints out all rows of a database. Use the consts
+
+file_helper --- Working with txt / csv files 
+- fileToList(filepath)      : Reads the lines of a file and converts to a list 
+
+image_helper --- Working with images 
+- getRandomImage(parentFolder)  : Gets a random image from the parent folder
+
+
+------------------------------   COGS   ------------------------------
+
+
+
+
+------------------------------    UI    ------------------------------
+

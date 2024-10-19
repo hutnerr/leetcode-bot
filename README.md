@@ -8,6 +8,8 @@ By default nothing is turned on. You must use the `/settings` command to set the
 [Invite Link]()
 
 ## Commands
+Note: These are not set in stone will change during development. 
+
 **Main Commands**
 - `/p <dif> <premium>` - Posts a problem for users to solve.
 

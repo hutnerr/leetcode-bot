@@ -15,10 +15,12 @@ class Client(commands.Bot):
         super().__init__(command_prefix = commands.when_mentioned_or("/"), intents = intents)
         
         self.cogslist = [
-            "cogs.problems",
-            "cogs.submitter",
-            "cogs.looper",
-            "cogs.contests",
+            # "cogs.problems",
+            # "cogs.submitter",
+            # "cogs.looper",
+            # "cogs.contests",
+            # "cogs.user_settings",
+            "cogs.server_settings",
         ]
 
     async def setup_hook(self) -> None:

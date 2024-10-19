@@ -82,13 +82,13 @@ class DatabaseTables(Enum):
 class DatabaseFields(Enum):
     """
     Tuples of the respective fields for the database tables. Has:
-    - USERS: ("userID", "leetcodeUsername", "serverID", "weeklyOpt", "biweeklyOpt", "problemsOpt")
+    - USERS: ("userID", "leetcodeUsername", "serverID", "weeklyOpt", "biweeklyOpt", "problemsOpt", "officialDailyOpt")
     - SERVERS: ("serverID", "channelID", "problemsActive", "weeklyOpt", "biweeklyOpt", "officialDaily", "notifType", "timezone")
     - PROBLEMS: ("serverID", "problemID", "dow", "hour", "difficulty", "premium")
-    - CONTESTS: ("serverID", "15min", "30min", "1hour", "2hour30min", "6hour", "12hour", "24hour")
+    - CONTESTS: ("serverID", "t15min", "t30min", "t1hour", "t2hour30min", "t6hour", "t12hour", "t24hour")
     - ACTIVE_PROBLEMS: ("serverID", "p1", "p2", "p3")
     """
-    USERS = ("userID", "leetcodeUsername", "serverID", "weeklyOpt", "biweeklyOpt", "problemsOpt")
+    USERS = ("userID", "leetcodeUsername", "serverID", "weeklyOpt", "biweeklyOpt", "problemsOpt", "officialDailyOpt")
     SERVERS = ("serverID", "channelID", "problemsActive", "weeklyOpt", "biweeklyOpt", "officialDaily", "notifType", "timezone")
     PROBLEMS = ("serverID", "problemID", "dow", "hour", "difficulty", "premium")
     CONTESTS = ("serverID", "t15min", "t30min", "t1hour", "t2hour30min", "t6hour", "t12hour", "t24hour")

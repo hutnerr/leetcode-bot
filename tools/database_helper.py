@@ -41,9 +41,9 @@ def addRow(table: str, columns: tuple, values: tuple) -> bool:
     """
     try:
         conn, cursor = connectDB(table)
-        query = f"INSERT INTO {table} {columns} VALUES ?"
-        cursor.execute(query, values)
-        # cursor.execute(f"INSERT INTO {table} {columns} VALUES {values}")
+        # query = f"INSERT INTO {table} {columns} VALUES ?"
+        # cursor.execute(query, values)
+        cursor.execute(f"INSERT INTO {table} {columns} VALUES {values}")
         conn.commit()
         conn.close()
         return True

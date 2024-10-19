@@ -102,19 +102,20 @@ def optToggle(userID: int, event: str) -> None:
     dbh.updateRow(dbt.USERS.value, column, not getAndParseUserSettings(userID)[column], f"userID = {userID}")
 
 
-def addNewUser(userID: int, leetcodeUsername: str, serverID: int) -> None:
+def addNewUser(userID: int, leetcodeUsername: str, serverID: int) -> bool:
     """
     Adds a new user to the database
     Args:
         userID (int): The Discord ID of the user
         leetcodeUsername (str): The LeetCode username of the user
         serverID (int): The Discord ID of the server the user is in
+    Returns:
+        bool: True if the user was added, False if failed 
     """
     if not userExists(userID):
         # Default state is only opted into server problems, not contests 
-        dbh.addRow(dbt.USERS.value, dbf.USERS.value, (userID, leetcodeUsername, serverID, False, False, True))
-    else:
-        print("User already exists")
+        return dbh.addRow(dbt.USERS.value, dbf.USERS.value, (userID, leetcodeUsername, serverID, False, False, True, False))
+    return False 
 
 def removeUser(userID: int) -> None:
     """
@@ -127,17 +128,18 @@ def removeUser(userID: int) -> None:
     else:
         print("User does not exist")
 
-def changeLeetcodeUsername(userID: int, leetcodeUsername: str) -> None:
+def changeLeetcodeUsername(userID: int, leetcodeUsername: str) -> bool:
     """
     Updates the users LeetCode username 
     Args:
         userID (int): The Discord ID of the user
         leetcodeUsername (str): The new LeetCode username of the user
+    Returns:
+        bool: True if the username was updated, False if failed
     """
     if userExists(userID):
-        dbh.updateRow(dbt.USERS.value, "leetcodeUsername", leetcodeUsername, f"userID = {userID}")
-    else:
-        print("User does not exist")
+        return dbh.updateRow(dbt.USERS.value, "leetcodeUsername", leetcodeUsername, f"userID = {userID}")
+    return False
 
 def userExists(userID: int) -> bool:
     """

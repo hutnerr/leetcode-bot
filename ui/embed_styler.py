@@ -12,7 +12,7 @@ Functions:
 """
 import discord
 
-from managers import problem_info_manager as pim
+from managers import problem_setting_manager as psm 
 from managers import daily_problem_manager as dpm
 
 from tools import time_helper as th
@@ -85,7 +85,7 @@ def styleProblem(problemInfo: dict) -> discord.Embed:
     em = discord.Embed(
         title = f"{problemInfo['id']} - {problemInfo['title']}",
         color = assignColor(problemInfo["difficulty"]),
-        url = pim.buildLinkFromSlug(problemInfo["slug"])
+        url = psm.buildLinkFromSlug(problemInfo["slug"])
     )
     em.add_field(name = "Description", value = problemInfo["description"], inline = False)
 
@@ -105,7 +105,7 @@ def styleProblemSimple(problemInfo: dict) -> discord.Embed:
     em = discord.Embed(
         title = f"{problemInfo['id']} - {problemInfo['title']}",
         color = assignColor(problemInfo["difficulty"]),
-        url = pim.buildLinkFromSlug(problemInfo["slug"])
+        url = psm.buildLinkFromSlug(problemInfo["slug"])
     )
     em.add_field(name = "", value = "Error sending full problem description. Please visit link.\nEmbed size exceeded.", inline = False)
     
@@ -152,7 +152,7 @@ def styleActiveProblems(activeProblems: dict) -> discord.Embed:
     em.add_field(name = "Official Daily", value = f'[{officialDaily["title"]}]({officialDaily["url"]})', inline = False)
     
     for problem in activeProblems:
-        problemInfo = pim.getProblemInfo(activeProblems[problem])
+        problemInfo = psm.getProblemInfo(activeProblems[problem])
         em.add_field(name = f'Problem {problem.replace("p", "")}', value = f'[{problemInfo["title"]}]({problemInfo["url"]})', inline = False)
     
     return em

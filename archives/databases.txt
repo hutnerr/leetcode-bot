@@ -1,0 +1,43 @@
+Users
+    - userID           : int   : The ID of the user these settins pertain to 
+    - leetcodeUsername : str   : The LeetCode username for this user
+    - serverID         : int   : The server ID that this user is apart of
+    - weeklyOpt        : bool  : Alerts for weekly contests
+    - biweeklyOpt      : bool  : Alerts for biweekly contests
+    - problemsOpt      : bool  : Alerts for server problems 
+    - officialDailyOpt : bool  : Alerts for the official dailies 
+
+Servers 
+    - serverID       : int   : The ID of this discord server
+    - channelID      : int   : The ID of the output channel desired 
+    - problemsActive : int   : The number of problems setup (1 - 3)
+    - weekylyOpt     : bool  : Bool flag is they want weekly contest notifs 
+    - biweeklyOpt    : bool  : Bool flag if they want biweekly contest notifs
+    - officialDaily  : bool  : Bool flag if they want notifs for the official daily
+    - notifType      : str   : How the server would like its alerts (@everyone, @role, none)
+    - timezone       : str   : The timezone of the server
+
+Problems
+    - serverID   : int   : The ID of the discord server this goes to 
+    - problemID  : int   : The ID of this problem for the sever. 1 - 3
+    - dow        : str   : String of CSV possible days of week e.g. "Monday,Friday,Tuesday"
+    - hour       : int   : The set hour each day the problem should post. 0 - 23
+    - difficulty : str   : String of CSV possible difs e.g. "Easy,Medium"
+    - premium    : str   : "Free", "Paid", or "Both"
+
+Contests
+    - serverID   : int   : The ID of the discord server 
+    - t15min      : bool  : T/F for 15 min notifications
+    - t30min      : bool  : T/F for 30 min notifications
+    - t1hour      : bool  : T/F for 1 hour notifications
+    - t2hour30min : bool  : T/F for 2 hour and 30 min notifications
+    - t6hour      : bool  : T/F for 6 hour notifications
+    - t12hour     : bool  : T/F for 12 hour notifications
+    - t24hour     : bool  : T/F for 24 hour notifications
+
+Active Problems
+    - serverID  : int   : The ID of the discord server
+    - p1        : str   : The slug of problem 1
+    - p2        : str   : The slug of problem 2
+    - p3        : str   : The slug of problem 3
+

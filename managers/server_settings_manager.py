@@ -13,6 +13,7 @@ from managers import user_setting_manager as usm
 
 from tools import database_helper as dbh
 from tools.consts import DatabaseTables as dbt
+from tools.consts import DatabaseFields as dbf
 
 def getAndParseServerSettings(serverID: int) -> dict:
     """
@@ -80,7 +81,6 @@ def getChannelToSendTo(serverID: int) -> int:
     serverRow = dbh.getRow(dbt.SERVERS.value, "serverID = ?", (serverID,))
     return parseServerSettings(serverRow)["channelID"]
 
-# TODO: For the notification settings 
 def optToggle(serverID: int, opt: str) -> None:
     """
     The User ID to toggle the contest status
@@ -138,11 +138,40 @@ def getOptedUsers(serverID: int) -> dict:
             
     return optedUsers
 
-def addNewServer(serverID: int, channelID: int, timezone: str) -> None:
+def addNewServer(serverID: int, channelID: int, timezone: str) -> bool:
     """
     Adds a new server to the database
     Args:
         serverID (int): The server ID
         channelID (int): The channel ID to send output to
         timezone (str): The timezone of the server
+    Returns:
+        bool: True if the server was added, False if not
     """
+    if not serverExists(serverID):
+        return dbh.addRow(dbt.SERVERS.value, dbf.SERVERS.value, (serverID, channelID, 0, 0, 0, 0, "simple", timezone))
+    return False
+        
+def serverExists(serverID: int) -> bool:
+    """
+    Checks if a server exists in the database
+    Args:
+        serverID (int): The server ID
+    Returns:
+        bool: True if the server exists, False if not
+    """
+    return dbh.contains(dbt.SERVERS.value, "serverID = ?", (serverID,))
+    
+def updateServer(serverID: int, column: str, value: any) -> bool:
+    """
+    Updates the server in the database
+    Args:
+        serverID (int): The server ID
+        channelID (int): The channel ID to send output to
+        timezone (str): The timezone of the server
+    Returns:
+        bool: True if the server was added, False if not
+    """
+    if serverExists(serverID):
+        return dbh.updateRow(dbt.SERVERS.value, column, value, f"serverID = {serverID}")
+    return False
