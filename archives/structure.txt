@@ -16,6 +16,7 @@ user_setting_manager --- Working with the users database & queries
 - checkIfRecentlySolved(uid, slug) : Check if a user has solved the slug prob 
 
 server_settings_manager --- Working with the servers database & queries
+- resetServer(id)               : Removes a server from existence 
 - getServerSettings(id)         : Gets a tuple from the database using the id
 - parseServerSettings(tuple)    : Converts a row from the db into a dict 
 - getAndParseServerSettings(id) : Combines the two functions above

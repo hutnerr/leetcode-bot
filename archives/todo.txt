@@ -5,7 +5,6 @@
 ----------------------------------
 
 Make the setup commands 
-
 Setting reset command 
 
 ----------------------------------
@@ -27,15 +26,12 @@ Notification System
 - Looper
     - Needs to account for the prod type 
 
-
 # opt command
 # lets the user opt into / out of an event. works as a toggle. 
 # can opt into the problems or opt into the contests. 
 # output that signals the change should be ephemeral. 
 # will add / remove a role if roles are active. 
 # sends an error if server isn't setup. 
-
-
 
 Point / Competition System
 - submitter cog 
@@ -62,3 +58,10 @@ Point / Competition System
 
 8. Discord Commands
     - The Discord Commands themselves 
+
+
+I want to redesign the active problems and not increment when they're made
+but I instead want problems to be toggleable, therefore ill have to add a boolean on/off to the problems table 
+and track when a problem is on or off to decide to send it.
+
+I NEED MORE ERROR CHECKING AND HANDLING IN ALL THE CODE!!!!!!!!!!

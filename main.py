@@ -1,33 +1,36 @@
-import sqlite3
+from managers import server_settings_manager as ssm
+from managers import problem_setting_manager as psm
+from tools import printer as pr
 
-""" 
-Users
-    - userID           : int   : The ID of the user these settins pertain to 
-    - leetcodeUsername : str   : The LeetCode username for this user
-    - serverID         : int   : The server ID that this user is apart of
-    - weeklyOpt        : bool  : Alerts for weekly contests
-    - biweeklyOpt      : bool  : Alerts for biweekly contests
-    - problemsOpt      : bool  : Alerts for server problems 
-    - officialDailyOpt : bool  : Alerts for the official dailies 
-"""
+ssm.resetServer(1234567890)
 
-# Connect to SQLite database (or create it if it doesn't exist)
-conn = sqlite3.connect('data/databases/users.db')
-cursor = conn.cursor()
+# shouldnt exist
+print(ssm.serverExists(1234567890))
 
-# Create Users table
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS users (
-    userID INTEGER PRIMARY KEY,
-    leetcodeUsername TEXT NOT NULL,
-    serverID INTEGER NOT NULL,
-    weeklyOpt BOOLEAN NOT NULL,
-    biweeklyOpt BOOLEAN NOT NULL,
-    problemsOpt BOOLEAN NOT NULL,
-    officialDailyOpt BOOLEAN NOT NULL
-)
-''')
+# try and add 
+ssm.addNewServer(1234567890, 123, "UTC")
 
-# Commit the changes and close the connection
-conn.commit()
-conn.close()
+# should exist
+print(ssm.serverExists(1234567890))
+
+# add problems 
+psm.addProblem(1234567890, 1, "Mon", 12, "Easy", "Free")
+psm.addProblem(1234567890, 2, "Tue", 12, "Easy", "Free")
+psm.addProblem(1234567890, 3, "Wed", 12, "Easy", "Free")
+
+# print out the default settings 
+pr.printDict(ssm.getAndParseServerSettings(1234567890))
+for p in psm.getAndParseAllProblems(1234567890):
+    pr.printDict(p)
+
+# delete all traces of server 
+ssm.resetServer(1234567890)
+
+# prove the server is gone 
+print(ssm.serverExists(1234567890))
+
+# prove it all got deleted 
+pr.printDict(ssm.getAndParseServerSettings(1234567890))
+
+for p in psm.getAndParseAllProblems(1234567890):
+    pr.printDict(p)

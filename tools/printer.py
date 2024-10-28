@@ -17,6 +17,10 @@ def printDict(dictionary: dict) -> None:
     Args:
         dictionary (dict): The dict to print
     """
+    if dictionary is None:
+        print("Dict is None")
+        return
+
     print('{')
     for key, value in dictionary.items():
         print("\t" + key, ":", value)

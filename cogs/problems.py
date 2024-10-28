@@ -78,7 +78,6 @@ class problems(commands.Cog):
             print(e)
             await interaction.response.send_message(embed = ems.styleProblemSimple(info, slug))
 
-    # TODO: PROBLEM INFO 
 
 async def setup(client: commands.Bot) -> None: 
     """

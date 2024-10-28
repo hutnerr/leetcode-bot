@@ -41,7 +41,7 @@ def getProblemCount(serverID: int) -> int:
     """
     serverRow = dbh.getRow(dbt.SERVERS.value, "serverID = ?", (serverID,))
     settings = ssm.parseServerSettings(serverRow)
-    return settings['problems']
+    return settings['problemsActive']
 
 def increaseProblemCount(serverID: int) -> bool:
     """
@@ -57,8 +57,7 @@ def increaseProblemCount(serverID: int) -> bool:
         print("Error: Problem count is already at maximum")
         return False
     else:
-        dbh.updateRow("servers", "problems", problemCount + 1, f"serverID = {serverID}")
-        return True
+        return dbh.updateRow("servers", "problemsActive", problemCount + 1, f"serverID = {serverID}")
     
 def decreaseProblemCount(serverID: int) -> bool:
     """
@@ -74,8 +73,7 @@ def decreaseProblemCount(serverID: int) -> bool:
         print("Error: Problem count is already at minimum")
         return False
     else:
-        dbh.updateRow(dbt.SERVERS.value, "problems", problemCount - 1, f"serverID = {serverID}")
-        return True
+        return dbh.updateRow(dbt.SERVERS.value, "problems", problemCount - 1, f"serverID = {serverID}")
         
 # ############################################################
 # Adding, Removing, & Updating Problems
@@ -95,9 +93,8 @@ def addProblem(serverID: int, problemID: int, dow: str, hour: int, difficulty: s
         bool: True if the problem was successfully added, False otherwise
     """
     # if we dont have and we we're not at max, then we can add
-    if not dbh.contains(dbt.PROBLEMS.value, "serverID = ? and problemNum = ?") and increaseProblemCount(serverID):
-        dbh.addRow(dbt.PROBLEMS.value, (dbf.PROBLEMS.value), (serverID, problemID, dow, hour, difficulty, premium))
-        return True
+    if not dbh.contains(dbt.PROBLEMS.value, "serverID = ? and problemID = ?", (serverID, problemID)) and increaseProblemCount(serverID):
+        return dbh.addRow(dbt.PROBLEMS.value, (dbf.PROBLEMS.value), (serverID, problemID, dow, hour, difficulty, premium))
     return False
 
 def removeProblem(serverID: int, problemID: int) -> bool:
@@ -111,8 +108,7 @@ def removeProblem(serverID: int, problemID: int) -> bool:
     """
     # if we have the row and not at min, then remove
     if dbh.contains(dbt.PROBLEMS.value, "serverID = ? and problemNum = ?", (serverID, problemID)) and decreaseProblemCount(serverID):
-        dbh.removeRow(dbt.PROBLEMS.value, "serverID = ? AND problemNum = ?", (serverID, problemID))
-        return True
+        return dbh.removeRow(dbt.PROBLEMS.value, "serverID = ? AND problemNum = ?", (serverID, problemID))
     return False
 
 def updateProblem(serverID: int, problemID: int, column: str, value: any) -> bool:
@@ -128,8 +124,7 @@ def updateProblem(serverID: int, problemID: int, column: str, value: any) -> boo
     """
     # if it exists we can update
     if dbh.contains(dbt.PROBLEMS.value, "serverID = ? and problemNum = ?", (serverID, problemID)):
-        dbh.updateRow(dbt.PROBLEMS.value, column, value, f"serverID = {serverID} AND problemNum = {problemID}")
-        return True
+        return dbh.updateRow(dbt.PROBLEMS.value, column, value, f"serverID = {serverID} AND problemNum = {problemID}")
     return False
 
 # ############################################################
@@ -171,6 +166,9 @@ def parseProblemSettings(problemRow: tuple) -> dict:
             - difficulty (str): The difficulty string of the problem e.g. "Easy,Medium"
             - premium (str): The dataset we want to use. e.g. "Free" or "Paid" or "Both"
     """
+    if problemRow is None:
+        return None
+
     settings = {
         "serverID" : problemRow[0],
         "problemNum" : problemRow[1],
@@ -199,6 +197,22 @@ def getAndParseProblem(serverID: int, problemID: int) -> dict:
     problem = getProblem(serverID, problemID)
     return parseProblemSettings(problem)
 
+def getAndParseAllProblems(serverID: int) -> list:
+    """
+    Gets and parses all the problems for a server
+    Args:
+        serverID (int): The Discord ID of the server we're getting the problems from
+    Returns:
+        list: The settings of the problems. Contains:
+            - serverID (int): The Discord ID of the server
+            - problemNum (int): The Problem ID
+            - dow (str): The dow string the problem is available e.g. "Monday,Wednesday,Friday"
+            - hour (int): The hour the problem is available e.g. 0 - 23
+            - difficulty (str): The difficulty string of the problem e.g. "Easy,Medium"
+            - premium (str): The dataset we want to use. e.g. "Free" or "Paid" or "Both"
+    """
+    problems = getProblems(serverID)
+    return [parseProblemSettings(problem) for problem in problems]
 
 def buildLinkFromSlug(slug: str) -> str:
     """

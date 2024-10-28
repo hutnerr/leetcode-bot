@@ -16,7 +16,7 @@ class Client(commands.Bot):
         
         self.cogslist = [
             # "cogs.problems",
-            # "cogs.submitter",
+            # "cogs.submitter", # TODO: Add this back when I finish the working version 
             # "cogs.looper",
             # "cogs.contests",
             # "cogs.user_settings",

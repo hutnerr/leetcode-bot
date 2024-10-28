@@ -73,6 +73,8 @@ def updateRow(table: str, column: str, value: str, condition: str) -> bool:
         print(e)
         return False
 
+# TODO: This also removes all rows with the same value.
+# rename and then update where its used 
 def removeRow(table: str, condition: str, params: tuple) -> bool:
     """
     Removes an individual row from a table in the database

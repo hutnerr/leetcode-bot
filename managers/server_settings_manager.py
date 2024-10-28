@@ -2,6 +2,7 @@
 This module contains functions to get and parse server settings from the database.
 
 Functions:
+    - resetServer(serverID: int) -> None
     - getAndParseServerSettings(serverID: int) -> dict
     - getServerSettings(serverID: int) -> tuple
     - parseServerSettings(serverRow: tuple) -> dict
@@ -14,6 +15,21 @@ from managers import user_setting_manager as usm
 from tools import database_helper as dbh
 from tools.consts import DatabaseTables as dbt
 from tools.consts import DatabaseFields as dbf
+
+def resetServer(serverID: int) -> None:
+    """
+    Removes any trace of the server
+    Args:
+        serverID (int): The server to reset
+    """
+
+    params = (serverID,)
+
+    dbh.removeRow(dbt.SERVERS.value, "serverID = ?", params)
+    dbh.removeRow(dbt.USERS.value, "serverID = ?", params)
+    dbh.removeRow(dbt.PROBLEMS.value, "serverID = ?", params)
+    dbh.removeRow(dbt.ACTIVE_PROBLEMS.value, "serverID = ?", params)
+    dbh.removeRow(dbt.CONTESTS.value, "serverID = ?", params)
 
 def getAndParseServerSettings(serverID: int) -> dict:
     """
@@ -59,6 +75,9 @@ def parseServerSettings(serverRow: tuple) -> dict:
             - notifType (str): The type of notification to send.
             - timezone (str): The server's timezone (e.g., "UTC", "PST").
     """
+    if serverRow is None:
+        return None
+    
     serverSettings = {
         "serverID" : serverRow[0],
         "channelID" : serverRow[1],

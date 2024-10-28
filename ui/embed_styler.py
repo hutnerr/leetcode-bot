@@ -173,3 +173,25 @@ def styleSimpleEmbed(title:str, description:str, color:discord.Color) -> discord
         color = color
     )
     return em
+
+def styleServerInfoEmbed(client: discord.Client, settings: dict) -> discord.Embed:
+    """
+    Styles the server settings into an embed for Discord. 
+    Args:
+        client (discord.Client): The client object
+        settings (dict): The server settings dictionary from server_setting_manager.getAndParseServerSettings()
+    Returns:
+        discord.Embed: The styled embed for the server settings
+    """
+    server = discord.utils.get(client.guilds, id = settings["serverID"])
+    outputchannel = discord.utils.get(server.channels, id = settings["channelID"])
+
+    em = discord.Embed(
+        title = "Server Settings for " + server.name,
+        color = discord.Color.blurple()
+    )
+
+    em.add_field(name = "Output Channel", value = f'`{outputchannel.name}`', inline = False)
+    em.add_field(name = "Timezone", value = f'`{settings["timezone"]}`', inline = False)
+    em.add_field(name = "Active Problems", value = f'`{settings["problemsActive"]}/3`', inline = False)
+    return em
