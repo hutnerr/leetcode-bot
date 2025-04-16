@@ -18,6 +18,8 @@ psm.addProblem(1234567890, 1, "Mon", 12, "Easy", "Free")
 psm.addProblem(1234567890, 2, "Tue", 12, "Easy", "Free")
 psm.addProblem(1234567890, 3, "Wed", 12, "Easy", "Free")
 
+# do it work?
+
 # print out the default settings 
 pr.printDict(ssm.getAndParseServerSettings(1234567890))
 for p in psm.getAndParseAllProblems(1234567890):
