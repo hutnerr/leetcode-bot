@@ -1,0 +1,18 @@
+Features I Want
+1. 5 customizable problems that can be set
+    - store serverID, problemID, dow, hour, interval, variable difficulty
+    - multiple days of the week
+    - one set time (I.E. 6:15am)
+    - variable difficulty (easy,med,hard)
+    - include premium problems
+2. Customizable server settings
+    - Store serverID, channelID, timezone, etc
+    - The channel to output to
+    - Server participate in the "official" LC daily?
+    - Allow duplicate problems?
+    - Allow SQL / JS / etc problems?
+3. Customizable user settings
+    - Leetcode User name
+4. Points system when users /submit
+    - store "active" problems within a server
+    - allow users to /submit
