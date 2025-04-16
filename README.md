@@ -1,3 +1,5 @@
+# Currently Going Through an Entire Rewrite!
+
 ## Overview
 The purpose of this bot is to encourage and enable LeetCoding within a Discord server. It achieves through the use of personalized server daily problems. Meaning that the server can select a set difficulty, the time it will be posted, if premium problems are included, and more. 
 

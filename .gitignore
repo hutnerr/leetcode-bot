@@ -1,3 +1,6 @@
 key.json
 data/
-archives/links.txt
+archives/notes/links.txt
+archives/data/
+*.pyc
+__pycache__/

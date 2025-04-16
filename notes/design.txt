@@ -1,0 +1,20 @@
+observer that uses the buckets to get the serverID and the problem, then it goes to the server and handles the problem
+i dont think ill have to store the problem both places, the buckets should be used to determine which server and which id to handles
+server should have a handleProblem function which the observer calls
+
+contest observer method as well. if a server wants contest alerts then it stores the ones that do and sends contest alerts 
+
+
+1. loop that checks time
+2. on 15 min intervals, use the buckets to get the problems on that interval 
+3. the bucket stores (serverid::problemid)
+4. split this to get the serverid and the problemid separately 
+5. use our dict of servers and the server id to get the server object. 
+6. call the servers handleProblem method and pass it the problemid
+7. this is where the problem should be handeled and sent to the server
+
+
+1. loop that checks on contest times
+2. loop will get servers that want notifications using contest_buckets
+3. these will store the servers that want notifs at each time interval 
+4. overall this will act in a similar way to the problem buckets and observer 
