@@ -37,7 +37,7 @@ class Server:
     
     def handleProblem(self, problemID:int):
         # this is the main call that "handles" using the observer pattern
-        pass
+        print(f"Server {self.serverID} is handling problem {problemID}: {self.problems[problemID]}")
     
     def handleContestAlert(self, timeAway:str):
         # this sends a message to the server telling them how far away the 

@@ -60,10 +60,18 @@ for r in read:
     parent = servers[prob.serverID].addProblem(prob)
     bucket.addProblem(prob)
 
-# bucket.printBucketClean()
-print(servers)
+# at this point, our structures should be setup
+# time to test the buckets 
 
-for serverID in servers:
-    server = servers[serverID]
-    print(server.problems, end = "\n")
-    print("------------------------------")
+# test the problems in bucket for 5:30
+HOUR = 5
+INTERVAL = 2
+
+# THIS ALMOST WORKS
+# there is a server 2 problem which is at hour 12, interval 3
+# so idk why its showing here
+
+for problem in bucket.getProblems(HOUR, INTERVAL):
+    serverid, problemid = map(int, problem.split("::"))
+    servers[serverid].handleProblem(problemid)
+    
