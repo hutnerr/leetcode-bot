@@ -4,3 +4,10 @@
 - Redesigned with an Object Oriented Approach
 - Load into memory on startup, don't constantly read from files
 - Stubbed it out and came up the general idea
+
+
+4/23/2025
+~~~~~~~~~~
+- Started to work on the reading/writing and observer loop
+- Implemented logger, filehelper
+- Updated problems and server to easily go to and from CSV

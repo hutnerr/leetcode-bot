@@ -31,6 +31,16 @@ class ProblemBucket:
         self.buckets[bucket].add(key)
         return True
     
+    def removeProblem(self, prob: Problem) -> bool:
+        bucket = self.getBucket(prob.hour, prob.interval)
+        if bucket == -1:
+            return False
+        key = prob.getKey()
+        if key in self.buckets[bucket]:
+            self.buckets[bucket].remove(key)
+            return True
+        return False
+    
     def getEntireBucket(self) -> list[dict]:
         return self.buckets
     

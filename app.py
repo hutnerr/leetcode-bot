@@ -1,12 +1,11 @@
 import os
 import random
 
-from utils import file_helper as fh
-from utils import logger
-
 from core.problem import Problem, problemFromCSV
 from core.problem_buckets import ProblemBucket
 from core.server import Server, serverFromCSV
+from utils import file_helper as fh
+from utils import logger
 
 bucket = ProblemBucket()
 servers: dict[int, Server] = dict()
@@ -57,9 +56,15 @@ ppath = os.path.join(DATAPATH, "problems.csv")
 read = fh.read_from_csv(ppath)
 for r in read:
     prob = problemFromCSV(r)
-    parent = servers[prob.serverID].addProblem(prob)
-    bucket.addProblem(prob)
+    
+    existing = servers[prob.serverID].problems[prob.problemID]
+    if existing is not None:
+        bucket.removeProblem(existing)
 
+    success = servers[prob.serverID].addProblem(prob)
+    if success:
+        bucket.addProblem(prob)
+    
 # at this point, our structures should be setup
 # time to test the buckets 
 
@@ -67,11 +72,9 @@ for r in read:
 HOUR = 5
 INTERVAL = 2
 
-# THIS ALMOST WORKS
-# there is a server 2 problem which is at hour 12, interval 3
-# so idk why its showing here
-
 for problem in bucket.getProblems(HOUR, INTERVAL):
     serverid, problemid = map(int, problem.split("::"))
+    print(f"{serverid} - {problemid} = ", end="")
     servers[serverid].handleProblem(problemid)
-    
+
+bucket.printBucketClean()
