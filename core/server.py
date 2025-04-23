@@ -1,13 +1,21 @@
 from core.problem import Problem
+from core.server_settings import ServerSettings
+from utils import logger
 
 class Server:
     
     MAXPROBLEMS = 5
     
-    def __init__(self, sid, settings):
+    def __init__(self, sid:int, settings:ServerSettings):
         self.serverID = sid
         self.settings = settings
         self.problems:list[Problem] = [None] * self.MAXPROBLEMS # index is the problem id
+    
+    def __str__(self) -> str:
+        return f"serverID:{self.serverID}"
+
+    def __repr__(self) -> str:
+        return self.__str__()
     
     def addProblem(self, problem: Problem) -> bool:
         id:int = problem.problemID
@@ -35,8 +43,16 @@ class Server:
         # this sends a message to the server telling them how far away the 
         pass
 
-    def toCSV():
-        pass
+    def toCSV(self) -> str:
+        return f"{self.serverID}"
     
-    def fromCSV():
-        pass
+def serverFromCSV(line:str) -> "Server":
+    split = line.split(",")
+    try:
+        return Server(
+            int(split[0]), # problem id
+            None, # server settings
+        )
+    except Exception as e:
+        logger.error(f"Error reading problem from csv: {line} {e}")
+    
