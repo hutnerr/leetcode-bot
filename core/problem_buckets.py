@@ -33,3 +33,10 @@ class ProblemBucket:
     
     def getEntireBucket(self) -> list[dict]:
         return self.buckets
+    
+    def printBucketClean(self) -> None:
+        for i, bucket in enumerate(self.buckets):
+            if bucket:
+                hour = i // self.NUMINTERVALS
+                interval = i % self.NUMINTERVALS
+                print(f"[{hour:02d}:{interval * 15:02d}] -> {sorted(bucket)}")

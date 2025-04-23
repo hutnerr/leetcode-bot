@@ -1,6 +1,8 @@
+from utils import logger
+
 class Problem:
         
-    def __init__(self, pid, sid, difs, dow, hour, interval):
+    def __init__(self, pid:int, sid:int, difs:str, dow:int, hour:int, interval:int):
         self.problemID:int = pid
         self.serverID:int = sid
         self.difficulties:list[str] = difs.split(",") if difs else None # easy,med,hard...
@@ -24,3 +26,23 @@ class Problem:
     # splittable by :: later
     def getKey(self) -> str:
         return f"{self.serverID}::{self.problemID}"
+    
+    def toCSV(self) -> str:
+        # replace , with --- in difficulties so i can store the whole thing in a csv
+        temp = "---".join(self.difficulties)
+        return f"{self.problemID},{self.serverID},{temp},{self.dow},{self.hour},{self.interval}"
+
+def problemFromCSV(line:str) -> "Problem":
+    split = line.split(",")
+    try:
+        return Problem(
+            int(split[0]), # problem id
+            int(split[1]), # server id
+            split[2].replace("-", ","), # difficulties
+            int(split[3]), # day of week
+            int(split[4]), # hour
+            int(split[5])  # interval
+        )
+    except Exception as e:
+        logger.error(f"Error reading problem from csv: {line} {e}")
+    

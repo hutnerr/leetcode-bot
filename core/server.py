@@ -34,3 +34,9 @@ class Server:
     def handleContestAlert(self, timeAway:str):
         # this sends a message to the server telling them how far away the 
         pass
+
+    def toCSV():
+        pass
+    
+    def fromCSV():
+        pass
