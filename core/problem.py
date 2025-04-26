@@ -46,3 +46,5 @@ def problemFromCSV(line:str) -> "Problem":
     except Exception as e:
         logger.error(f"Error reading problem from csv: {line} {e}")
     
+def titleToSlug(title:str) -> str:
+    return title.replace(" ", "-").lower()

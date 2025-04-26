@@ -11,3 +11,11 @@
 - Started to work on the reading/writing and observer loop
 - Implemented logger, filehelper
 - Updated problems and server to easily go to and from CSV
+
+
+4/26/2025
+~~~~~~~~~~
+- Decided I wanted a Cache to minimize queries
+- Implemented caching basics
+- Added JSON support in file helper
+- Setup basic querying 
