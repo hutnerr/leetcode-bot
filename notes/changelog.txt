@@ -19,3 +19,11 @@
 - Implemented caching basics
 - Added JSON support in file helper
 - Setup basic querying 
+
+5/28/2025
+~~~~~~~~~~
+- Changing file structure to use individual JSON files
+- Removed logger
+- Split file_helper into JSON helper, and CSV helper, kept some functionality in there
+- Reviewed old code, changed files to JSON instead of CSV
+- Minor updates all around

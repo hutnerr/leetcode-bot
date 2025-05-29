@@ -25,7 +25,7 @@ class ProblemBucket:
         bucket = self.getBucket(prob.hour, prob.interval)
         if bucket == -1:
             return False
-        if prob.problemID < 0 or prob.problemID >= Server.MAXPROBLEMS:
+        if prob.problemID < 0 or prob.problemID > Server.MAXPROBLEMS:
             return False
         key = prob.getKey()
         self.buckets[bucket].add(key)

@@ -16,3 +16,7 @@ Features I Want
 4. Points system when users /submit
     - store "active" problems within a server
     - allow users to /submit
+
+
+- UI folder for the discord UI
+- cogs folder for the commands
