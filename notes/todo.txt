@@ -37,3 +37,8 @@ which then has problembuckets inside of it.
 i dont know how the server notification is going to actually work. 
 maybe i can import discord and do it there?
 maybe i can just pass the function call along to the cog or something?
+
+
+------------------------------------
+maybe i could redesign the structure
+server package, problem package, ?
