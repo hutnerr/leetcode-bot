@@ -24,7 +24,7 @@ class Server:
         if id < 0 or id > self.MAXPROBLEMS:
             return False
         self.problems[id] = problem
-        # self.toJSON()
+        self.toJSON()
         return True
     
     def removeProblem(self, problem: Problem) -> bool:
@@ -32,7 +32,7 @@ class Server:
         if id < 0 or id > self.MAXPROBLEMS:
             return False
         self.problems[id] = None
-        # self.toJSON()
+        self.toJSON()
         return True
 
     def __hash__(self):
