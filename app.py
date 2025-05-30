@@ -42,9 +42,9 @@ def generateTestServers() -> list[Server]:
 # generate the testing servers 
 # save them to JSON as we generate
 spath = os.path.join(DATAPATH, "servers")
-# servs = generateTestServers() # generate 10 servers with ids 1-10
-# for serv in servs:
-#     serv.toJSON() # this will create a new server, and overwrite the existing one if it exists
+servs = generateTestServers() # generate 10 servers with ids 1-10
+for serv in servs:
+    serv.toJSON() # this will create a new server, and overwrite the existing one if it exists
 
 # read the servers from the JSON files
 serverFiles = fh.getFilesInDirectory(spath) # get all server files in the directory
@@ -54,35 +54,35 @@ for f in serverFiles:
     servers[serv.serverID] = serv # add the server to the servers dict
 
 # generate random problems and add them to the servers
-# problems = generateRandomProblems(50)
-# for prob in problems:
-#     sid = prob.serverID
-#     pid = prob.problemID
+problems = generateRandomProblems(50)
+for prob in problems:
+    sid = prob.serverID
+    pid = prob.problemID
     
-#     server: Server = servers.get(sid)
+    server: Server = servers.get(sid)
     
-#     # if a problem exists within a server already, and we're going to update it,
-#     # we need to remove the old problem from the buckets first
-#     if server.problems[pid] is not None:
-#         old_problem = server.problems[pid]
-#         bucket.removeProblem(old_problem)
+    # if a problem exists within a server already, and we're going to update it,
+    # we need to remove the old problem from the buckets first
+    if server.problems[pid] is not None:
+        old_problem = server.problems[pid]
+        bucket.removeProblem(old_problem)
     
-#     # now we can add the new problem to the server
-#     if bucket.addProblem(prob):
-#         server.addProblem(prob) # add the problem to the server
-#     else:
-#         print("FAILED TO ADD PROBLEM TO BUCKET:", prob)
-#         server.removeProblem(prob)
+    # now we can add the new problem to the server
+    if bucket.addProblem(prob):
+        server.addProblem(prob) # add the problem to the server
+    else:
+        print("FAILED TO ADD PROBLEM TO BUCKET:", prob)
+        server.removeProblem(prob)
 
-#     if server is not None:
-#         if server.addProblem(prob): # add the problem to the server
-#             if not bucket.addProblem(prob):
-#                 print("FAILED TO ADD PROBLEM TO BUCKET:", prob)
-#                 server.removeProblem(prob)
-#         else:
-#             print("failed to add problem to server:", prob)
-#             bucket.removeProblem(prob)
-#             server.removeProblem(prob)
+    if server is not None:
+        if server.addProblem(prob): # add the problem to the server
+            if not bucket.addProblem(prob):
+                print("FAILED TO ADD PROBLEM TO BUCKET:", prob)
+                server.removeProblem(prob)
+        else:
+            print("failed to add problem to server:", prob)
+            bucket.removeProblem(prob)
+            server.removeProblem(prob)
 
 # we've generated new problems, time to update the servers and save them
 # for server in servers.values():

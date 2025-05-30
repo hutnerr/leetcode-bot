@@ -12,9 +12,17 @@ class Server:
         self.problems:list[Problem] = [None] * (self.MAXPROBLEMS + 1) # +1 to account for 0 index, so 0 is unused
 
     def __str__(self) -> str:
-        return (f"Server(serverID={self.serverID}, "
-                f"settings={self.settings}, "
-                f"problems={self.problems})")
+        problems_str = ""
+        for i, problem in enumerate(self.problems):
+            if problem:
+                problems_str += f"\t\t[{i}]: {problem}\n"
+        return (
+            f"Server(\n"
+            f"\tserverID={self.serverID},\n"
+            f"\tsettings=[\n\t\t{self.settings}\t]\n"
+            f"\tproblems=[\n{problems_str}\t]\n"
+            f")"
+        )
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -67,7 +75,8 @@ class Server:
             print("Error: No data provided to build Server from JSON.")
             return None
         sid = data["serverID"]
-        settings = ServerSettings.buildFromJSON()
+        settings = data["settings"]
+        settings = ServerSettings.buildFromJSON(settings)
         problems = [Problem.buildFromJSON(prob) for prob in data["problems"]]
 
         server = Server(sid, settings)
