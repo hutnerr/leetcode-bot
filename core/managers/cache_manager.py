@@ -16,10 +16,10 @@ class CacheManager():
         problems = fh.getFilesInDirectory(
             self.CACHELOCATION, show_extensions=False)
 
-        for problem in problems:
-            path = os.path.join(self.CACHELOCATION, f"{problem}.json")
+        for prob in problems:
+            path = os.path.join(self.CACHELOCATION, f"{prob}.json")
             json_data = jsonh.readJSON(path)
-            self.cachedProblems[problem] = json_data
+            self.cachedProblems[prob] = json_data
 
     # inserts a problem into the cache
     def cacheProblem(self, json):

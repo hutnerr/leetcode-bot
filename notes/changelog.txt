@@ -27,3 +27,9 @@
 - Split file_helper into JSON helper, and CSV helper, kept some functionality in there
 - Reviewed old code, changed files to JSON instead of CSV
 - Minor updates all around
+
+5/30/2025
+- made the testing bits more modular and representative of the final app (now spam.py)
+- implemented server settings
+- implemented the contest alerts bucket as well as the static buckets
+- setup the stubs of the observer notifications

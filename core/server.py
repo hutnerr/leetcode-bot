@@ -54,7 +54,16 @@ class Server:
     def handleContestAlert(self, timeAway:str):
         # TODO: Implement the logic to handle contest alert
         # this sends a message to the server telling them how far away the 
-        pass
+        print(f"Server {self.serverID} is handling contest alert for {timeAway} minutes.")
+        
+    def handleStaticAlert(self, alert:str):
+        match alert.lower():
+            case "weekly":
+                print(f"Server {self.serverID} is handling weekly contest alert.")
+            case "biweekly":
+                print(f"Server {self.serverID} is handling biweekly contest alert.")
+            case "daily":
+                print(f"Server {self.serverID} is handling official daily contest alert.")
     
     # save the server to JSON
     def toJSON(self):

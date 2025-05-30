@@ -1,20 +1,19 @@
 import os
 import random
-from pprint import pprint
 
 from core.problem import Problem
-from core.problem_buckets import ProblemBucket
+from core.buckets.problem_buckets import ProblemBucket
+from core.buckets.static_buckets import StaticBucket
+from core.buckets.contest_alert_buckets import ContestAlertBucket
 from core.server import Server
 from core.server_settings import ServerSettings
 
 from utils import file_helper as fh
 from utils import json_helper as jsonh
 
-DATAPATH = "data"
-spath = os.path.join(DATAPATH, "servers")
-
-bucket = ProblemBucket()
-servers: dict[int, Server] = dict()
+# =========================================================
+# ================== Gen/Build Servers ====================
+# =========================================================
 
 def generateRandomProblems(n) -> list[Problem]:
     lst = []
@@ -36,7 +35,8 @@ def generateTestServers() -> list[Server]:
             postingChannelID=random.randint(1000, 9999),
             weeklyContestAlerts=random.choice([True, False]),
             biweeklyContestAlerts=random.choice([True, False]),
-            officialDailyAlerts=random.choice([True, False])
+            officialDailyAlerts=random.choice([True, False]),
+            contestAlertIntervals=[random.choice([15, 30, 60, 120, 360, 720, 1440]) for _ in range(3)]  # 3 random intervals
         )
         temp = Server(i, temp_settings)
         lst.append(temp)
@@ -44,71 +44,88 @@ def generateTestServers() -> list[Server]:
 
 def generate():
     # generate the servers
+    servers: dict[int, Server] = dict()
     servs = generateTestServers() # generate 10 servers with ids 1-10
     for serv in servs:
-        serv.toJSON() # this saves the server to JSON, creating a new file or overwriting the existing one
+        serv.toJSON()
         servers[serv.serverID] = serv # add the server to the servers dict
     
     # generate the problems
     problems = generateRandomProblems(50)
-    for prob in problems:
-        sid = prob.serverID
-        pid = prob.problemID
-        
-        server: Server = servers.get(sid)
-        
-        # if a problem exists within a server already, and we're going to update it,
-        # we need to remove the old problem from the buckets first
-        if server.problems[pid] is not None:
-            old_problem = server.problems[pid]
-            bucket.removeProblem(old_problem)
-        
-        # now we can add the new problem to the server
-        if bucket.addProblem(prob):
-            server.addProblem(prob) # add the problem to the server
-        else:
-            print("FAILED TO ADD PROBLEM TO BUCKET:", prob)
-            server.removeProblem(prob)
-
-        # might not need all these error checks and stuff
-        if server is not None:
-            if server.addProblem(prob): # add the problem to the server
-                if not bucket.addProblem(prob):
-                    print("FAILED TO ADD PROBLEM TO BUCKET:", prob)
-                    server.removeProblem(prob)
-            else:
-                print("failed to add problem to server:", prob)
-                bucket.removeProblem(prob)
-                server.removeProblem(prob)
+    for prob in problems:        
+        server: Server = servers.get(prob.serverID)
+        server.addProblem(prob)
+    return servers
 
 def readFromFiles():
-    serverFiles = fh.getFilesInDirectory(spath) # get all server files in the directory
+    # problems are saved within the servers json file so they're read in
+    # when the server is built from JSON
+    spath = os.path.join("data", "servers")
+    servers: dict[int, Server] = dict()
+    serverFiles = fh.getFilesInDirectory(spath)
     for f in serverFiles:
-        data = jsonh.readJSON(os.path.join(spath, f)) # read the JSON data using the file
-        serv = Server.buildFromJSON(data) # build the server from JSON
-        servers[serv.serverID] = serv # add the server to the servers dict
+        data = jsonh.readJSON(os.path.join(spath, f))
+        serv = Server.buildFromJSON(data)
+        servers[serv.serverID] = serv
+    return servers
 
-    for server in servers.values():
+# ========================================================
+# ================== Setup Buckets =======================
+# ========================================================
+
+def setupBuckets(servers):
+    problemBucket = ProblemBucket()
+    staticBucket = StaticBucket()
+    contestAlertBucket = ContestAlertBucket()
+    
+    def addServerToProblemBucket(server: Server):
         for problem in server.problems:
             if problem is not None:
-                if not bucket.addProblem(problem):
-                    print("FAILED TO ADD PROBLEM TO BUCKET:", problem)
+                if not problemBucket.addProblem(problem):
+                    print("Failed to add problem to bucket:", problem)
+
+    def addServerToStaticBucket(server: Server):
+        settings = server.settings
+        if settings.weeklyContestAlerts:
+            staticBucket.addToWeeklyBucket(server.serverID)
+            
+        if settings.biweeklyContestAlerts:
+            staticBucket.addToBiweeklyBucket(server.serverID)
+            
+        if settings.officialDailyAlerts:
+            staticBucket.addToDailyBucket(server.serverID)
+
+    def addServerToContestAlertBucket(server: Server):
+        settings = server.settings
+        for interval in settings.contestAlertIntervals:
+            contestAlertBucket.addToBucket(interval, server.serverID)
+
+    for server in servers.values():
+        addServerToProblemBucket(server)
+        addServerToStaticBucket(server)
+        addServerToContestAlertBucket(server)
+
+    return (problemBucket, staticBucket, contestAlertBucket)
 
 # ========================================================
-# ========================================================
+# ==================== Setup App =========================
 # ========================================================
 
 def main():
-    # generate()
-    readFromFiles()
-    
-    # select one of the above to setup the structures
-    # once theyre setup, we can test stuff
-    
-    tester = servers.get(1)  # get server with ID 1, assume it exists
-    print(tester)
-    
+    # servers = generate()
+    servers = readFromFiles()
+    problemBucket, staticBucket, contestAlertBucket = setupBuckets(servers)
 
-                
+    problemBucket.printBucketClean()
+    problemBucket.notifyServers(servers, 3, 2)  # Notify servers for problems at 3:30
+
+    # staticBucket.printBucketClean()
+    # staticBucket.notifyServers(servers, "weekly")  # Notify servers for weekly contests
+    # staticBucket.notifyServers(servers, "biweekly")  # Notify servers for biweekly contests
+    # staticBucket.notifyServers(servers, "daily")  # Notify servers for daily problems
+    
+    # contestAlertBucket.printBucketClean()
+    # contestAlertBucket.notifyServers(servers, 15)  # Notify servers for 15 minute alerts
+
 if __name__ == "__main__":
     main()

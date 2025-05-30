@@ -20,3 +20,20 @@ Features I Want
 
 - UI folder for the discord UI
 - cogs folder for the commands
+
+-----------------------------------
+it is going to be complicated managing the buckets after theyre loading
+ie adding and removing after initialization
+the easiest way is likely to give each of the servers a reference to the buckets
+then remove the related server when editing/adding 
+or maybe just know i have to do this, and call remove before i call add on the server
+this second approach is likely better
+
+i also need to redesign the problem notifs to account for days of the week
+it wont be that bad since problems can only be set for one day of the week
+maybe the easiest way to do this is to make a day of the week bucket,
+which then has problembuckets inside of it. 
+
+i dont know how the server notification is going to actually work. 
+maybe i can import discord and do it there?
+maybe i can just pass the function call along to the cog or something?
