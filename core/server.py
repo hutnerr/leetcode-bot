@@ -31,6 +31,11 @@ class Server:
         id:int = problem.problemID
         if id < 0 or id > self.MAXPROBLEMS:
             return False
+        
+        # if the problem already exists, we must remove it from the bucket first
+        # to prevent duplicate problem ids in the bucket
+        # if self.problems[id] is not None:
+        #     self.dowBucket.removeFromBucket(self.problems[id])
         self.problems[id] = problem
         self.toJSON()
         return True
@@ -40,6 +45,7 @@ class Server:
         if id < 0 or id > self.MAXPROBLEMS:
             return False
         self.problems[id] = None
+        # self.dowBucket.removeFromBucket(problem)
         self.toJSON()
         return True
 

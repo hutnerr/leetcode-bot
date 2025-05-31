@@ -9,6 +9,10 @@ class ProblemBucket:
     def __init__(self):
         self.buckets = [set() for _ in range(self.NUMBUCKETS)]
         
+    def __str__(self) -> str:
+        non_empty = [bucket for bucket in self.buckets if bucket]
+        return str(non_empty)
+        
     def getBucket(self, hour: int, interval: int) -> int:
         if (hour < 0 or hour > 24) or (interval < 0 or interval > self.NUMINTERVALS):
             return -1
@@ -27,6 +31,7 @@ class ProblemBucket:
             return False
         if prob.problemID < 0 or prob.problemID > Server.MAXPROBLEMS:
             return False
+        
         key = prob.getKey()
         self.buckets[bucket].add(key)
         return True

@@ -1,10 +1,15 @@
 import os
 import random
 
-from core.problem import Problem
-from core.buckets.problem_buckets import ProblemBucket
+from core.buckets.dow_buckets import DowBucket
 from core.buckets.static_buckets import StaticBucket
 from core.buckets.contest_alert_buckets import ContestAlertBucket
+
+from core.managers.cache_manager import CacheManager
+from core.managers.problem_manager import ProblemManager
+from core.managers.query_manager import QueryManager
+
+from core.problem import Problem
 from core.server import Server
 from core.server_settings import ServerSettings
 
@@ -28,9 +33,9 @@ def generateRandomProblems(n) -> list[Problem]:
         lst.append(temp)
     return lst
 
-def generateTestServers() -> list[Server]:
+def generateTestServers(n = 11) -> list[Server]:
     lst = []
-    for i in range(1, 11):
+    for i in range(1, n):
         temp_settings = ServerSettings(
             postingChannelID=random.randint(1000, 9999),
             weeklyContestAlerts=random.choice([True, False]),
@@ -74,14 +79,15 @@ def readFromFiles():
 # ========================================================
 
 def setupBuckets(servers):
-    problemBucket = ProblemBucket()
+    dowBucket = DowBucket()
     staticBucket = StaticBucket()
     contestAlertBucket = ContestAlertBucket()
-    
-    def addServerToProblemBucket(server: Server):
+
+    # the dowBucket has a ProblemBucket object for each day of the week
+    def addServerToDowProblemBucket(server: Server):
         for problem in server.problems:
             if problem is not None:
-                if not problemBucket.addProblem(problem):
+                if not dowBucket.addToBucket(problem):
                     print("Failed to add problem to bucket:", problem)
 
     def addServerToStaticBucket(server: Server):
@@ -101,11 +107,27 @@ def setupBuckets(servers):
             contestAlertBucket.addToBucket(interval, server.serverID)
 
     for server in servers.values():
-        addServerToProblemBucket(server)
+        addServerToDowProblemBucket(server)
         addServerToStaticBucket(server)
         addServerToContestAlertBucket(server)
 
-    return (problemBucket, staticBucket, contestAlertBucket)
+    return (dowBucket, staticBucket, contestAlertBucket)
+
+# ========================================================
+# ================== Setup Managers =======================
+# ========================================================
+
+def setupCacheManager():
+    return 
+
+def setupQueryManager():
+    pass
+
+def setupProblemManager(dowBucket):
+    pass
+
+def setupManagers(dowBucket):
+    pass
 
 # ========================================================
 # ==================== Setup App =========================
@@ -114,18 +136,43 @@ def setupBuckets(servers):
 def main():
     # servers = generate()
     servers = readFromFiles()
-    problemBucket, staticBucket, contestAlertBucket = setupBuckets(servers)
-
-    problemBucket.printBucketClean()
-    problemBucket.notifyServers(servers, 3, 2)  # Notify servers for problems at 3:30
-
-    # staticBucket.printBucketClean()
-    # staticBucket.notifyServers(servers, "weekly")  # Notify servers for weekly contests
-    # staticBucket.notifyServers(servers, "biweekly")  # Notify servers for biweekly contests
-    # staticBucket.notifyServers(servers, "daily")  # Notify servers for daily problems
     
-    # contestAlertBucket.printBucketClean()
-    # contestAlertBucket.notifyServers(servers, 15)  # Notify servers for 15 minute alerts
+    dowBucket, staticBucket, contestAlertBucket = setupBuckets(servers)
+    
+    
+
+
+def testIfBucketHasOldProblemsWhenAdding():
+    DOW = 1
+    SERVERID = 1
+    PROBLEMID =1 
+    
+    dowBucket = DowBucket()        
+    server = generateTestServers(2)[0]
+    server.serverID = SERVERID
+    
+    problems = generateRandomProblems(3)
+    for problem in problems:
+        problem.dow = DOW
+        problem.problemID = PROBLEMID
+        problem.serverID = SERVERID
+
+    p1, p2, p3 = problems
+    
+    # after the subsequent calls below, the server and the bucket should both only have 1 problem in them
+    server.addProblem(p1)
+    dowBucket.addToBucket(p1)
+    
+    server.addProblem(p2)
+    dowBucket.addToBucket(p2)
+    
+    server.addProblem(p3)
+    dowBucket.addToBucket(p3)
+    
+    print(server)
+    dowBucket.getBucket(DOW).printBucketClean()
+
 
 if __name__ == "__main__":
-    main()
+    # main()
+    testIfBucketHasOldProblemsWhenAdding()
