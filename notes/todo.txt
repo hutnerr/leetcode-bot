@@ -40,3 +40,5 @@ maybe i can just pass the function call along to the cog or something?
 
 after a little more setup, make some testing things then run it overnight in a while loop to see 
 if it actually handles it all
+
+delete the archives folder whem im done
