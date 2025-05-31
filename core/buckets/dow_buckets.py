@@ -21,9 +21,11 @@ class DowBucket:
             return self.buckets[day].addProblem(problem)
         return False
 
-    def removeFromBucket(self, day: int, serverID: int):
+    def removeFromBucket(self, problem: Problem) -> bool:
+        day = problem.dow
         if day in self.buckets:
-            self.buckets[day].removeProblem(serverID)
+            return self.buckets[day].removeProblem(problem)
+        return False
 
     def getBucket(self, day: int) -> ProblemBucket:
         return self.buckets.get(day, ProblemBucket())

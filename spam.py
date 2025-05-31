@@ -29,7 +29,8 @@ def generateRandomProblems(n) -> list[Problem]:
         dow = random.randint(1, 7) # 1-7
         hour = random.randint(0, 10) # 0-23
         interval = random.randint(0, 2) # 0-3
-        temp = Problem(pid, sid, difs, dow, hour, interval)
+        premium = random.choice([True, False])
+        temp = Problem(pid, sid, difs, dow, hour, interval, premium)
         lst.append(temp)
     return lst
 
@@ -118,28 +119,31 @@ def setupBuckets(servers):
 # ========================================================
 
 def setupCacheManager():
-    return 
+    return CacheManager()
 
 def setupQueryManager():
-    pass
+    return QueryManager()
 
-def setupProblemManager(dowBucket):
-    pass
+def setupProblemManager(servers, dowBucket):
+    return ProblemManager(servers, dowBucket)
 
-def setupManagers(dowBucket):
-    pass
+def setupManagers(servers, dowBucket):
+    cacheManager = setupCacheManager()
+    queryManager = setupQueryManager()
+    problemManager = setupProblemManager(servers, dowBucket)
+    return (cacheManager, queryManager, problemManager)
 
 # ========================================================
 # ==================== Setup App =========================
 # ========================================================
 
 def main():
-    # servers = generate()
-    servers = readFromFiles()
-    
+    servers = generate()
+    # servers = readFromFiles()
     dowBucket, staticBucket, contestAlertBucket = setupBuckets(servers)
+    cacheManager, queryManager, problemManager = setupManagers(servers, dowBucket)
     
-    
+    print(servers)
 
 
 def testIfBucketHasOldProblemsWhenAdding():
@@ -147,9 +151,15 @@ def testIfBucketHasOldProblemsWhenAdding():
     SERVERID = 1
     PROBLEMID =1 
     
-    dowBucket = DowBucket()        
-    server = generateTestServers(2)[0]
+    server = generateTestServers(2)[0] # 2 because range is 1,n and n is not inclusive so it gens 1    
     server.serverID = SERVERID
+    server.toJSON()        
+    
+    servers: dict[int, Server] = dict()
+    servers[server.serverID] = server # add the server to the servers dict
+    
+    dowBucket = DowBucket()
+    problemManager = setupProblemManager(servers, dowBucket)
     
     problems = generateRandomProblems(3)
     for problem in problems:
@@ -159,20 +169,15 @@ def testIfBucketHasOldProblemsWhenAdding():
 
     p1, p2, p3 = problems
     
-    # after the subsequent calls below, the server and the bucket should both only have 1 problem in them
-    server.addProblem(p1)
-    dowBucket.addToBucket(p1)
-    
-    server.addProblem(p2)
-    dowBucket.addToBucket(p2)
-    
-    server.addProblem(p3)
-    dowBucket.addToBucket(p3)
+    x1 = problemManager.addProblem(p1)
+    x2 = problemManager.addProblem(p2)
+    x3 = problemManager.addProblem(p3)    
+    print(x1, x2, x3)
     
     print(server)
     dowBucket.getBucket(DOW).printBucketClean()
 
 
 if __name__ == "__main__":
-    # main()
-    testIfBucketHasOldProblemsWhenAdding()
+    main()
+    # testIfBucketHasOldProblemsWhenAdding()

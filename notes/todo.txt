@@ -22,12 +22,8 @@ Features I Want
 - cogs folder for the commands
 
 -----------------------------------
-it is going to be complicated managing the buckets after theyre loading
-ie adding and removing after initialization
-the easiest way is likely to give each of the servers a reference to the buckets
-then remove the related server when editing/adding 
-or maybe just know i have to do this, and call remove before i call add on the server
-this second approach is likely better
+make contest manager, handle the bucket managing there too 
+
 
 i dont know how the server notification is going to actually work. 
 maybe i can import discord and do it there?

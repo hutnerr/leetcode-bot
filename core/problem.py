@@ -1,6 +1,6 @@
 class Problem:
 
-    def __init__(self, pid: int, sid: int, difs: str, dow: int, hour: int, interval: int):
+    def __init__(self, pid: int, sid: int, difs: str, dow: int, hour: int, interval: int, premium: bool):
         self.problemID: int = pid
         self.serverID: int = sid
         # easy,med,hard...
@@ -9,6 +9,7 @@ class Problem:
         self.hour: int = hour  # 0 - 23
         # interval can be 0, 1, 2, 3. 0=0min 1=15min, 2=30min, 3=45min
         self.interval: int = interval
+        self.premium: bool = premium
 
     def __str__(self) -> str:
         return (f"Problem("
@@ -17,7 +18,8 @@ class Problem:
                 f"difficulties={self.difficulties}, "
                 f"dow={self.dow}, "
                 f"hour={self.hour}, "
-                f"interval={self.interval})")
+                f"interval={self.interval}, "
+                f"premium={self.premium})")
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -34,7 +36,8 @@ class Problem:
             "difficulties": self.difficulties,
             "dow": self.dow,
             "hour": self.hour,
-            "interval": self.interval
+            "interval": self.interval,
+            "premium": self.premium
         }
 
     # ===================================
@@ -53,5 +56,6 @@ class Problem:
             difs=",".join(data["difficulties"]) if data["difficulties"] else "",
             dow=data["dow"],
             hour=data["hour"],
-            interval=data["interval"]
+            interval=data["interval"],
+            premium=data["premium"]
         )

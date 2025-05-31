@@ -28,7 +28,7 @@ class ServerSettings:
                 f"\t\tbiweeklyContestAlerts={self.biweeklyContestAlerts}\n"
                 f"\t\tofficialDailyAlerts={self.officialDailyAlerts}\n"
                 f"\t\tcontestAlertIntervals={self.contestAlertIntervals}\n"
-               )
+                )
 
     @staticmethod
     def buildFromJSON(settings: dict) -> "ServerSettings":
