@@ -4,7 +4,8 @@ class ServerSettings:
                  weeklyContestAlerts: bool = False,
                  biweeklyContestAlerts: bool = False,
                  officialDailyAlerts: bool = False,
-                 contestAlertIntervals: list[int] = None
+                 contestAlertIntervals: list[int] = None,
+                 duplicatesAllowed: bool = False
                  ):
 
         self.postingChannelID = postingChannelID
@@ -12,6 +13,7 @@ class ServerSettings:
         self.biweeklyContestAlerts = biweeklyContestAlerts
         self.officialDailyAlerts = officialDailyAlerts
         self.contestAlertIntervals = contestAlertIntervals if contestAlertIntervals is not None else []
+        self.duplicatesAllowed = duplicatesAllowed
 
     def toJSON(self) -> dict:
         return {
@@ -20,6 +22,7 @@ class ServerSettings:
             "biweeklyContestAlerts": self.biweeklyContestAlerts,
             "officialDailyAlerts": self.officialDailyAlerts,
             "contestAlertIntervals": self.contestAlertIntervals,
+            "duplicatesAllowed": self.duplicatesAllowed
         }
 
     def __str__(self) -> str:
@@ -28,6 +31,7 @@ class ServerSettings:
                 f"\t\tbiweeklyContestAlerts={self.biweeklyContestAlerts}\n"
                 f"\t\tofficialDailyAlerts={self.officialDailyAlerts}\n"
                 f"\t\tcontestAlertIntervals={self.contestAlertIntervals}\n"
+                f"\t\tduplicatesAllowed={self.duplicatesAllowed}\n"
                 )
 
     @staticmethod
@@ -37,5 +41,6 @@ class ServerSettings:
             weeklyContestAlerts=settings.get("weeklyContestAlerts", False),
             biweeklyContestAlerts=settings.get("biweeklyContestAlerts", False),
             officialDailyAlerts=settings.get("officialDailyAlerts", False),
-            contestAlertIntervals=settings.get("contestAlertIntervals", [])
+            contestAlertIntervals=settings.get("contestAlertIntervals", []),
+            duplicatesAllowed=settings.get("duplicatesAllowed", False)
         )

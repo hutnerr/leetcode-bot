@@ -122,6 +122,6 @@ class ProblemManager:
         # print(f"Selected {difficulty} out of {problem.difficulties}")
         
         slug = random.choice(ps[difficulty])
-        print(f"http://www.leetcode.com/problems/{slug}")
+        # print(f"http://www.leetcode.com/problems/{slug}")
         return slug
         

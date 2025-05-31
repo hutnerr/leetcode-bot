@@ -1,18 +1,16 @@
 import os
 import random
 
+from core.buckets.contest_alert_buckets import ContestAlertBucket
 from core.buckets.dow_buckets import DowBucket
 from core.buckets.static_buckets import StaticBucket
-from core.buckets.contest_alert_buckets import ContestAlertBucket
-
+from core.managers.alert_manager import AlertManager
 from core.managers.cache_manager import CacheManager
 from core.managers.problem_manager import ProblemManager
-from core.managers.query_manager import QueryManager, Query
-
+from core.managers.query_manager import Query, QueryManager
 from core.problem import Problem
 from core.server import Server
 from core.server_settings import ServerSettings
-
 from utils import file_helper as fh
 from utils import json_helper as jsonh
 
@@ -42,9 +40,11 @@ def generateTestServers(n = 11) -> list[Server]:
             weeklyContestAlerts=random.choice([True, False]),
             biweeklyContestAlerts=random.choice([True, False]),
             officialDailyAlerts=random.choice([True, False]),
-            contestAlertIntervals=[random.choice([15, 30, 60, 120, 360, 720, 1440]) for _ in range(3)]  # 3 random intervals
+            contestAlertIntervals=[random.choice([15, 30, 60, 120, 360, 720, 1440]) for _ in range(3)],  # 3 random intervals
+            duplicatesAllowed=random.choice([True, False]),
         )
-        temp = Server(i, temp_settings)
+        previousProblems = ["two-sum"]
+        temp = Server(i, temp_settings, previousProblems)
         lst.append(temp)
     return lst
 
@@ -127,11 +127,15 @@ def setupQueryManager():
 def setupProblemManager(servers, dowBucket):
     return ProblemManager(servers, dowBucket)
 
-def setupManagers(servers, dowBucket):
+def setupAlertManager(servers, dowBucket, staticBucket, contestAlertBucket, cacheManager, queryManager, problemManager):
+    return AlertManager(servers, dowBucket, staticBucket, contestAlertBucket, cacheManager, queryManager, problemManager)
+
+def setupManagers(servers, dowBucket, staticBucket, contestAlertBucket):
     cacheManager = setupCacheManager()
     queryManager = setupQueryManager()
     problemManager = setupProblemManager(servers, dowBucket)
-    return (cacheManager, queryManager, problemManager)
+    alertManager = setupAlertManager(servers, dowBucket, staticBucket, contestAlertBucket, cacheManager, queryManager, problemManager)
+    return (cacheManager, queryManager, problemManager, alertManager)
 
 # ========================================================
 # ==================== Setup App =========================
@@ -141,11 +145,16 @@ def main():
     # servers = generate()
     servers = readFromFiles()
     dowBucket, staticBucket, contestAlertBucket = setupBuckets(servers)
-    cacheManager, queryManager, problemManager = setupManagers(servers, dowBucket)
-    
-    
-    for problem in generateRandomProblems(100000):
-        problemManager.selectProblem(problem)
+    cacheManager, queryManager, problemManager, alertManager = setupManagers(servers, dowBucket, staticBucket, contestAlertBucket)
+
+    # dowBucket.printBucketClean()  # Print the day of week buckets
+    # dowBucket.getBucket(1).printBucketClean()  # Print the bucket for day 1
+
+    output = alertManager.handleProblemAlerts(1, 7, 0)  # Example call to handle problem alerts for day 1, hour 2, interval 1
+    print(output)
+
+    # for problem in generateRandomProblems(100):
+        # problemManager.selectProblem(problem)
     
     # problem = generateRandomProblems(1)[0]
     # problemSlug = problemManager.selectProblem(problem)

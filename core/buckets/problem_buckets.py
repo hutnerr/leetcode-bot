@@ -56,17 +56,17 @@ class ProblemBucket:
                 interval = i % self.NUMINTERVALS
                 print(f"[{hour:02d}:{interval * 15:02d}] -> {sorted(bucket)}")
 
-    def notifyServers(self, servers: dict[int, Server], hour: int, interval: int) -> None:
-        bucket = self.getBucket(hour, interval)
-        if bucket == -1:
-            print(f"Invalid hour or interval: {hour}:{interval * 15}")
-            return
-        if not self.buckets[bucket]:
-            print(f"No problems in bucket {hour}:{interval * 15}")
-            return
+    # def notifyServers(self, servers: dict[int, Server], hour: int, interval: int) -> None:
+    #     bucket = self.getBucket(hour, interval)
+    #     if bucket == -1:
+    #         print(f"Invalid hour or interval: {hour}:{interval * 15}")
+    #         return
+    #     if not self.buckets[bucket]:
+    #         print(f"No problems in bucket {hour}:{interval * 15}")
+    #         return
         
-        for key in self.buckets[bucket]:
-            sid, pid = key.split("::")
-            serverToNotify = servers.get(int(sid))
-            if serverToNotify:
-                serverToNotify.handleProblem(int(pid))
+    #     for key in self.buckets[bucket]:
+    #         sid, pid = key.split("::")
+    #         serverToNotify = servers.get(int(sid))
+    #         if serverToNotify:
+    #             serverToNotify.handleProblem(int(pid))
