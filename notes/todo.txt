@@ -28,6 +28,15 @@ to make sure there are no duplicates
 maybe i can add helper methods to the QueryManager which make it simpler and more direct
 ie a getProblemInfo method which calls performQuery internally
 
+implement the duplicate problem setting
+adds to duplicate when handle problem is called in server
+
+handle problem for the server more than likely is going to just have to take in the slug
+and then do something with it as opposed to the problem object
+
 i dont know how the server notification is going to actually work. 
 maybe i can import discord and do it there?
 maybe i can just pass the function call along to the cog or something?
+
+after a little more setup, make some testing things then run it overnight in a while loop to see 
+if it actually handles it all
