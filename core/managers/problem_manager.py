@@ -2,6 +2,7 @@ import os
 import random
 
 from core.buckets.dow_buckets import DowBucket
+
 from core.server import Server
 from core.problem import Problem
 
@@ -45,7 +46,7 @@ class ProblemManager:
                 else:
                     self.problemSets["free"][dif].append(slug)
 
-
+    # called if the csv problemset is updated
     def refreshProblemSets(self):
         self.problemSets = {
             "free": [],
@@ -106,22 +107,15 @@ class ProblemManager:
     def selectProblem(self, problem: Problem) -> str:
         match problem.premium:
             case 0: # free
-                # print("Free")
                 ps = self.problemSets["free"]
             case 1: # paid
-                # print("Paid")
                 ps = self.problemSets["paid"]
             case 2: # all
-                # print("All")
                 ps = self.problemSets["all"]
             case _: 
-                # print("Invalid problem to select")
                 return None
             
-        difficulty = random.choice(problem.difficulties)
-        # print(f"Selected {difficulty} out of {problem.difficulties}")
-        
+        difficulty = random.choice(problem.difficulties)        
         slug = random.choice(ps[difficulty])
-        # print(f"http://www.leetcode.com/problems/{slug}")
         return slug
         

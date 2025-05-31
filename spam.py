@@ -170,7 +170,11 @@ def main():
     
     # print(problemInfo)
     
-    
+def changeWhileRunning():
+    servers = readFromFiles()
+    server = servers[1]
+    server.settings.officialDailyAlerts = not server.settings.officialDailyAlerts
+    server.toJSON()  # Save the changes to the server's JSON file
 
 def testIfBucketHasOldProblemsWhenAdding():
     DOW = 1
@@ -210,4 +214,5 @@ def testIfBucketHasOldProblemsWhenAdding():
 
 if __name__ == "__main__":
     main()
+    # changeWhileRunning()
     # testIfBucketHasOldProblemsWhenAdding()

@@ -55,14 +55,18 @@ class AlertManager:
             allowDuplicates = server.settings.duplicatesAllowed
             if not allowDuplicates:
                 print("Checking for duplicates...")
-                while server.isProblemDuplicate(slug):
+                limit = 25 # limit the number of attempts to find a non-duplicate problem
+                while server.isProblemDuplicate(slug) and limit > 0:
                     print(f"Duplicate problem {slug} found for server {sid}. Getting a new one.")
                     slug = self.problemManager.selectProblem(problem)
+                    limit -= 1
             else:
                 print(f"Allowing duplicates for server {sid}. Using problem {slug}.")
             
             if server.settings.postingChannelID is not None:
                 channelIDsToSlug[server.settings.postingChannelID] = slug
+            
+            server.addPreviousProblem(slug)
             
         return channelIDsToSlug
 
@@ -70,3 +74,13 @@ class AlertManager:
 
     def handleContestAlert(self, timeAway: str):
         pass
+
+
+    def handleStaticAlert(self, alert: str):
+        match alert.lower():
+            case "weekly":
+                pass
+            case "biweekly":
+                pass
+            case "daily":
+                pass    

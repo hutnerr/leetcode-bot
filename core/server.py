@@ -12,6 +12,7 @@ class Server:
         self.previousProblems = previousProblems if previousProblems is not None else []
         self.problems:list[Problem] = [None] * (self.MAXPROBLEMS + 1) # +1 to account for 0 index, so 0 is unused
 
+
     def __str__(self) -> str:
         problems_str = ""
         for i, problem in enumerate(self.problems):
@@ -29,51 +30,41 @@ class Server:
     def __repr__(self) -> str:
         return self.__str__()
     
+    def __hash__(self):
+        return hash(self.serverID)
+    
+    # adds a problem to the server
+    # should only be called by the problem manager
     def addProblem(self, problem: Problem) -> bool:
         id:int = problem.problemID
         if id < 0 or id > self.MAXPROBLEMS:
             return False
-        
-        # if the problem already exists, we must remove it from the bucket first
-        # to prevent duplicate problem ids in the bucket
-        # if self.problems[id] is not None:
-        #     self.dowBucket.removeFromBucket(self.problems[id])
         self.problems[id] = problem
         self.toJSON()
         return True
     
+    
+    # removes a problem from the server
+    # should also only be called by the problem manager
     def removeProblem(self, problem: Problem) -> bool:
         id:int = problem.problemID
         if id < 0 or id > self.MAXPROBLEMS:
             return False
         self.problems[id] = None
-        # self.dowBucket.removeFromBucket(problem)
         self.toJSON()
         return True
 
-    def __hash__(self):
-        return hash(self.serverID)
-    
-    # def handleProblem(self, problemID:int, slug:str):
-    #     # this is the main call that "handles" using the observer pattern
-    #     print(f"Server {self.serverID} is handling problem {problemID}: {self.problems[problemID]}")
-    
-    # def handleContestAlert(self, timeAway:str):
-    #     # TODO: Implement the logic to handle contest alert
-    #     # this sends a message to the server telling them how far away the 
-    #     print(f"Server {self.serverID} is handling contest alert for {timeAway} minutes.")
-        
-    def handleStaticAlert(self, alert:str):
-        match alert.lower():
-            case "weekly":
-                print(f"Server {self.serverID} is handling weekly contest alert.")
-            case "biweekly":
-                print(f"Server {self.serverID} is handling biweekly contest alert.")
-            case "daily":
-                print(f"Server {self.serverID} is handling official daily contest alert.")
-    
+
     def isProblemDuplicate(self, slug: str) -> bool:
         return slug in self.previousProblems
+    
+    
+    # adds a problem to the previous problems list
+    def addPreviousProblem(self, slug: str):
+        if slug not in self.previousProblems:
+            self.previousProblems.append(slug)
+            self.toJSON()
+    
     
     # save the server to JSON
     def toJSON(self):

@@ -27,6 +27,7 @@
 - Minor updates all around
 
 5/30/2025
+~~~~~~~~~~
 - made the testing bits more modular and representative of the final app (now spam.py)
 - implemented server settings
 - implemented the contest alerts bucket as well as the static buckets
@@ -34,3 +35,10 @@
 - fixed buckets not removing old problems when adding new ones, had duplicates 
 - implemented a problem manager, this solved the above problem, also selects problems
 - implemented day of week buckets
+
+5/31/2025
+~~~~~~~~~~
+- added the alert manager to handle the connection to the cogs 
+- minor refactoring the base classes
+- added a setting to track previously sent problems 
+- made a problem helper for minor things related to lc problems

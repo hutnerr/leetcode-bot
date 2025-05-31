@@ -1,13 +1,7 @@
 class ServerSettings:
 
-    def __init__(self, postingChannelID: int = None,
-                 weeklyContestAlerts: bool = False,
-                 biweeklyContestAlerts: bool = False,
-                 officialDailyAlerts: bool = False,
-                 contestAlertIntervals: list[int] = None,
-                 duplicatesAllowed: bool = False
-                 ):
-
+    # long line lol sorry
+    def __init__(self, postingChannelID: int = None, weeklyContestAlerts: bool = False, biweeklyContestAlerts: bool = False, officialDailyAlerts: bool = False, contestAlertIntervals: list[int] = None, duplicatesAllowed: bool = False):
         self.postingChannelID = postingChannelID
         self.weeklyContestAlerts = weeklyContestAlerts
         self.biweeklyContestAlerts = biweeklyContestAlerts
