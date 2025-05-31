@@ -7,7 +7,7 @@ from core.buckets.contest_alert_buckets import ContestAlertBucket
 
 from core.managers.cache_manager import CacheManager
 from core.managers.problem_manager import ProblemManager
-from core.managers.query_manager import QueryManager
+from core.managers.query_manager import QueryManager, Query
 
 from core.problem import Problem
 from core.server import Server
@@ -25,11 +25,11 @@ def generateRandomProblems(n) -> list[Problem]:
     for _ in range(n):
         pid = random.randint(1, Server.MAXPROBLEMS)  # problem IDs are 1-5
         sid = random.randint(1, 10)
-        difs = random.choice(["easy", "easy-medium", "medium-hard"])
+        difs = random.choice(["easy", "medium", "hard", "easy-medium", "medium-hard", "easy-medium-hard", "hard-easy-medium"])
         dow = random.randint(1, 7) # 1-7
         hour = random.randint(0, 10) # 0-23
         interval = random.randint(0, 2) # 0-3
-        premium = random.choice([True, False])
+        premium = random.randint(0, 2) # 0=free, 1=premium, 2=either
         temp = Problem(pid, sid, difs, dow, hour, interval, premium)
         lst.append(temp)
     return lst
@@ -138,12 +138,26 @@ def setupManagers(servers, dowBucket):
 # ========================================================
 
 def main():
-    servers = generate()
-    # servers = readFromFiles()
+    # servers = generate()
+    servers = readFromFiles()
     dowBucket, staticBucket, contestAlertBucket = setupBuckets(servers)
     cacheManager, queryManager, problemManager = setupManagers(servers, dowBucket)
     
-    print(servers)
+    problem = generateRandomProblems(1)[0]
+    problemSlug = problemManager.selectProblem(problem)
+    problemSlug = "two-sum"
+
+    if cacheManager.existsInCache(problemSlug):
+        print("Getting from cache")
+        problemInfo = cacheManager.getFromCache(problemSlug)
+    else:
+        print("Performing query")
+        problemInfo = queryManager.performQuery(Query.QUESTION_INFO, {"titleSlug" : problemSlug})
+        cacheManager.cacheProblem(problemInfo)
+    
+    print(problemInfo)
+    
+    
 
 
 def testIfBucketHasOldProblemsWhenAdding():
@@ -177,6 +191,10 @@ def testIfBucketHasOldProblemsWhenAdding():
     print(server)
     dowBucket.getBucket(DOW).printBucketClean()
 
+    problemManager.removeProblem(p3)
+    print("After removing p1:")
+    print(server)
+    dowBucket.getBucket(DOW).printBucketClean()
 
 if __name__ == "__main__":
     main()

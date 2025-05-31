@@ -1,15 +1,15 @@
 class Problem:
 
-    def __init__(self, pid: int, sid: int, difs: str, dow: int, hour: int, interval: int, premium: bool):
+    def __init__(self, pid: int, sid: int, difs: str, dow: int, hour: int, interval: int, premium: int):
         self.problemID: int = pid
         self.serverID: int = sid
         # easy,med,hard...
-        self.difficulties: list[str] = difs.split(",") if difs else None
+        self.difficulties: list[str] = difs.split("-") if difs else None
         self.dow: int = dow  # 1 - 7
         self.hour: int = hour  # 0 - 23
         # interval can be 0, 1, 2, 3. 0=0min 1=15min, 2=30min, 3=45min
         self.interval: int = interval
-        self.premium: bool = premium
+        self.premium: int = premium # 0=free, 1=premium, 2=either
 
     def __str__(self) -> str:
         return (f"Problem("
@@ -53,7 +53,7 @@ class Problem:
         return Problem(
             pid=data["problemID"],
             sid=data["serverID"],
-            difs=",".join(data["difficulties"]) if data["difficulties"] else "",
+            difs="-".join(data["difficulties"]) if data["difficulties"] else "",
             dow=data["dow"],
             hour=data["hour"],
             interval=data["interval"],

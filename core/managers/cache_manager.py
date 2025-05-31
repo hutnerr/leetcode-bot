@@ -1,6 +1,6 @@
 from utils import json_helper as jsonh
 from utils import file_helper as fh
-from core import problem
+from core.problem import Problem
 import os
 
 class CacheManager():
@@ -25,7 +25,7 @@ class CacheManager():
     def cacheProblem(self, json):
         info = json["data"]["question"]
         # id = info["questionFrontendId"]
-        slug = problem.titleToSlug(info["title"])
+        slug = Problem.titleToSlug(info["title"])
         path = os.path.join(self.CACHELOCATION, f"{slug}.json")
         jsonh.writeJSON(path, json)
         self.cachedProblems[slug] = json # write the mf name
