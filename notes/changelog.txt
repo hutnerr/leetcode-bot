@@ -5,13 +5,11 @@
 - Load into memory on startup, don't constantly read from files
 - Stubbed it out and came up the general idea
 
-
 4/23/2025
 ~~~~~~~~~~
 - Started to work on the reading/writing and observer loop
 - Implemented logger, filehelper
 - Updated problems and server to easily go to and from CSV
-
 
 4/26/2025
 ~~~~~~~~~~
@@ -33,3 +31,6 @@
 - implemented server settings
 - implemented the contest alerts bucket as well as the static buckets
 - setup the stubs of the observer notifications
+- fixed buckets not removing old problems when adding new ones, had duplicates 
+- implemented a problem manager, this solved the above problem, also selects problems
+- implemented day of week buckets

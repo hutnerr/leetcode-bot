@@ -17,13 +17,16 @@ Features I Want
     - store "active" problems within a server
     - allow users to /submit
 
-
 - UI folder for the discord UI
 - cogs folder for the commands
 
 -----------------------------------
 make contest manager, handle the bucket managing there too 
+ensure that when changing a bucket it must remove the old one as well 
+to make sure there are no duplicates
 
+maybe i can add helper methods to the QueryManager which make it simpler and more direct
+ie a getProblemInfo method which calls performQuery internally
 
 i dont know how the server notification is going to actually work. 
 maybe i can import discord and do it there?

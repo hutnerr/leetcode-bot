@@ -143,22 +143,25 @@ def main():
     dowBucket, staticBucket, contestAlertBucket = setupBuckets(servers)
     cacheManager, queryManager, problemManager = setupManagers(servers, dowBucket)
     
-    problem = generateRandomProblems(1)[0]
-    problemSlug = problemManager.selectProblem(problem)
-    problemSlug = "two-sum"
+    
+    for problem in generateRandomProblems(100000):
+        problemManager.selectProblem(problem)
+    
+    # problem = generateRandomProblems(1)[0]
+    # problemSlug = problemManager.selectProblem(problem)
+    # problemSlug = "two-sum"
 
-    if cacheManager.existsInCache(problemSlug):
-        print("Getting from cache")
-        problemInfo = cacheManager.getFromCache(problemSlug)
-    else:
-        print("Performing query")
-        problemInfo = queryManager.performQuery(Query.QUESTION_INFO, {"titleSlug" : problemSlug})
-        cacheManager.cacheProblem(problemInfo)
+    # if cacheManager.existsInCache(problemSlug):
+    #     print("Getting from cache")
+    #     problemInfo = cacheManager.getFromCache(problemSlug)
+    # else:
+    #     print("Performing query")
+    #     problemInfo = queryManager.performQuery(Query.QUESTION_INFO, {"titleSlug" : problemSlug})
+    #     cacheManager.cacheProblem(problemInfo)
     
-    print(problemInfo)
+    # print(problemInfo)
     
     
-
 
 def testIfBucketHasOldProblemsWhenAdding():
     DOW = 1
