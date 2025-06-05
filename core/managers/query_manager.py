@@ -4,6 +4,33 @@ import requests
 
 class QueryManager:
     API_URL: str = "https://leetcode.com/graphql"
+    
+    def getDailyProblem(self) -> dict:
+        args = {} 
+        return self.performQuery(Query.DAILY_PROBLEM, args)
+    
+    def getUserRecentAcceptedSubmissions(self, username: str, amount: int = 10) -> dict:
+        args = {
+            "username" : username,
+            "limit" : amount
+        }
+        return self.performQuery(Query.RECENT_SUBMISSIONS, args)
+    
+    def getUserProfile(self, username: str) -> dict:
+        args = {
+            "username" : username
+            }
+        return self.performQuery(Query.USER_PROFILE, args)
+    
+    def getQuestionInfo(self, slug: str) -> dict:
+        args = {
+            "titleSlug" : slug
+        }
+        return self.performQuery(Query.QUESTION_INFO, args)
+    
+    def getUpcomingContests(self) -> dict:
+        args = {}
+        return self.performQuery(Query.UPCOMING_CONTESTS, args)
 
     def performQuery(self, query: str, variables: dict) -> dict:
         """
