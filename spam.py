@@ -144,8 +144,8 @@ def setupManagers(servers, dowBucket, staticBucket, contestAlertBucket):
 # ========================================================
 
 def main():
-    servers = generate()
-    # servers = readFromFiles()
+    # servers = generate()
+    servers = readFromFiles()
     dowBucket, staticBucket, contestAlertBucket = setupBuckets(servers)
     cacheManager, queryManager, problemManager, alertManager = setupManagers(servers, dowBucket, staticBucket, contestAlertBucket)
 
@@ -154,23 +154,13 @@ def main():
 
     # output = alertManager.handleProblemAlerts(1, 7, 0)  # Example call to handle problem alerts for day 1, hour 2, interval 1
     # print(output)
-
-    # for problem in generateRandomProblems(100):
-        # problemManager.selectProblem(problem)
     
-    # problem = generateRandomProblems(1)[0]
-    # problemSlug = problemManager.selectProblem(problem)
-    # problemSlug = "two-sum"
-
-    # if cacheManager.existsInCache(problemSlug):
-    #     print("Getting from cache")
-    #     problemInfo = cacheManager.getFromCache(problemSlug)
-    # else:
-    #     print("Performing query")
-    #     problemInfo = queryManager.performQuery(Query.QUESTION_INFO, {"titleSlug" : problemSlug})
-    #     cacheManager.cacheProblem(problemInfo)
+    staticBucket.printBucketClean()  # Print the static buckets
     
-    # print(problemInfo)
+    out = alertManager.collectStaticAlerts("daily")
+    print(out)
+
+
     
 def changeWhileRunning():
     servers = readFromFiles()
@@ -218,3 +208,23 @@ if __name__ == "__main__":
     main()
     # changeWhileRunning()
     # testIfBucketHasOldProblemsWhenAdding()
+    
+    
+# MISC LINES, MIGHT BE USEFUL LATER
+    
+# for problem in generateRandomProblems(100):
+    # problemManager.selectProblem(problem)
+
+# problem = generateRandomProblems(1)[0]
+# problemSlug = problemManager.selectProblem(problem)
+# problemSlug = "two-sum"
+
+# if cacheManager.existsInCache(problemSlug):
+#     print("Getting from cache")
+#     problemInfo = cacheManager.getFromCache(problemSlug)
+# else:
+#     print("Performing query")
+#     problemInfo = queryManager.performQuery(Query.QUESTION_INFO, {"titleSlug" : problemSlug})
+#     cacheManager.cacheProblem(problemInfo)
+
+# print(problemInfo)

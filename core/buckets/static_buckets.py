@@ -61,6 +61,12 @@ class StaticBucket:
     def getDailyBucket(self) -> list[int]:
         return self.buckets["daily"]
     
+    def getBucket(self, bucketType: str) -> list[int] | None:
+        if bucketType in self.buckets:
+            return self.buckets[bucketType]
+        else:
+            print(f"Invalid bucket type: {bucketType}")
+            return None
 
     # =================OBSERVER HANDLING================================
 
