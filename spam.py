@@ -42,6 +42,8 @@ def generateTestServers(n = 11) -> list[Server]:
             officialDailyAlerts=random.choice([True, False]),
             contestAlertIntervals=[random.choice([15, 30, 60, 120, 360, 720, 1440]) for _ in range(3)],  # 3 random intervals
             duplicatesAllowed=random.choice([True, False]),
+            alertRoleID=random.randint(1000, 9999),
+            useAlertRole=random.choice([True, False]),
         )
         previousProblems = ["two-sum"]
         temp = Server(i, temp_settings, previousProblems)
@@ -142,16 +144,16 @@ def setupManagers(servers, dowBucket, staticBucket, contestAlertBucket):
 # ========================================================
 
 def main():
-    # servers = generate()
-    servers = readFromFiles()
+    servers = generate()
+    # servers = readFromFiles()
     dowBucket, staticBucket, contestAlertBucket = setupBuckets(servers)
     cacheManager, queryManager, problemManager, alertManager = setupManagers(servers, dowBucket, staticBucket, contestAlertBucket)
 
     # dowBucket.printBucketClean()  # Print the day of week buckets
     # dowBucket.getBucket(1).printBucketClean()  # Print the bucket for day 1
 
-    output = alertManager.handleProblemAlerts(1, 7, 0)  # Example call to handle problem alerts for day 1, hour 2, interval 1
-    print(output)
+    # output = alertManager.handleProblemAlerts(1, 7, 0)  # Example call to handle problem alerts for day 1, hour 2, interval 1
+    # print(output)
 
     # for problem in generateRandomProblems(100):
         # problemManager.selectProblem(problem)
