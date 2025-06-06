@@ -2,6 +2,7 @@ import random
 
 from models.problem import Problem
 from models.server import Server
+from models.user import User
 from models.server_settings import ServerSettings
 
 # generates problems with random parmeters
@@ -37,6 +38,17 @@ def generateTestServers(n: int) -> list[Server]:
         previousProblems = ["two-sum"]
         temp = Server(i + 1, temp_settings, previousProblems)
         lst.append(temp)
+    return lst
+
+def generateTestUsers(n: int) -> list[User]:
+    lst = []
+    for i in range(0, n):
+        user = User(
+            discordID=random.randint(1000000000, 9999999999),
+            leetcodeUsername=f"user{i}",
+            points=random.randint(0, 1000)
+        )
+        lst.append(user)
     return lst
 
 # generates servers, then generates problems and adds them to the servers

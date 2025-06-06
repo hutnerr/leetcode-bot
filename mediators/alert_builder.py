@@ -65,12 +65,10 @@ class AlertBuilder:
 
             if server.settings.postingChannelID is not None:
                 info = {
-                    "slug" : slug
+                    "slug" : slug,
+                    "pid" : pid
                 }
                 alerts.append(Alert(AlertType.PROBLEM, server.serverID, server.settings.postingChannelID, info))
-            
-            #FIXME: Might move this logic elsewhere
-            server.addPreviousProblem(slug) # consider selected problem "previous"
             
         return alerts
 

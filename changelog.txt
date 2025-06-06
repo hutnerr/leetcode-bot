@@ -62,3 +62,12 @@
 - tons of other refactoring
 - added a small testing framework & tested the services
 
+6/6/2025
+~~~~~~~~~~
+- refacted the mini test suite
+- did testing for all current mediators, buckets, and services
+- fixed little bugs as they showed
+- make a user model to hold users
+- gave the app a user property
+- added a activeProblem property to servers 
+- the user and active stuff is the base for the submission and point system 

@@ -18,23 +18,27 @@ from mediators.alert_builder import AlertBuilder
 
 from models.app import App
 from models.server import Server
+from models.user import User
 
 
 # sets up and initializes the app 
 class Initializer:
-    
     @staticmethod
-    def initApp(generate: bool = False, passedInServers: dict[int, Server] = None) -> App:
+    def initApp(generate: bool = False, passedInServers: dict[int, Server] = None, nservers: int = 10, nproblems: int = 50, nusers=50) -> App:
         # if generate, gen servers
         # otherwise read from files
         if not passedInServers:
             if generate:
-                servers = gen.generate()
+                servers = gen.generate(nservers, nproblems)
+                users = gen.generateTestUsers(nusers)
             else:
-                servers = readFromFiles()
+                servers = readServersFromFiles()
+                users = readUsersFromFiles()
+                
         else:
             servers = passedInServers
-        
+            users = gen.generateTestUsers(nusers)
+
         buckets = setupBuckets(servers)
         problemBucket, staticTimeBucket, contestTimeBucket = buckets
 
@@ -43,11 +47,11 @@ class Initializer:
         
         mediators = setupMediators(servers, problemBucket, staticTimeBucket, contestTimeBucket, problemService, queryService)
         alertBuilder, synchronizer = mediators
-        
-        return App(servers, buckets, services, mediators)
+
+        return App(servers, users, buckets, services, mediators)
         
     
-def readFromFiles():
+def readServersFromFiles():
     # problems are saved within the servers json file so they're read in
     # when the server is built from JSON
     spath = os.path.join("data", "servers")
@@ -59,6 +63,15 @@ def readFromFiles():
         servers[serv.serverID] = serv
     return servers
     
+def readUsersFromFiles():
+    upath = os.path.join("data", "users")
+    users: dict[int, User] = dict()
+    userFiles = fileh.getFilesInDirectory(upath)
+    for f in userFiles:
+        data = jsonh.readJSON(os.path.join(upath, f))
+        user = User.buildFromJSON(data)
+        users[user.discordID] = user
+    return users
     
 # ========================================================
 # ================== Setup Buckets =======================

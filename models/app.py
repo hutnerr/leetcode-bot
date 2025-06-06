@@ -10,12 +10,14 @@ from mediators.synchronizer import Synchronizer
 from mediators.alert_builder import AlertBuilder
 
 from models.server import Server
+from models.user import User
 
 # stores all of the key components
 class App:
-    def __init__(self, servers, buckets, services, mediators):
+    def __init__(self, servers, users, buckets, services, mediators):
         self.servers: dict[int, Server] = servers
-        
+        self.users: dict[int, User] = users
+
         self.problemBucket: ProblemBucket = buckets[0]
         self.staticTimeBucket: StaticTimeBucket = buckets[1]
         self.contestTimeBucket: ContestTimeBucket = buckets[2]

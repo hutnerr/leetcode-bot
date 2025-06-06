@@ -1,3 +1,5 @@
+import os
+
 from models.problem import Problem
 from models.server_settings import ServerSettings
 
@@ -7,12 +9,13 @@ from utils import json_helper as jsonh
 class Server:
     
     MAXPROBLEMS = 5
-    
-    def __init__(self, sid:int, settings:ServerSettings, previousProblems:list[str] = None):
+
+    def __init__(self, sid:int, settings:ServerSettings, previousProblems:list[str] = None, activeProblems:list[tuple[str, set]] = None):
         self.serverID = sid
         self.settings = settings
         self.previousProblems = previousProblems if previousProblems is not None else []
-        self.problems:list[Problem] = [None] * (self.MAXPROBLEMS + 1) # +1 to account for 0 index, so 0 is unused
+        self.problems :list[Problem] = [None] * (self.MAXPROBLEMS + 1) # +1 to account for 0 index, so 0 is unused
+        self.activeProblems = activeProblems if activeProblems is not None else [("", set())] * (self.MAXPROBLEMS + 1)
 
     def __str__(self) -> str:
         problems_str = ""
@@ -25,6 +28,8 @@ class Server:
             f"\tsettings=[\n\t\t{self.settings}\t]\n"
             f"\tpreviousProblems={self.previousProblems},\n"
             f"\tproblems=[\n{problems_str}\t]\n"
+            f"\tactiveProblems=[\n"
+            f"\t\t{self.activeProblems}\n"
             f")"
         )
 
@@ -51,14 +56,34 @@ class Server:
         if id < 0 or id > self.MAXPROBLEMS:
             return False
         self.problems[id] = None
+        self.activeProblems[id] = ("", set()) # reset the active problem slug as well
         self.toJSON()
         return True
+
+    # adds an active problem which is one users can try and submit to 
+    # when a problem is deemed active is is also deemed "previous"
+    # TODO: should be being called on the results gotten back from the alert builder
+    # and right before being added
+    def addActiveProblem(self, slug: str, problemID: int) -> None:
+        self.addPreviousProblem(slug) # to prevent duplicates
+    
+        for problem in self.activeProblems:
+            if problem[0] == slug: # get the slug portion of the tuple
+                return
+    
+        if problemID < 0 or problemID > self.MAXPROBLEMS:
+            return
+
+        # initialize the active problem with an empty set of users
+        # because no one has submitted yet
+        self.activeProblems[problemID] = (slug, set())
+        self.toJSON()
 
     def isProblemDuplicate(self, slug: str) -> bool:
         return slug in self.previousProblems
         
     # adds a problem to the previous problems list
-    def addPreviousProblem(self, slug: str):
+    def addPreviousProblem(self, slug: str) -> None:
         if slug not in self.previousProblems:
             self.previousProblems.append(slug)
             self.toJSON()
@@ -69,9 +94,10 @@ class Server:
             "serverID": self.serverID,
             "settings": self.settings.toJSON(),
             "previousProblems": self.previousProblems,
+            "activeProblems": [(slug, list(users)) for slug, users in self.activeProblems], 
             "problems": [problem.toJSON() for problem in self.problems if problem]
         }
-        jsonh.writeJSON(f"data/servers/{self.serverID}.json", data)
+        jsonh.writeJSON(f"{os.path.join('data', 'servers', f'{self.serverID}.json')}", data)
         
     # ===================================
     # helper functions
@@ -86,8 +112,9 @@ class Server:
         settings = ServerSettings.buildFromJSON(settings)
         problems = [Problem.buildFromJSON(prob) for prob in data["problems"]]
         previousProblems = data["previousProblems"]
+        activeProblems = [(slug, set(users)) for slug, users in data["activeProblems"]]
 
-        server = Server(sid, settings, previousProblems)
+        server = Server(sid, settings, previousProblems, activeProblems)
 
         for prob in problems:
             pid = prob.problemID
@@ -95,4 +122,4 @@ class Server:
                 server.problems[pid] = prob
 
         return server
-    
+
