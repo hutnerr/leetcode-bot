@@ -20,13 +20,12 @@ def makeApp() -> App:
     return Initializer.initApp(passedInServers=servers)
 
 
-def testAlertBuilder() -> tuple[bool, str]:
+def testAlertBuilder() -> bool:
     app = makeApp()
     
     alertBuilder = app.alertBuilder
-    if not alertBuilder:
-        return (False, "App's alertBuilder was None")
-    
+    assert alertBuilder is not None, "App's alertBuilder was None"
+
     # THE STATIC GENERATED TESTING SERVER INFO:
     # server1:  
     # - weekly, biweekly, daily, contesttime, [15, 30] intervals      
@@ -56,9 +55,9 @@ def testAlertBuilder() -> tuple[bool, str]:
     # biweekyStaticAlerts = alertBuilder.buildContestAlerts(StaticTimeAlert.BIWEEKLY_CONTEST)
     # dailyStaticAlerts = alertBuilder.buildContestAlerts(StaticTimeAlert.DAILY_PROBLEM)
     
-    return (True, "All Good!")
+    return True
 
 
-def testSyncrhonzier() -> tuple[bool, str]:
+def testSyncrhonzier() -> bool:
     # adding a problem to a server that has a full 5 problems
-    pass
+    return True
