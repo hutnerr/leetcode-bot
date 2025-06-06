@@ -1,5 +1,5 @@
 import csv
-from core.utils import file_helper as fh
+from utils import file_helper as fh
 
 # reads a CSV file and returns its content as a list of lists
 def readFromCSV(filePath: str) -> list[list[str]] | None:

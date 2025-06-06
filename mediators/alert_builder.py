@@ -1,15 +1,15 @@
-from core.utils import time_helper as timeh
-from core.utils import problem_helper as probh
+from utils import time_helper as timeh
+from utils import problem_helper as probh
 
-from core.models.server import Server
-from core.models.problem import Problem
-from core.models.alert import Alert, AlertType
+from models.server import Server
+from models.problem import Problem
+from models.alert import Alert, AlertType
 
-from core.services.problem_service import ProblemService
+from services.problem_service import ProblemService
 
-from core.buckets.problem_bucket import ProblemBucket
-from core.buckets.static_time_bucket import StaticTimeBucket, StaticTimeAlert
-from core.buckets.contest_time_bucket import ContestTimeBucket
+from buckets.problem_bucket import ProblemBucket
+from buckets.static_time_bucket import StaticTimeBucket, StaticTimeAlert
+from buckets.contest_time_bucket import ContestTimeBucket
 
 # builds Alerts which contain the ServerID, ChannelID, and some info that will be expected 
 # the info will be a dict, the keys/values will be context independent

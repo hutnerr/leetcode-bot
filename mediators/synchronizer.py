@@ -1,9 +1,9 @@
-from core.models.problem import Problem
-from core.models.server import Server
+from models.problem import Problem
+from models.server import Server
 
-from core.buckets.problem_bucket import ProblemBucket
-from core.buckets.contest_time_bucket import ContestTimeBucket
-from core.buckets.static_time_bucket import StaticTimeBucket, StaticTimeAlert
+from buckets.problem_bucket import ProblemBucket
+from buckets.contest_time_bucket import ContestTimeBucket
+from buckets.static_time_bucket import StaticTimeBucket, StaticTimeAlert
 
 class Synchronizer:
     def __init__(self, 

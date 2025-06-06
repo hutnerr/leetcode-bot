@@ -1,8 +1,8 @@
 import random
 
-from core.models.problem import Problem
-from core.models.server import Server
-from core.models.server_settings import ServerSettings
+from models.problem import Problem
+from models.server import Server
+from models.server_settings import ServerSettings
 
 # generates problems with random parmeters
 def generateRandomProblems(n) -> list[Problem]:

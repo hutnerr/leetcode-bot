@@ -2,22 +2,22 @@ import os
 
 from testing import generator as gen
 
-from core.utils import json_helper as jsonh
-from core.utils import file_helper as fileh
+from utils import json_helper as jsonh
+from utils import file_helper as fileh
 
-from core.buckets.contest_time_bucket import ContestTimeBucket
-from core.buckets.problem_bucket import ProblemBucket
-from core.buckets.static_time_bucket import StaticTimeBucket, StaticTimeAlert
+from buckets.contest_time_bucket import ContestTimeBucket
+from buckets.problem_bucket import ProblemBucket
+from buckets.static_time_bucket import StaticTimeBucket, StaticTimeAlert
 
-from core.services.cache_service import CacheService
-from core.services.problem_service import ProblemService
-from core.services.query_service import QueryService
+from services.cache_service import CacheService
+from services.problem_service import ProblemService
+from services.query_service import QueryService
 
-from core.mediators.synchronizer import Synchronizer
-from core.mediators.alert_builder import AlertBuilder
+from mediators.synchronizer import Synchronizer
+from mediators.alert_builder import AlertBuilder
 
-from core.models.app import App
-from core.models.server import Server
+from models.app import App
+from models.server import Server
 
 
 # sets up and initializes the app 

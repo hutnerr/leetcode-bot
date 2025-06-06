@@ -2,15 +2,15 @@ import os
 
 from testing.generator import GeneratedServers
 
-from core.utils.initializer import Initializer
-from core.utils import problem_helper as probh
+from utils.initializer import Initializer
+from utils import problem_helper as probh
 
-from core.models.app import App
-from core.models.problem import Problem
+from models.app import App
+from models.problem import Problem
 
-from core.services.cache_service import CacheService
-from core.services.problem_service import ProblemService
-from core.services.query_service import QueryService
+from services.cache_service import CacheService
+from services.problem_service import ProblemService
+from services.query_service import QueryService
 
 # services integration testing
 def makeApp() -> App:

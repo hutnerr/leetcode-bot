@@ -1,5 +1,5 @@
-from core.models.problem import Problem
-from core.models.server import Server
+from models.problem import Problem
+from models.server import Server
 
 # this bucket handles the times each individual problem is located at
 # the bucket itself is a dict with dow as keys with values being a list of sets

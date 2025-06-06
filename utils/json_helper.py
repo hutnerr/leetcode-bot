@@ -1,5 +1,5 @@
 import json
-from core.utils import file_helper as fh
+from utils import file_helper as fh
 
 # reads a JSON file and returns its content as a dictionary
 # returns None if the file does not exist

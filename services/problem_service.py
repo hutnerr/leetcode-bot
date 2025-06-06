@@ -1,8 +1,8 @@
 import os
 import random
 
-from core.utils import csv_helper as csvh
-from core.models.problem import Problem
+from utils import csv_helper as csvh
+from models.problem import Problem
 
 # performs to service of determining a concrete problem based on problem settings
 # also acts as a data container for all of the problems

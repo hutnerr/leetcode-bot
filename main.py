@@ -1,4 +1,4 @@
-from core.utils.initializer import Initializer
+from utils.initializer import Initializer
 
 def main():
     app = Initializer.initApp(True)

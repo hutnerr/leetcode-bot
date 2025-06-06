@@ -1,8 +1,8 @@
 import os
 
-from core.utils import json_helper as jsonh
-from core.utils import file_helper as fh
-from core.utils import problem_helper as probHelper
+from utils import json_helper as jsonh
+from utils import file_helper as fh
+from utils import problem_helper as probHelper
 
 # service that handles operations related to caching
 class CacheService:

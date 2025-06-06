@@ -1,7 +1,7 @@
-from core.models.problem import Problem
-from core.models.server_settings import ServerSettings
+from models.problem import Problem
+from models.server_settings import ServerSettings
 
-from core.utils import json_helper as jsonh
+from utils import json_helper as jsonh
 
 # representation of a discord server
 class Server:
