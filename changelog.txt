@@ -60,3 +60,5 @@
 - split spam.py up into app, testing/generator, and services/initializer
 - implemented some enums to use instead of strings
 - tons of other refactoring
+- added a small testing framework & tested the services
+

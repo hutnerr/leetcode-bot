@@ -5,9 +5,9 @@ from enum import Enum
 class StaticTimeBucket:
     def __init__(self):
         self.buckets: dict[str, set[int]] = {
-            StaticTimeAlert.WEEKLY_CONTEST: {},
-            StaticTimeAlert.BIWEEKLY_CONTEST: {},
-            StaticTimeAlert.DAILY_PROBLEM: {}
+            StaticTimeAlert.WEEKLY_CONTEST: set(),
+            StaticTimeAlert.BIWEEKLY_CONTEST: set(),
+            StaticTimeAlert.DAILY_PROBLEM: set()
         }
     
     def __str__(self) -> str:
@@ -17,7 +17,7 @@ class StaticTimeBucket:
     # TO ENSURE THAT THE BUCKET AND MODEL CONTAIN THE SAME DATA
     def addToBucket(self, bucketType: "StaticTimeAlert", serverID: int) -> bool:
         if bucketType in self.buckets:
-            if serverID in self.buckets[bucketType]:
+            if serverID not in self.buckets[bucketType]:
                 self.buckets[bucketType].add(serverID)
                 return True
         return False
@@ -33,7 +33,7 @@ class StaticTimeBucket:
     
     # returns a list of all of the servers in the bucketType
     def getBucket(self, bucketType: "StaticTimeAlert") -> list[int] | None:
-        return self.buckets.get(bucketType, None)
+        return self.buckets.get(bucketType, [None])
 
 
    # FIXME: For testing, delete when product complete

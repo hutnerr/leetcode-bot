@@ -19,7 +19,7 @@ def makeApp() -> App:
     
 def testCacheService() -> tuple[bool, str]:
     app = makeApp()
-    cacheService: CacheService = app.cacheService    
+    cacheService: CacheService = app.cacheService
     
     if not cacheService:
         return (False, "App's cacheService was None")

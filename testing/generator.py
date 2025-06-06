@@ -28,7 +28,8 @@ def generateTestServers(n: int) -> list[Server]:
             weeklyContestAlerts=random.choice([True, False]),
             biweeklyContestAlerts=random.choice([True, False]),
             officialDailyAlerts=random.choice([True, False]),
-            contestAlertIntervals=[random.choice([15, 30, 60, 120, 360, 720, 1440]) for _ in range(3)],  # 3 random intervals
+            contestTimeIntervals=[random.choice([15, 30, 60, 120, 360, 720, 1440]) for _ in range(3)],  # 3 random intervals
+            contestTimeAlerts=random.choice([True, False]),
             duplicatesAllowed=random.choice([True, False]),
             alertRoleID=random.randint(1000, 9999),
             useAlertRole=random.choice([True, False]),
@@ -74,7 +75,8 @@ class GeneratedServers:
             weeklyContestAlerts=True,
             biweeklyContestAlerts=True,
             officialDailyAlerts=True,
-            contestAlertIntervals=[15, 30],
+            contestTimeIntervals=[15, 30],
+            contestTimeAlerts=True,
             duplicatesAllowed=True,
             alertRoleID=11111,
             useAlertRole=True
@@ -100,7 +102,8 @@ class GeneratedServers:
             weeklyContestAlerts=False,
             biweeklyContestAlerts=False,
             officialDailyAlerts=False,
-            contestAlertIntervals=[15, 30, 45], # TODO: what happens if we have contest alerts on but no intervals?
+            contestTimeIntervals=[15, 30, 60, 120],
+            contestTimeAlerts=False,
             duplicatesAllowed=False,
             alertRoleID=11111,
             useAlertRole=False
@@ -111,10 +114,10 @@ class GeneratedServers:
         server = Server(sid=2, settings=serverSettings, previousProblems=previousProblems)
         
         p1 = Problem(pid=1, sid=2, difs="easy", dow=1, hour=1, interval=0, premium=0)
-        p2 = Problem(pid=2, sid=2, difs="medium", dow=2, hour=2, interval=1, premium=1)
-        p3 = Problem(pid=3, sid=2, difs="hard", dow=3, hour=3, interval=2, premium=2)
-        p4 = Problem(pid=4, sid=2, difs="easy-medium", dow=4, hour=4, interval=3, premium=0)
-        p5 = Problem(pid=5, sid=2, difs="easy-medium-hard", dow=5, hour=5, interval=4, premium=0)
+        p2 = Problem(pid=2, sid=2, difs="medium", dow=2, hour=2, interval=0, premium=1)
+        p3 = Problem(pid=3, sid=2, difs="hard", dow=3, hour=3, interval=0, premium=2)
+        p4 = Problem(pid=4, sid=2, difs="easy-medium", dow=4, hour=4, interval=0, premium=0)
+        p5 = Problem(pid=5, sid=2, difs="easy-medium-hard", dow=5, hour=5, interval=0, premium=0)
         problems = [p1, p2, p3, p4, p5]
         
         for problem in problems:
@@ -124,10 +127,11 @@ class GeneratedServers:
     def genServer3(self) -> Server:
         serverSettings = ServerSettings(
             postingChannelID=12345,
-            weeklyContestAlerts=False,
+            weeklyContestAlerts=True,
             biweeklyContestAlerts=False,
             officialDailyAlerts=False,
-            contestAlertIntervals=[15, 30, 45], # TODO: what happens if we have contest alerts on but no intervals?
+            contestTimeIntervals=[],
+            contestTimeAlerts=True,
             duplicatesAllowed=False,
             alertRoleID=11111,
             useAlertRole=False

@@ -79,18 +79,22 @@ def setupBuckets(servers):
     def addServerToStaticTimeBucket(server: Server):
         settings = server.settings
         if settings.weeklyContestAlerts:
-            staticTimeBucket.addToBucket(StaticTimeAlert.WEEKLY_CONTEST, server.serverID)
+            if not staticTimeBucket.addToBucket(StaticTimeAlert.WEEKLY_CONTEST, server.serverID):
+                print("ADDING WEEKLY FAILED")
             
         if settings.biweeklyContestAlerts:
-            staticTimeBucket.addToBucket(StaticTimeAlert.BIWEEKLY_CONTEST, server.serverID)
+            if not staticTimeBucket.addToBucket(StaticTimeAlert.BIWEEKLY_CONTEST, server.serverID):
+                print("ADDING BIWEEKLY FAILED")
             
         if settings.officialDailyAlerts:
-            staticTimeBucket.addToBucket(StaticTimeAlert.DAILY_PROBLEM, server.serverID)
+            if not staticTimeBucket.addToBucket(StaticTimeAlert.DAILY_PROBLEM, server.serverID):
+                print("ADDING DAILY FAILED")
 
     def addServerToContestTimeBucket(server: Server):
         settings = server.settings
-        for interval in settings.contestAlertIntervals:
-            contestTimeBucket.addToBucket(interval, server.serverID)
+        if settings.contestTimeAlerts and settings.contestTimeIntervals:
+            for interval in settings.contestTimeIntervals:
+                contestTimeBucket.addToBucket(interval, server.serverID)
 
     for server in servers.values():
         addServerToProblemBucket(server)

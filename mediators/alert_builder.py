@@ -90,6 +90,12 @@ class AlertBuilder:
         
         for serverID in serversToNotify:
             server = self.servers[serverID]            
+            
+            # we may be in the bucket, but have the setting turned off
+            # in this case, just ignore
+            if not server.settings.contestTimeAlerts:
+                continue
+            
             info = {
                 "alertString" : alertString
             }

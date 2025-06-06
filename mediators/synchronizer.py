@@ -76,17 +76,38 @@ class Synchronizer:
         server = self.servers[serverID]
         
         # get and remove the current intervals
-        currentIntervals = server.settings.contestAlertIntervals
+        currentIntervals = server.settings.contestTimeAlerts
         for interval in currentIntervals:
-            if not self.contestTimeBucket.removeFromBucket(interval, server):
+            if not self.contestTimeBucket.removeFromBucket(interval, serverID):
                 return False
         
         # add the new intervals
         for interval in newIntervals:
-            if not self.contestTimeBucket.addToBucket(interval, server):
+            if not self.contestTimeBucket.addToBucket(interval, serverID):
                 return False
         
         return True
+    
+    def changeContestAlertParticpation(self, serverID: int, participate: bool) -> bool:
+        if serverID not in self.servers:
+            return False
+
+        server = self.servers[serverID]
+        serverSettings = server.settings
+
+        serverSettings.contestTimeAlerts = participate
+        
+        currentIntervals = server.settings.contestTimeAlerts
+        if not currentIntervals:
+            currentIntervals = [15] # set to a default of 15 mins is empty
+            
+        # if we now want to participate, add our intervals to the bucket
+        # otherwise, remove them from the bucket 
+        for interval in currentIntervals:
+            if participate:
+                self.contestTimeBucket.addToBucket(interval, serverID)
+            else:
+                self.contestTimeBucket.removeFromBucket(interval, serverID)
     
     # ==============================================
     # STATIC ALERTS
