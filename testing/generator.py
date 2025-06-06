@@ -53,3 +53,99 @@ def generate(nservers = 10, nproblems = 50):
         server: Server = servers.get(prob.serverID)
         server.addProblem(prob)
     return servers
+
+class GeneratedServers:
+    def __init__(self):
+        self.testServer1: Server = self.genServer1()
+        self.testServer2: Server = self.genServer2()
+        self.testServer3: Server = self.genServer3()
+    
+    def collectServers(self) -> dict[int, Server]:
+        servers = {
+            self.testServer1.serverID : self.testServer1,
+            self.testServer2.serverID : self.testServer2,
+            self.testServer3.serverID : self.testServer3,
+        }
+        return servers
+    
+    def genServer1(self) -> Server:
+        serverSettings = ServerSettings(
+            postingChannelID=12345,
+            weeklyContestAlerts=True,
+            biweeklyContestAlerts=True,
+            officialDailyAlerts=True,
+            contestAlertIntervals=[15, 30],
+            duplicatesAllowed=True,
+            alertRoleID=11111,
+            useAlertRole=True
+        )
+        previousProblems = [
+            "two-sum"
+        ]
+        server = Server(sid=1, settings=serverSettings, previousProblems=previousProblems)
+        
+        p1 = Problem(pid=1, sid=1, difs="easy-med-hard", dow=1, hour=1, interval=1, premium=0)
+        p2 = Problem(pid=2, sid=1, difs="easy-med-hard", dow=1, hour=1, interval=1, premium=0)
+        p3 = Problem(pid=3, sid=1, difs="easy-med-hard", dow=1, hour=1, interval=1, premium=0)
+        problems = [p1, p2, p3]
+        
+        for problem in problems:
+            server.addProblem(problem)
+        return server
+
+
+    def genServer2(self) -> Server:
+        serverSettings = ServerSettings(
+            postingChannelID=12345,
+            weeklyContestAlerts=False,
+            biweeklyContestAlerts=False,
+            officialDailyAlerts=False,
+            contestAlertIntervals=[15, 30, 45], # TODO: what happens if we have contest alerts on but no intervals?
+            duplicatesAllowed=False,
+            alertRoleID=11111,
+            useAlertRole=False
+        )
+        previousProblems = [
+            "two-sum"
+        ]
+        server = Server(sid=2, settings=serverSettings, previousProblems=previousProblems)
+        
+        p1 = Problem(pid=1, sid=2, difs="easy", dow=1, hour=1, interval=0, premium=0)
+        p2 = Problem(pid=2, sid=2, difs="medium", dow=2, hour=2, interval=1, premium=1)
+        p3 = Problem(pid=3, sid=2, difs="hard", dow=3, hour=3, interval=2, premium=2)
+        p4 = Problem(pid=4, sid=2, difs="easy-medium", dow=4, hour=4, interval=3, premium=0)
+        p5 = Problem(pid=5, sid=2, difs="easy-medium-hard", dow=5, hour=5, interval=4, premium=0)
+        problems = [p1, p2, p3, p4, p5]
+        
+        for problem in problems:
+            server.addProblem(problem)
+        return server
+    
+    def genServer3(self) -> Server:
+        serverSettings = ServerSettings(
+            postingChannelID=12345,
+            weeklyContestAlerts=False,
+            biweeklyContestAlerts=False,
+            officialDailyAlerts=False,
+            contestAlertIntervals=[15, 30, 45], # TODO: what happens if we have contest alerts on but no intervals?
+            duplicatesAllowed=False,
+            alertRoleID=11111,
+            useAlertRole=False
+        )
+        previousProblems = [
+            "two-sum"
+        ]
+        server = Server(sid=3, settings=serverSettings, previousProblems=previousProblems)
+        
+        p1 = Problem(pid=1, sid=3, difs="easy", dow=1, hour=1, interval=1, premium=0)
+        p2 = Problem(pid=1, sid=3, difs="med", dow=1, hour=1, interval=1, premium=0)
+        p3 = Problem(pid=1, sid=3, difs="hard", dow=1, hour=1, interval=1, premium=0)
+        p4 = Problem(pid=1, sid=3, difs="easy-med", dow=1, hour=1, interval=1, premium=0)
+        p5 = Problem(pid=1, sid=3, difs="easy-med-hard", dow=1, hour=1, interval=1, premium=0)
+        problems = [p1, p2, p3, p4, p5]
+        
+        for problem in problems:
+            server.addProblem(problem)
+        return server
+    
+    

@@ -8,7 +8,7 @@ class QueryService:
     # gets the official daily leetcode problem
     def getDailyProblem(self) -> dict:
         args = {} 
-        return self.performQuery(QueryStrings.DAILY_PROBLEM, args)
+        return self._performQuery(QueryStrings.DAILY_PROBLEM, args)
     
     # can define an amount to get only that many
     def getUserRecentAcceptedSubmissions(self, username: str, amount: int = 10) -> dict:
@@ -16,23 +16,23 @@ class QueryService:
             "username" : username,
             "limit" : amount
         }
-        return self.performQuery(QueryStrings.RECENT_SUBMISSIONS, args)
+        return self._performQuery(QueryStrings.RECENT_SUBMISSIONS, args)
     
     def getUserProfile(self, username: str) -> dict:
         args = {
             "username" : username
             }
-        return self.performQuery(QueryStrings.USER_PROFILE, args)
+        return self._performQuery(QueryStrings.USER_PROFILE, args)
     
     def getQuestionInfo(self, slug: str) -> dict:
         args = {
             "titleSlug" : slug
         }
-        return self.performQuery(QueryStrings.QUESTION_INFO, args)
+        return self._performQuery(QueryStrings.QUESTION_INFO, args)
     
     def getUpcomingContests(self) -> dict:
         args = {}
-        return self.performQuery(QueryStrings.UPCOMING_CONTESTS, args)
+        return self._performQuery(QueryStrings.UPCOMING_CONTESTS, args)
 
     # internal query actions
     def _performQuery(self, query: str, variables: dict) -> dict:

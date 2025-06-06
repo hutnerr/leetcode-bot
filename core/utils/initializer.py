@@ -24,13 +24,16 @@ from core.models.server import Server
 class Initializer:
     
     @staticmethod
-    def initApp(generate: bool = False) -> App:
+    def initApp(generate: bool = False, passedInServers: dict[int, Server] = None) -> App:
         # if generate, gen servers
         # otherwise read from files
-        if generate:
-            servers = gen.generate()
+        if not passedInServers:
+            if generate:
+                servers = gen.generate()
+            else:
+                servers = readFromFiles()
         else:
-            servers = readFromFiles()
+            servers = passedInServers
         
         buckets = setupBuckets(servers)
         problemBucket, staticTimeBucket, contestTimeBucket = buckets

@@ -60,7 +60,10 @@ class ProblemService:
                 ps = self.problemSets["all"]
             case _: 
                 return None
-            
+        
+        if not problem.difficulties:
+            return None
+        
         difficulty = random.choice(problem.difficulties)        
         slug = random.choice(ps[difficulty])
         return slug
