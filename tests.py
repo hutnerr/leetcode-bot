@@ -1,6 +1,6 @@
-from testing import int_services as services_testing
-from testing import int_mediator as mediator_testing
-from testing import int_bucket as bucket_testing
+from testing import test_services as services_testing
+from testing import test_mediators as mediator_testing
+from testing import test_buckets as bucket_testing
 
 def services_integration_tests() -> None:
     print("===== Services Integration Tests =====")
@@ -25,7 +25,8 @@ def buckets_integration_tests() -> None:
 def mediators_integration_tests() -> None:
     print("===== Mediator Integration Tests =====")
     tests = [
-        ("Mediator\t", mediator_testing.testAlertBuilder),
+        ("AlertBuilder\t", mediator_testing.testAlertBuilder),
+        ("Synchronizer\t", mediator_testing.testSynchronizer),
     ]
     performTests(tests)
     
@@ -51,7 +52,7 @@ def testAll() -> None:
     print("======================\n")
     print("ALL TESTS COMPLETED")
 
-# testAll()
+testAll()
 # services_integration_tests()
-buckets_integration_tests()
+# buckets_integration_tests()
 # mediators_integration_tests()

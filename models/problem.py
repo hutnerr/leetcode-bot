@@ -25,6 +25,17 @@ class Problem:
     def __repr__(self) -> str:
         return self.__str__()
 
+    def __compare__(self, other: "Problem") -> bool:
+        if not isinstance(other, Problem):
+            return False
+        return (self.problemID == other.problemID and
+                self.serverID == other.serverID and
+                self.difficulties == other.difficulties and
+                self.dow == other.dow and
+                self.hour == other.hour and
+                self.interval == other.interval and
+                self.premium == other.premium)
+
     # builds what will be the dict key
     # splittable by :: later
     def getKey(self) -> str:

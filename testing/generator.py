@@ -86,9 +86,9 @@ class GeneratedServers:
         ]
         server = Server(sid=1, settings=serverSettings, previousProblems=previousProblems)
         
-        p1 = Problem(pid=1, sid=1, difs="easy-med-hard", dow=1, hour=1, interval=1, premium=0)
-        p2 = Problem(pid=2, sid=1, difs="easy-med-hard", dow=1, hour=1, interval=1, premium=0)
-        p3 = Problem(pid=3, sid=1, difs="easy-med-hard", dow=1, hour=1, interval=1, premium=0)
+        p1 = Problem(pid=1, sid=1, difs="easy-medium-hard", dow=1, hour=1, interval=1, premium=0)
+        p2 = Problem(pid=2, sid=1, difs="easy-medium-hard", dow=1, hour=1, interval=1, premium=0)
+        p3 = Problem(pid=3, sid=1, difs="easy-medium-hard", dow=1, hour=1, interval=1, premium=0)
         problems = [p1, p2, p3]
         
         for problem in problems:
@@ -142,14 +142,15 @@ class GeneratedServers:
         server = Server(sid=3, settings=serverSettings, previousProblems=previousProblems)
         
         p1 = Problem(pid=1, sid=3, difs="easy", dow=1, hour=1, interval=1, premium=0)
-        p2 = Problem(pid=1, sid=3, difs="med", dow=1, hour=1, interval=1, premium=0)
+        p2 = Problem(pid=1, sid=3, difs="medium", dow=1, hour=1, interval=1, premium=0)
         p3 = Problem(pid=1, sid=3, difs="hard", dow=1, hour=1, interval=1, premium=0)
-        p4 = Problem(pid=1, sid=3, difs="easy-med", dow=1, hour=1, interval=1, premium=0)
-        p5 = Problem(pid=1, sid=3, difs="easy-med-hard", dow=1, hour=1, interval=1, premium=0)
+        p4 = Problem(pid=1, sid=3, difs="easy-medium", dow=1, hour=1, interval=1, premium=0)
+        p5 = Problem(pid=1, sid=3, difs="easy-medium-hard", dow=1, hour=1, interval=1, premium=0)
         problems = [p1, p2, p3, p4, p5]
         
         for problem in problems:
-            server.addProblem(problem)
+            if not server.addProblem(problem):
+                print(f"Failed to add problem {problem} to server {server.serverID}")
         return server
     
     

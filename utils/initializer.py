@@ -41,7 +41,7 @@ class Initializer:
         services = setupServices()
         cacheService, queryService, problemService = services
         
-        mediators = setupMediators(servers, problemBucket, staticTimeBucket, contestTimeBucket, problemService)
+        mediators = setupMediators(servers, problemBucket, staticTimeBucket, contestTimeBucket, problemService, queryService)
         alertBuilder, synchronizer = mediators
         
         return App(servers, buckets, services, mediators)
@@ -117,8 +117,8 @@ def setupServices():
 # ================== Setup Mediators =====================
 # ========================================================
 
-def setupMediators(servers, problemBucket, staticTimeBucket, contestTimeBucket, problemService):
-    alertBuilder = AlertBuilder(servers, problemBucket, staticTimeBucket, contestTimeBucket, problemService)
+def setupMediators(servers, problemBucket, staticTimeBucket, contestTimeBucket, problemService, queryService):
+    alertBuilder = AlertBuilder(servers, problemBucket, staticTimeBucket, contestTimeBucket, problemService, queryService)
     synchronizer = Synchronizer(servers, problemBucket, staticTimeBucket, contestTimeBucket)
     return (alertBuilder, synchronizer)
 

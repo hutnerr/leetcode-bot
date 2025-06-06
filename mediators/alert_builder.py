@@ -6,6 +6,7 @@ from models.problem import Problem
 from models.alert import Alert, AlertType
 
 from services.problem_service import ProblemService
+from services.query_service import QueryService
 
 from buckets.problem_bucket import ProblemBucket
 from buckets.static_time_bucket import StaticTimeBucket, StaticTimeAlert
@@ -19,23 +20,25 @@ class AlertBuilder:
                  problemBucket: ProblemBucket, 
                  staticTimeBucket: StaticTimeBucket, 
                  contestTimeBucket: ContestTimeBucket, 
-                 problemService: ProblemService
+                 problemService: ProblemService,
+                 queryService: QueryService
                  ):
         self.servers = servers
         self.problemBucket = problemBucket
         self.staticTimeBucket = staticTimeBucket
         self.contestTimeBucket = contestTimeBucket
         self.problemService = problemService
+        self.queryService = queryService
 
     # collects all the server & channel ids and the slug of the problem that has beens selected based 
     # on the server settings and the problem bucket for the day of week, hour, and interval
-    def buildProblemAlerts(self, dow: int, hour: int, interval: int) -> list[Alert] | None:
+    def buildProblemAlerts(self, dow: int, hour: int, interval: int) -> list[Alert]:
         alerts = []
         
         # the bucket problems are the problems we want to notify the servers about
         bucket = self.problemBucket.getBucket(dow, hour, interval)
         if bucket is None:
-            return None
+            return []
         
         # sid = serverID, pid = problemID
         for problem in bucket:
@@ -66,27 +69,28 @@ class AlertBuilder:
                 }
                 alerts.append(Alert(AlertType.PROBLEM, server.serverID, server.settings.postingChannelID, info))
             
+            #FIXME: Might move this logic elsewhere
             server.addPreviousProblem(slug) # consider selected problem "previous"
             
         return alerts
 
 
     # collects the server & channel IDs and builds the alert message for the contest alerts
-    def buildContestAlerts(self, timeAway: str, weekly: bool = False) -> list[Alert] | None:
+    def buildContestAlerts(self, interval: int, alertType: AlertType) -> list[Alert]:
         alerts = []
-        
-        if weekly:
+
+        if alertType == AlertType.WEEKLY_CONTEST:
             contestType = "Weekly"
-            alertType = AlertType.WEEKLY_CONTEST
-        else:
+        elif alertType == AlertType.BIWEEKLY_CONTEST:
             contestType = "Biweekly"
-            alertType = AlertType.BIWEEKLY_CONTEST
+        else:
+            return []
 
-        alertString = f"Upcoming {contestType} Contest in {timeh.minutesToHours(timeAway)}"
+        alertString = f"Upcoming {contestType} Contest in {timeh.minutesToHours(interval)}"
 
-        serversToNotify = self.contestTimeBucket.getBucket(timeAway)
+        serversToNotify = self.contestTimeBucket.getBucket(interval)
         if not serversToNotify: # no servers to notify
-            return None
+            return []
         
         for serverID in serversToNotify:
             server = self.servers[serverID]            
@@ -105,13 +109,14 @@ class AlertBuilder:
         
         
     # these alerts all happen at a static time, so we can just get the channel IDs, build the alert message, and return them
-    def buildStaticAlerts(self, alert: StaticTimeAlert) -> list[Alert] | None:
-        
-        def buildStaticAlertString(self, alert: StaticTimeAlert) -> str | None:
+    def buildStaticAlerts(self, alert: StaticTimeAlert) -> list[Alert]:
+
+        def buildStaticAlertString() -> str | None:
             # we have a contest
             if (alert == StaticTimeAlert.WEEKLY_CONTEST) or (alert == StaticTimeAlert.BIWEEKLY_CONTEST):
                 contestType = alert.value.capitalize() # FIXME: uses the enum value, might be ugly
-                info = self.queryManager.getUpcomingContests()
+                
+                info = self.queryService.getUpcomingContests()
                 
                 contests = info["data"]["upcomingContests"]
                 title = None
@@ -129,7 +134,7 @@ class AlertBuilder:
 
             # FIXME: also might need a delay on this 
             elif alert == StaticTimeAlert.DAILY_PROBLEM:
-                slug = self.queryManager.getDailyProblem()["data"]["challenge"]["question"]["titleSlug"]
+                slug = self.queryService.getDailyProblem()["data"]["challenge"]["question"]["titleSlug"]
                 return f"Daily Problem Released: {probh.slugToURL(slug)}"
             else:
                 return None # invalid alert
@@ -138,11 +143,11 @@ class AlertBuilder:
         
         serversToNotify = self.staticTimeBucket.getBucket(alert)
         if not serversToNotify:
-            return None
+            return []
 
-        alertString = buildStaticAlertString(alert)
+        alertString = buildStaticAlertString()
         if alertString is None:
-            return None
+            return []
 
         match (alert):
             case StaticTimeAlert.WEEKLY_CONTEST:
@@ -152,14 +157,13 @@ class AlertBuilder:
             case StaticTimeAlert.DAILY_PROBLEM:
                 alertType = AlertType.DAILY_PROBLEM
             case _:
-                return None
+                return []
 
         for serverID in serversToNotify:
             server = self.servers[serverID]
             info = {
                 "alertString" : alertString
             }
-            alerts.append(alertType, server.serverID, server.settings.postingChannelID, info)
+            alerts.append(Alert(alertType, server.serverID, server.settings.postingChannelID, info))
 
-        return alertString
-    
+        return alerts
