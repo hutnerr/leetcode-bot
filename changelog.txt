@@ -42,3 +42,21 @@
 - minor refactoring the base classes
 - added a setting to track previously sent problems 
 - made a problem helper for minor things related to lc problems
+
+6/4/2025
+~~~~~~~~~~
+- added a server role setting
+- added some helper funcs to query manager
+- implemented alert manager functionality for contest time and static alerts
+
+6/5/2025
+~~~~~~~~~~
+- general restructure and rewrite
+- combined dowbuckets and problembuckets
+- decoupled some classes
+- added the mediator folder
+- moved utils into the core
+- added an alert class 
+- split spam.py up into app, testing/generator, and services/initializer
+- implemented some enums to use instead of strings
+- tons of other refactoring

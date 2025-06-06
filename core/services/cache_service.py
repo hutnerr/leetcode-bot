@@ -1,9 +1,11 @@
-from utils import json_helper as jsonh
-from utils import file_helper as fh
-from utils import problem_helper as probHelper
 import os
 
-class CacheManager():
+from core.utils import json_helper as jsonh
+from core.utils import file_helper as fh
+from core.utils import problem_helper as probHelper
+
+# service that handles operations related to caching
+class CacheService:
     CACHELOCATION: str = os.path.join("data", "problem_cache")
 
     def __init__(self):
@@ -13,7 +15,7 @@ class CacheManager():
     # initializes the cache by reading all json files in the cache directory
     # and storing them in the cachedProblems dict
     def initCache(self):
-        problems = fh.getFilesInDirectory(self.CACHELOCATION, show_extensions=False)
+        problems = fh.getFilesInDirectory(self.CACHELOCATION, showExtensions=False)
 
         for prob in problems:
             path = os.path.join(self.CACHELOCATION, f"{prob}.json")

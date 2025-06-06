@@ -1,9 +1,9 @@
 import os
 
 # if create is false, just check if the directory exists.
-def directoryExists(file_path: str, create: bool = False) -> bool:
+def directoryExists(filePath: str, create: bool = False) -> bool:
     try:
-        directory = os.path.dirname(file_path)
+        directory = os.path.dirname(filePath)
         if directory and not os.path.exists(directory):
             if create:
                 os.makedirs(directory)
@@ -16,20 +16,20 @@ def directoryExists(file_path: str, create: bool = False) -> bool:
         return False
 
 
-def fileExists(file_path: str) -> bool:
-    return os.path.isfile(file_path)
+def fileExists(filePath: str) -> bool:
+    return os.path.isfile(filePath)
 
 
 # returns a list of files in the given directory
 # does not include other directories or subdirectories
-def getFilesInDirectory(directory: str, show_extensions: bool = True) -> list[str]:
+def getFilesInDirectory(directory: str, showExtensions: bool = True) -> list[str]:
     if not os.path.isdir(directory):
         return []
 
     # if show_extensions is true, return the full file names with extensions
     # e.g. ['file1.txt', 'file2.py'] otherwise return just the file names without extensions
     # e.g. ['file1', 'file2']
-    if show_extensions:
+    if showExtensions:
         return [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
     else:
         return [os.path.splitext(f)[0] for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]

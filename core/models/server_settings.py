@@ -1,7 +1,16 @@
+# composition piece used by a Server
+# just contains additional server settings 
 class ServerSettings:
-
-    # long line lol sorry
-    def __init__(self, postingChannelID: int = None, weeklyContestAlerts: bool = False, biweeklyContestAlerts: bool = False, officialDailyAlerts: bool = False, contestAlertIntervals: list[int] = None, duplicatesAllowed: bool = False, alertRoleID: int = None, useAlertRole: bool = False):
+    def __init__(self,
+                 postingChannelID: int = None,
+                 weeklyContestAlerts: bool = False,
+                 biweeklyContestAlerts: bool = False,
+                 officialDailyAlerts: bool = False,
+                 contestAlertIntervals: list[int] = None,
+                 duplicatesAllowed: bool = False,
+                 alertRoleID: int = None,
+                 useAlertRole: bool = False
+                 ):
         self.postingChannelID = postingChannelID
         self.weeklyContestAlerts = weeklyContestAlerts
         self.biweeklyContestAlerts = biweeklyContestAlerts
@@ -10,6 +19,17 @@ class ServerSettings:
         self.duplicatesAllowed = duplicatesAllowed
         self.alertRoleID = alertRoleID
         self.useAlertRole = useAlertRole
+
+    def __str__(self) -> str:
+        return (f"postingChannelID={self.postingChannelID}\n"
+                f"\t\tweeklyContestAlerts={self.weeklyContestAlerts}\n"
+                f"\t\tbiweeklyContestAlerts={self.biweeklyContestAlerts}\n"
+                f"\t\tofficialDailyAlerts={self.officialDailyAlerts}\n"
+                f"\t\tcontestAlertIntervals={self.contestAlertIntervals}\n"
+                f"\t\tduplicatesAllowed={self.duplicatesAllowed}\n"
+                f"\t\talertRoleID={self.alertRoleID}\n"
+                f"\t\tuseAlertRole={self.useAlertRole}\n"
+                )
 
     def toJSON(self) -> dict:
         return {
@@ -22,17 +42,6 @@ class ServerSettings:
             "alertRoleID": self.alertRoleID,
             "useAlertRole": self.useAlertRole
         }
-
-    def __str__(self) -> str:
-        return (f"postingChannelID={self.postingChannelID}\n"
-                f"\t\tweeklyContestAlerts={self.weeklyContestAlerts}\n"
-                f"\t\tbiweeklyContestAlerts={self.biweeklyContestAlerts}\n"
-                f"\t\tofficialDailyAlerts={self.officialDailyAlerts}\n"
-                f"\t\tcontestAlertIntervals={self.contestAlertIntervals}\n"
-                f"\t\tduplicatesAllowed={self.duplicatesAllowed}\n"
-                f"\t\talertRoleID={self.alertRoleID}\n"
-                f"\t\tuseAlertRole={self.useAlertRole}\n"
-                )
 
     @staticmethod
     def buildFromJSON(settings: dict) -> "ServerSettings":

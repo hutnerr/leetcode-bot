@@ -1,3 +1,6 @@
+# representation of a leetcode problem settings
+# used by servers 
+# stores information to determine what type of problem & when it should be sent
 class Problem:
 
     def __init__(self, pid: int, sid: int, difs: str, dow: int, hour: int, interval: int, premium: int):

@@ -1,57 +1,51 @@
-from enum import Enum
 import requests
+from enum import Enum
 
-
-class QueryManager:
+# performs queries
+class QueryService:
     API_URL: str = "https://leetcode.com/graphql"
     
+    # gets the official daily leetcode problem
     def getDailyProblem(self) -> dict:
         args = {} 
-        return self.performQuery(Query.DAILY_PROBLEM, args)
+        return self.performQuery(QueryStrings.DAILY_PROBLEM, args)
     
+    # can define an amount to get only that many
     def getUserRecentAcceptedSubmissions(self, username: str, amount: int = 10) -> dict:
         args = {
             "username" : username,
             "limit" : amount
         }
-        return self.performQuery(Query.RECENT_SUBMISSIONS, args)
+        return self.performQuery(QueryStrings.RECENT_SUBMISSIONS, args)
     
     def getUserProfile(self, username: str) -> dict:
         args = {
             "username" : username
             }
-        return self.performQuery(Query.USER_PROFILE, args)
+        return self.performQuery(QueryStrings.USER_PROFILE, args)
     
     def getQuestionInfo(self, slug: str) -> dict:
         args = {
             "titleSlug" : slug
         }
-        return self.performQuery(Query.QUESTION_INFO, args)
+        return self.performQuery(QueryStrings.QUESTION_INFO, args)
     
     def getUpcomingContests(self) -> dict:
         args = {}
-        return self.performQuery(Query.UPCOMING_CONTESTS, args)
+        return self.performQuery(QueryStrings.UPCOMING_CONTESTS, args)
 
-    def performQuery(self, query: str, variables: dict) -> dict:
-        """
-        Perform a query on the leetcode graphql api
-        Args:
-            query (str): The query to perform. Use tools.consts.Query for the queries
-            variables (dict): THe variables to pass to the query
-        Returns:
-            dict: The json response dict. 
-        """
-        query = query.value
-
+    # internal query actions
+    def _performQuery(self, query: str, variables: dict) -> dict:
         json = {
-            'query': query,
+            'query': query.value,
             'variables': variables
         }
-        response = requests.post(self.API_URL, json=json)
-        return response.json()
+        return requests.post(self.API_URL, json=json).json()
 
-
-class Query(Enum):
+# enum class that holds the query strings 
+# can also be used to see what you need to pass
+# and what you will get back
+class QueryStrings(Enum):
     """ 
     DAILY_PROBLEM: Retrieves info about the daily problem
     RECENT_SUBMISSIONS: Retrieves the recent submissions of a user

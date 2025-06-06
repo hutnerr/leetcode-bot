@@ -1,7 +1,9 @@
-from core.problem import Problem
-from core.server_settings import ServerSettings
-from utils import json_helper as jsonh
+from core.models.problem import Problem
+from core.models.server_settings import ServerSettings
 
+from core.utils import json_helper as jsonh
+
+# representation of a discord server
 class Server:
     
     MAXPROBLEMS = 5
@@ -11,7 +13,6 @@ class Server:
         self.settings = settings
         self.previousProblems = previousProblems if previousProblems is not None else []
         self.problems:list[Problem] = [None] * (self.MAXPROBLEMS + 1) # +1 to account for 0 index, so 0 is unused
-
 
     def __str__(self) -> str:
         problems_str = ""
@@ -33,8 +34,8 @@ class Server:
     def __hash__(self):
         return hash(self.serverID)
     
-    # adds a problem to the server
-    # should only be called by the problem manager
+    # ADDING AND REMOVING SHOULD BE CALLED BY A SYNCRONIZER
+    # TO ENSURE THAT THE BUCKET AND MODEL CONTAIN THE SAME DATA
     def addProblem(self, problem: Problem) -> bool:
         id:int = problem.problemID
         if id < 0 or id > self.MAXPROBLEMS:
@@ -43,9 +44,8 @@ class Server:
         self.toJSON()
         return True
     
-    
-    # removes a problem from the server
-    # should also only be called by the problem manager
+    # ADDING AND REMOVING SHOULD BE CALLED BY A SYNCRONIZER
+    # TO ENSURE THAT THE BUCKET AND MODEL CONTAIN THE SAME DATA
     def removeProblem(self, problem: Problem) -> bool:
         id:int = problem.problemID
         if id < 0 or id > self.MAXPROBLEMS:
@@ -54,17 +54,14 @@ class Server:
         self.toJSON()
         return True
 
-
     def isProblemDuplicate(self, slug: str) -> bool:
         return slug in self.previousProblems
-    
-    
+        
     # adds a problem to the previous problems list
     def addPreviousProblem(self, slug: str):
         if slug not in self.previousProblems:
             self.previousProblems.append(slug)
             self.toJSON()
-    
     
     # save the server to JSON
     def toJSON(self):
@@ -76,7 +73,6 @@ class Server:
         }
         jsonh.writeJSON(f"data/servers/{self.serverID}.json", data)
         
-
     # ===================================
     # helper functions
     # ===================================
@@ -99,3 +95,4 @@ class Server:
                 server.problems[pid] = prob
 
         return server
+    
