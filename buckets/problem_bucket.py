@@ -78,3 +78,6 @@ class ProblemBucket:
                     hour = i // self.NUMINTERVALS
                     interval = i % self.NUMINTERVALS
                     print(f"[{hour:02d}:{interval * 15:02d}] -> {sorted(bucket)}")
+
+
+# TODO: Make enums for intervals, hours, days of week?

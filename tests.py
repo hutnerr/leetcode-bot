@@ -51,7 +51,7 @@ def testAll() -> None:
     print("======================\n")
     print("ALL TESTS COMPLETED")
 
-testAll()
+# testAll()
 # services_integration_tests()
-# buckets_integration_tests()
+buckets_integration_tests()
 # mediators_integration_tests()

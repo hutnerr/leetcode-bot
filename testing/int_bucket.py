@@ -1,6 +1,7 @@
 from testing.generator import GeneratedServers
 from utils.initializer import Initializer
 from models.app import App
+from models.problem import Problem
 import copy
 
 from buckets.static_time_bucket import StaticTimeAlert
@@ -102,11 +103,54 @@ def testContestTimeBucket() -> bool:
 
 # problem bucket
 def testProblemBucket() -> bool:
+    INVALIDNUM = -999
+    
     app = makeApp()
     
     problemBucket = app.problemBucket
     assert problemBucket is not None, "App's problemBucket is None"
+    
+    initialBucket = copy.deepcopy(problemBucket.buckets)
+    
+    validProblem = Problem(pid=1, sid=5, difs="easy", dow=1, hour=1, interval=1, premium=0)
+    invalidDOW = Problem(pid=1, sid=1, difs="", dow=INVALIDNUM, hour=1, interval=1, premium=0)
+    invalidHour = Problem(pid=1, sid=1, difs="", dow=1, hour=INVALIDNUM, interval=1, premium=0)
+    invalidInterval = Problem(pid=1, sid=1, difs="", dow=1, hour=1, interval=INVALIDNUM, premium=0)
+    invalidPIDLT0 = Problem(pid=INVALIDNUM, sid=1, difs="", dow=1, hour=1, interval=1, premium=0) # < 0 problem id
+    invalidPIDGTMP = Problem(pid=-INVALIDNUM, sid=1, difs="", dow=1, hour=1, interval=1, premium=0) # > server.maxproblems id
+    
+    # getBucket
+    # valid problem
+    assert problemBucket.getBucket(dow=INVALIDNUM, hour=1, interval=1) is None, "Successfully got an invalid DOW"
+    assert problemBucket.getBucket(dow=1, hour=INVALIDNUM, interval=1) is None, "Successfully got an invalid hour"
+    assert problemBucket.getBucket(dow=1, hour=1, interval=INVALIDNUM) is None, "Successfully got an invalid interval"    
+    assert len(problemBucket.getBucket(dow=7, hour=1, interval=1)) == 0, "A bucket that exist but should be empty had items"
+    assert problemBucket.getBucket(dow=1, hour=1, interval=1) is not None, "Failed to get a bucket that should have items"
 
-    # problemBucket.printBucketClean()
+    # asser that bucket 1,1,1 has 4 items in it
+    bucket111 = problemBucket.getBucket(dow=1, hour=1, interval=1)
+    expectedBucket = set(["1::1", "1::2", "1::3", "3::1"])
+    assert bucket111, "Bucket 1,1,1 is None when it should have items"
+    assert len(bucket111) == 4, "Bucket 1,1,1 did not have the expected number of items"    
+    assert bucket111 == expectedBucket, "Bucket 1,1,1 did not have the expected items"
+
+    # addToBucket
+    assert not problemBucket.addToBucket(invalidDOW), "Added a problem with an invalid DOW"
+    assert not problemBucket.addToBucket(invalidHour), "Added a problem with an invalid hour"
+    assert not problemBucket.addToBucket(invalidInterval), "Added a problem with an invalid interval"
+    assert not problemBucket.addToBucket(invalidPIDLT0), "Added a problem with a < 0 problem id"
+    assert not problemBucket.addToBucket(invalidPIDGTMP), "Added a problem with a > server.maxproblems id"
+    assert problemBucket.addToBucket(validProblem), "Failed to add a valid problem to the bucket"
+    assert initialBucket != problemBucket.buckets, "Initial bucket is equal to current bucket after adding a valid problem"
+    
+    # removeFromBucket
+    assert not problemBucket.removeFromBucket(invalidDOW), "Removed a problem with an invalid DOW"
+    assert not problemBucket.removeFromBucket(invalidHour), "Removed a problem with an invalid hour"
+    assert not problemBucket.removeFromBucket(invalidInterval), "Removed a problem with an invalid interval"
+    assert not problemBucket.removeFromBucket(invalidPIDLT0), "Removed a problem with a < 0 problem id"
+    assert not problemBucket.removeFromBucket(invalidPIDGTMP), "Removed a problem with a > server.maxproblems id"
+    assert problemBucket.removeFromBucket(validProblem), "Failed to remove a valid problem from the bucket"
+    assert initialBucket == problemBucket.buckets, "Initial bucket not equal to current bucket after removing the only thing added"
+    assert not problemBucket.removeFromBucket(Problem(pid=4, sid=1, difs="", dow=1, hour=1, interval=1, premium=0)), "Removed a problem that was not in the bucket"
     
     return True
