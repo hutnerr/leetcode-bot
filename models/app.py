@@ -8,6 +8,7 @@ from services.query_service import QueryService
 
 from mediators.synchronizer import Synchronizer
 from mediators.alert_builder import AlertBuilder
+from mediators.submitter import Submitter
 
 from models.server import Server
 from models.user import User
@@ -28,3 +29,4 @@ class App:
         
         self.alertBuilder: AlertBuilder = mediators[0]
         self.synchronizer: Synchronizer = mediators[1]
+        self.submitter: Submitter = mediators[2]

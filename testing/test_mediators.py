@@ -81,6 +81,9 @@ def testAlertBuilder() -> bool:
     biweekyStaticAlerts = alertBuilder.buildStaticAlerts(StaticTimeAlert.BIWEEKLY_CONTEST)
     assert biweekyStaticAlerts is not None, "Biweekly static alerts should not be None"
     assert len(biweekyStaticAlerts) == 1, "There should be 1 biweekly static alert"
+    # NOTE: This might fail sometimes because the new contest is being returned 
+    # in the api query, so it might return false and the length will be 0
+    
     
     dailyStaticAlerts = alertBuilder.buildStaticAlerts(StaticTimeAlert.DAILY_PROBLEM)    
     assert dailyStaticAlerts is not None, "Daily static alerts should not be None"

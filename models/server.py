@@ -10,12 +10,12 @@ class Server:
     
     MAXPROBLEMS = 5
 
-    def __init__(self, sid:int, settings:ServerSettings, previousProblems:list[str] = None, activeProblems:list[tuple[str, set]] = None):
+    def __init__(self, sid:int, settings:ServerSettings, previousProblems:list[str] = None, activeProblems:list[tuple[str, str, set]] = None):
         self.serverID = sid
         self.settings = settings
         self.previousProblems = previousProblems if previousProblems is not None else []
         self.problems :list[Problem] = [None] * (self.MAXPROBLEMS + 1) # +1 to account for 0 index, so 0 is unused
-        self.activeProblems = activeProblems if activeProblems is not None else [("", set())] * (self.MAXPROBLEMS + 1)
+        self.activeProblems = activeProblems if activeProblems is not None else [("", "", set())] * (self.MAXPROBLEMS + 1)
 
     def __str__(self) -> str:
         problems_str = ""
@@ -56,7 +56,7 @@ class Server:
         if id < 0 or id > self.MAXPROBLEMS:
             return False
         self.problems[id] = None
-        self.activeProblems[id] = ("", set()) # reset the active problem slug as well
+        self.activeProblems[id] = ("", "", set()) # reset the active problem slug as well
         self.toJSON()
         return True
 
@@ -64,7 +64,7 @@ class Server:
     # when a problem is deemed active is is also deemed "previous"
     # TODO: should be being called on the results gotten back from the alert builder
     # and right before being added
-    def addActiveProblem(self, slug: str, problemID: int) -> None:
+    def addActiveProblem(self, slug: str, difficulty: str, problemID: int) -> None:
         self.addPreviousProblem(slug) # to prevent duplicates
     
         for problem in self.activeProblems:
@@ -76,8 +76,20 @@ class Server:
 
         # initialize the active problem with an empty set of users
         # because no one has submitted yet
-        self.activeProblems[problemID] = (slug, set())
+        self.activeProblems[problemID] = (slug, difficulty, set())
         self.toJSON()
+
+    def addSubmittedUser(self, userID: int, problemID) -> bool:
+        if problemID not in self.activeProblems:
+            return False
+        
+        activeProblem = self.activeProblems[problemID]
+        if not activeProblem:
+            return False
+        
+        submittedUsers: set = activeProblem[2]
+        submittedUsers.add(userID)
+        return True
 
     def isProblemDuplicate(self, slug: str) -> bool:
         return slug in self.previousProblems
@@ -94,7 +106,7 @@ class Server:
             "serverID": self.serverID,
             "settings": self.settings.toJSON(),
             "previousProblems": self.previousProblems,
-            "activeProblems": [(slug, list(users)) for slug, users in self.activeProblems], 
+            "activeProblems": [(slug, difficulty, list(users)) for slug, difficulty, users in self.activeProblems], 
             "problems": [problem.toJSON() for problem in self.problems if problem]
         }
         jsonh.writeJSON(f"{os.path.join('data', 'servers', f'{self.serverID}.json')}", data)
@@ -112,7 +124,7 @@ class Server:
         settings = ServerSettings.buildFromJSON(settings)
         problems = [Problem.buildFromJSON(prob) for prob in data["problems"]]
         previousProblems = data["previousProblems"]
-        activeProblems = [(slug, set(users)) for slug, users in data["activeProblems"]]
+        activeProblems = [(slug, difficulty, set(users)) for slug, difficulty, users in data["activeProblems"]]
 
         server = Server(sid, settings, previousProblems, activeProblems)
 

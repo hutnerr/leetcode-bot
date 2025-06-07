@@ -15,6 +15,7 @@ from services.query_service import QueryService
 
 from mediators.synchronizer import Synchronizer
 from mediators.alert_builder import AlertBuilder
+from mediators.submitter import Submitter
 
 from models.app import App
 from models.server import Server
@@ -45,8 +46,8 @@ class Initializer:
         services = setupServices()
         cacheService, queryService, problemService = services
         
-        mediators = setupMediators(servers, problemBucket, staticTimeBucket, contestTimeBucket, problemService, queryService)
-        alertBuilder, synchronizer = mediators
+        mediators = setupMediators(servers, users, problemBucket, staticTimeBucket, contestTimeBucket, problemService, queryService)
+        alertBuilder, synchronizer, submitter = mediators
 
         return App(servers, users, buckets, services, mediators)
         
@@ -130,8 +131,9 @@ def setupServices():
 # ================== Setup Mediators =====================
 # ========================================================
 
-def setupMediators(servers, problemBucket, staticTimeBucket, contestTimeBucket, problemService, queryService):
+def setupMediators(servers, users, problemBucket, staticTimeBucket, contestTimeBucket, problemService, queryService):
     alertBuilder = AlertBuilder(servers, problemBucket, staticTimeBucket, contestTimeBucket, problemService, queryService)
     synchronizer = Synchronizer(servers, problemBucket, staticTimeBucket, contestTimeBucket)
-    return (alertBuilder, synchronizer)
+    submitter = Submitter(servers, users, queryService)
+    return (alertBuilder, synchronizer, submitter)
 

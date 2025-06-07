@@ -20,6 +20,10 @@ class User:
         self.leetcodeUsername = username.strip()
         self.toJSON()
     
+    def addPoints(self, points: int):
+        self.points += points
+        self.toJSON()
+    
     def toJSON(self) -> dict:
         data =  {
             "discordID": self.discordID,

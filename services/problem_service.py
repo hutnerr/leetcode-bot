@@ -50,7 +50,7 @@ class ProblemService:
                 self.problemSets["free"][dif].append(slug)
     
     # uses the problem to get a slug for the problem
-    def selectProblem(self, problem: Problem) -> str:
+    def selectProblem(self, problem: Problem) -> tuple[str, str]:
         match problem.premium:
             case 0: # free
                 ps = self.problemSets["free"]
@@ -66,5 +66,5 @@ class ProblemService:
         
         difficulty = random.choice(problem.difficulties)        
         slug = random.choice(ps[difficulty])
-        return slug
+        return (slug, difficulty)
         

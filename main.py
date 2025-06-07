@@ -1,3 +1,4 @@
+import random
 from utils.initializer import Initializer
 
 def main():
@@ -7,9 +8,14 @@ def main():
 
     # app = Initializer.initApp(True, nservers=NSERVERS, nproblems=NPROBLEMS, nusers=NUSERS)
     app = Initializer.initApp()
-    # app.problemBucket.printBucketClean()
-    print(app.users)
+
+    submitter = app.submitter
+    user = random.choice(list(app.users.values()))
+    user.leetcodeUsername = "hutnerr"
+    slug = "maximum-difference-by-remapping-a-digit"
     
+    print(submitter.userCompletedProblem(user, slug))
+
 
 
 if __name__ == "__main__":

@@ -51,9 +51,9 @@ def testProblemService() -> bool:
 
     assert not (p1 is None or p2 is None or p3 is None), "One of the problems is None, but it shouldn't be"
     
-    p1slug = problemService.selectProblem(p1)
-    p2slug = problemService.selectProblem(p2)
-    p3slug = problemService.selectProblem(p3)
+    p1slug, p1dif = problemService.selectProblem(p1)
+    p2slug, p2dif = problemService.selectProblem(p2)
+    p3slug, p3dif = problemService.selectProblem(p3)
 
     assert p1slug and p2slug and p3slug, "Failed in problem selection"
     
@@ -128,6 +128,13 @@ def testQueryService() -> bool:
 
     return True
 
+
+def testSubmitter() -> bool:
+    # add a user, test if its actually in users
+    # whatveer else needs done 
+    pass
+
+
 def lifecycleTest() -> bool:
     app = makeApp()
     queryService = app.queryService
@@ -135,7 +142,7 @@ def lifecycleTest() -> bool:
     cacheService = app.cacheService
 
     problem = Problem(pid=1, sid=2, difs="easy-medium", dow=1, hour=1, interval=1, premium=0) # easy/medium, free problem
-    problemSlug = problemService.selectProblem(problem)
+    problemSlug, problemDifficulty = problemService.selectProblem(problem)
     
     if cacheService.existsInCache(problemSlug):
         problemInfo = cacheService.getFromCache(problemSlug)

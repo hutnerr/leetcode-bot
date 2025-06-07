@@ -53,7 +53,7 @@ class AlertBuilder:
             if problem is None: # couldn't find the problemID
                 continue
             
-            slug = self.problemService.selectProblem(problem)
+            slug, difficulty = self.problemService.selectProblem(problem)
             
             # if a problem is a duplicate, get a new one
             allowDuplicates = server.settings.duplicatesAllowed
@@ -66,7 +66,8 @@ class AlertBuilder:
             if server.settings.postingChannelID is not None:
                 info = {
                     "slug" : slug,
-                    "pid" : pid
+                    "pid" : pid,
+                    "difficulty" : difficulty
                 }
                 alerts.append(Alert(AlertType.PROBLEM, server.serverID, server.settings.postingChannelID, info))
             
@@ -113,9 +114,7 @@ class AlertBuilder:
             # we have a contest
             if (alert == StaticTimeAlert.WEEKLY_CONTEST) or (alert == StaticTimeAlert.BIWEEKLY_CONTEST):
                 contestType = alert.value.capitalize() # FIXME: uses the enum value, might be ugly
-                
-                info = self.queryService.getUpcomingContests()
-                
+    
                 contests = info["data"]["upcomingContests"]
                 title = None
                 for contest in contests:
