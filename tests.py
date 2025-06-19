@@ -1,6 +1,7 @@
 from testing import test_services as services_testing
 from testing import test_mediators as mediator_testing
 from testing import test_buckets as bucket_testing
+from testing import test_other as other_testing
 
 def services_integration_tests() -> None:
     print("===== Services Integration Tests =====")
@@ -30,7 +31,13 @@ def mediators_integration_tests() -> None:
         ("Submitter\t", mediator_testing.testSubmitter),
     ]
     performTests(tests)
-    
+
+def other_integration_tests() -> None:
+    print("===== Other Integration Tests =====")
+    tests = [
+        ("DuplicateProb\t", other_testing.testDuplicateProblem),
+    ]
+    performTests(tests)
 
 def performTests(tests) -> None:
     all_passed = True
@@ -48,6 +55,7 @@ def testAll() -> None:
     res1 = services_integration_tests()
     res2 = buckets_integration_tests()
     res3 = mediators_integration_tests()
+    res4 = other_integration_tests()
 
     # No need to check results, as asserts will raise on failure
     print("======================\n")
@@ -57,3 +65,4 @@ testAll()
 # services_integration_tests()
 # buckets_integration_tests()
 # mediators_integration_tests()
+# other_integration_tests()

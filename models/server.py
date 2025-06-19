@@ -64,26 +64,30 @@ class Server:
     # when a problem is deemed active is is also deemed "previous"
     # TODO: should be being called on the results gotten back from the alert builder
     # and right before being added
-    def addActiveProblem(self, slug: str, difficulty: str, problemID: int) -> None:
-        self.addPreviousProblem(slug) # to prevent duplicates
-    
+    def addActiveProblem(self, slug: str, difficulty: str, problemID: int) -> bool:
+        if not self.addPreviousProblem(slug): # to prevent duplicates
+            return False
+
         for problem in self.activeProblems:
             if problem[0] == slug: # get the slug portion of the tuple
-                return
+                return False
     
         if problemID < 0 or problemID > self.MAXPROBLEMS:
-            return
+            return False
 
         # initialize the active problem with an empty set of users
         # because no one has submitted yet
         self.activeProblems[problemID] = (slug, difficulty, set())
         self.toJSON()
+        return True
 
     # adds a problem to the previous problems list
     def addPreviousProblem(self, slug: str) -> None:
         if slug not in self.previousProblems:
             self.previousProblems.append(slug)
             self.toJSON()
+            return True
+        return False
 
     def addSubmittedUser(self, userID: int, problemID) -> bool:
         if not self.isProblemIDActive(problemID):

@@ -247,18 +247,25 @@ def testSubmitter() -> bool:
     
     user.leetcodeUsername = username # reset username back to a valid one
     
+    
+    
     # submit
     serverID = 1
-    problemID = 1 
-    slug = "two-sum"  # the slug for the problem we want to submit
-    
     server = app.servers.get(serverID)
     assert server is not None, "Server should not be None"
-    server.addActiveProblem(slug, "easy", problemID)  # add the problem to the server's active problems
+    
+    problemID = 1
+    slug = "smallest-even-multiple"    
+    server.addActiveProblem(slug, "easy", problemID)  
     
     hardSlug = "median-of-two-sorted-arrays"
     hardProblemID = 2
     server.addActiveProblem(hardSlug, "hard", hardProblemID) 
+
+    dupProblemID = 3
+    dupSlug = "two-sum"  # the slug for the problem we want to submit
+    server.addActiveProblem(dupSlug, "easy", dupProblemID) # try and add a previous problem to the server
+    assert not server.addActiveProblem(dupSlug, "easy", dupProblemID), f"Should not be able to add active problem {dupSlug} as it is a duplicate"
     
     beforePoints = user.points
     assert user.discordID not in server.activeProblems[problemID][2], "User should not be in the submitted users for the problem"
@@ -271,6 +278,6 @@ def testSubmitter() -> bool:
     assert not submitter.submit(serverID, user.discordID, -1), "User should not be able to submit with an invalid problem ID"
     assert not submitter.submit(serverID, user.discordID, 999999), "User should not be able to submit with a problem ID that does not exist"
     assert not submitter.submit(serverID, user.discordID, hardProblemID), "User should not be able to submit a problem they have not completed"
-    assert not submitter.submit(serverID, user.discordID, 3), "User should not be able to submit a problem that is not active "
+    assert not submitter.submit(serverID, user.discordID, 4), "User should not be able to submit a problem that is not active "
 
     return True
