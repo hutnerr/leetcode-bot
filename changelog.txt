@@ -76,3 +76,9 @@
 ~~~~~~~~~~
 - made the submitter
 - minor to make it work and make it flow better
+
+6/19/2025
+~~~~~~~~~~
+- finished testing the submitter
+- finished some other misc testing 
+- started on the discord integration

@@ -129,12 +129,6 @@ def testQueryService() -> bool:
     return True
 
 
-def testSubmitter() -> bool:
-    # add a user, test if its actually in users
-    # whatveer else needs done 
-    pass
-
-
 def lifecycleTest() -> bool:
     app = makeApp()
     queryService = app.queryService

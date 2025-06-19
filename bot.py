@@ -9,23 +9,31 @@ import discord
 from colorama import Back, Fore, Style
 from discord.ext import commands
 
+from utils.initializer import Initializer
+from models.app import App
+
 class Client(commands.Bot):
     def __init__(self):
         intents = discord.Intents().all()
         super().__init__(command_prefix = commands.when_mentioned_or("/"), intents = intents)
         
+        self.app = None # the app instance will be set in on_ready, it is the main backend 
         self.cogslist = [
-            # "cogs.problems",
+            "cogs.problems",
             # "cogs.submitter", # TODO: Add this back when I finish the working version 
             # "cogs.looper",
-            # "cogs.contests",
+            "cogs.contests",
             # "cogs.user_settings",
-            "cogs.server_settings",
+            # "cogs.server_settings",
         ]
 
     async def setup_hook(self) -> None:
+        # the "app" is the main backend & data container for the bot
+        # it contains all the servers, users, buckets, services, and mediators, etc.
+        self.app = Initializer.initApp()
+        
         for ext in self.cogslist:
-            await self.load_extension(ext) # loads our cogs
+            await self.load_extension(ext) # loads our cogs    
 
     # prints info to console, gives us custom status, and syncs slash commands
     async def on_ready(self):
