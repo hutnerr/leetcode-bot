@@ -79,8 +79,14 @@ class Server:
         self.activeProblems[problemID] = (slug, difficulty, set())
         self.toJSON()
 
+    # adds a problem to the previous problems list
+    def addPreviousProblem(self, slug: str) -> None:
+        if slug not in self.previousProblems:
+            self.previousProblems.append(slug)
+            self.toJSON()
+
     def addSubmittedUser(self, userID: int, problemID) -> bool:
-        if problemID not in self.activeProblems:
+        if not self.isProblemIDActive(problemID):
             return False
         
         activeProblem = self.activeProblems[problemID]
@@ -93,12 +99,21 @@ class Server:
 
     def isProblemDuplicate(self, slug: str) -> bool:
         return slug in self.previousProblems
+    
+    def isProblemIDActive(self, problemID: int) -> bool:
+        if problemID < 0 or problemID > self.MAXPROBLEMS:
+            return False
+        return self.activeProblems[problemID][0] != ""
+    
+    def resetActiveProblem(self, problemID: int) -> bool:
+        if problemID < 0 or problemID > self.MAXPROBLEMS:
+            return False
         
-    # adds a problem to the previous problems list
-    def addPreviousProblem(self, slug: str) -> None:
-        if slug not in self.previousProblems:
-            self.previousProblems.append(slug)
-            self.toJSON()
+        # reset the active problem to an empty tuple
+        self.activeProblems[problemID] = ("", "", set())
+        self.toJSON()
+        return True
+
     
     # save the server to JSON
     def toJSON(self):

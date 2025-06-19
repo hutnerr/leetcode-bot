@@ -115,6 +115,7 @@ class AlertBuilder:
             if (alert == StaticTimeAlert.WEEKLY_CONTEST) or (alert == StaticTimeAlert.BIWEEKLY_CONTEST):
                 contestType = alert.value.capitalize() # FIXME: uses the enum value, might be ugly
     
+                info = self.queryService.getUpcomingContests()
                 contests = info["data"]["upcomingContests"]
                 title = None
                 for contest in contests:

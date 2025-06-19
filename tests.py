@@ -27,6 +27,7 @@ def mediators_integration_tests() -> None:
     tests = [
         ("AlertBuilder\t", mediator_testing.testAlertBuilder),
         ("Synchronizer\t", mediator_testing.testSynchronizer),
+        ("Submitter\t", mediator_testing.testSubmitter),
     ]
     performTests(tests)
     

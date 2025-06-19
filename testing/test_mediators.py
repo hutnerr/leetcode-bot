@@ -1,8 +1,10 @@
 import copy
+import random
 from testing.generator import GeneratedServers
 from utils.initializer import Initializer
 from models.app import App
 from models.problem import Problem
+from models.user import User
 from models.alert import Alert, AlertType
 from buckets.static_time_bucket import StaticTimeAlert
 
@@ -212,5 +214,63 @@ def testSynchronizer() -> bool:
     assert server1.serverID in app.staticTimeBucket.getBucket(StaticTimeAlert.WEEKLY_CONTEST), "Server 1's ID not found in static time bucket for weekly contest"
     assert server2.serverID in app.staticTimeBucket.getBucket(StaticTimeAlert.BIWEEKLY_CONTEST), "Server 2's ID not found in static time bucket for biweekly contest"
     assert server3.serverID in app.staticTimeBucket.getBucket(StaticTimeAlert.DAILY_PROBLEM), "Server 3's ID not found in static time bucket for daily problem"
+
+    return True
+
+def testSubmitter() -> bool:
+    app = makeApp()
+    submitter = app.submitter
+    assert submitter is not None, "App's submitter was None"
+    
+    users: dict[int, User] = app.users
+    user: User = random.choice(list(users.values()))  # pick a random user from the app
+    assert user is not None, "User should not be None"
+    
+    baduser = -9999999999  # invalid user id
+    assert user.discordID in users, "User should be in the app's users"
+    assert baduser not in users, "Bad user should not be in the app's users"
+    
+    # get my username and one of the problems ive recently solved at this time
+    username = "hutnerr"
+    user.leetcodeUsername = username
+    
+    slug = "maximum-difference-by-remapping-a-digit"
+    badslug = "invalid-slug"  # slug that does not exist
+
+    # userCompletedProblem
+    assert submitter.userCompletedProblem(user, slug), "User should have completed the problem"
+    assert not submitter.userCompletedProblem(user, badslug), "User should not have completed the problem with an invalid slug"
+
+    badusername = "invalid-username12345"
+    user.leetcodeUsername = badusername
+    assert not submitter.userCompletedProblem(user, slug), "User should not have completed the problem with an invalid username"
+    
+    user.leetcodeUsername = username # reset username back to a valid one
+    
+    # submit
+    serverID = 1
+    problemID = 1 
+    slug = "two-sum"  # the slug for the problem we want to submit
+    
+    server = app.servers.get(serverID)
+    assert server is not None, "Server should not be None"
+    server.addActiveProblem(slug, "easy", problemID)  # add the problem to the server's active problems
+    
+    hardSlug = "median-of-two-sorted-arrays"
+    hardProblemID = 2
+    server.addActiveProblem(hardSlug, "hard", hardProblemID) 
+    
+    beforePoints = user.points
+    assert user.discordID not in server.activeProblems[problemID][2], "User should not be in the submitted users for the problem"
+    assert submitter.submit(serverID, user.discordID, problemID), "User should be able to submit the problem"
+    assert not submitter.submit(serverID, user.discordID, problemID), "User should not be able to submit the problem again"
+    assert user.discordID in server.activeProblems[problemID][2], "User should now be in the submitted users for the problem"
+    assert user.points == beforePoints + 1, "User should have 1 point after submitting an easy problem"
+    
+    assert not submitter.submit(serverID, baduser, problemID), "User should not be able to submit with an invalid user ID"
+    assert not submitter.submit(serverID, user.discordID, -1), "User should not be able to submit with an invalid problem ID"
+    assert not submitter.submit(serverID, user.discordID, 999999), "User should not be able to submit with a problem ID that does not exist"
+    assert not submitter.submit(serverID, user.discordID, hardProblemID), "User should not be able to submit a problem they have not completed"
+    assert not submitter.submit(serverID, user.discordID, 3), "User should not be able to submit a problem that is not active "
 
     return True

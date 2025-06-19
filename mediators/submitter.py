@@ -9,8 +9,12 @@ class Submitter:
         self.queryService = queryService
     
     # allows a user to submit a problem
-    def submit(self, serverID: int, userID: int, problemID: int, queryService: QueryService) -> bool:
+    def submit(self, serverID: int, userID: int, problemID: int) -> bool:
         if (serverID not in self.servers) or (userID not in self.users):
+            return False
+
+        if problemID < 0 or problemID > Server.MAXPROBLEMS:
+            # print(f"Invalid problemID {problemID} for server {serverID}")
             return False
         
         server: Server = self.servers[serverID]
@@ -18,24 +22,30 @@ class Submitter:
         
         problem = server.problems[problemID]
         if not problem:
+            # print(f"Invalid problemID {problemID} for server {serverID}")
             return False
         
-        if problemID not in server.activeProblems:
+        if not server.isProblemIDActive(problemID):
+            # print(f"ProblemID {problemID} is not active for server {serverID}")
             return False
         
         activeProblem = server.activeProblems[problemID]
         if not activeProblem:
+            # print(f"Active problem not found for problemID {problemID} on server {serverID}")
             return False
         
         slug, difficulty, submittedUsers = activeProblem
         if userID in submittedUsers:
             # user has already submitted this problem
+            # print(f"User {userID} has already submitted problem {problemID} on server {serverID}")
             return False
 
         if not self.userCompletedProblem(user, slug):
+            # print(f"User {userID} has not completed problem {slug} on LeetCode")
             return False
         
         if not server.addSubmittedUser(user.discordID, problemID):
+            # print(f"Failed to add user {userID} to submitted users for problem {problemID} on server {serverID}")
             return False
         
         match difficulty:
@@ -46,6 +56,7 @@ class Submitter:
             case "hard":
                 points = 6
             case _:
+                # print(f"Invalid difficulty {difficulty} for problem {problemID} on server {serverID}")
                 return False
         
         user.addPoints(points)
@@ -62,7 +73,7 @@ class Submitter:
         
         submissions = info["data"]["recentAcSubmissionList"]
         slugs = []
-        for submission in submissions:
+        for submission in submissions: # collect all slugs
             if "titleSlug" in submission:
                 slugs.append(submission["titleSlug"])
         

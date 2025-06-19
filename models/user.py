@@ -13,6 +13,11 @@ class User:
                 f"leetcodeUsername={self.leetcodeUsername}, "
                 f"points={self.points})")
     
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, User):
+            return False
+        return self.discordID == other.discordID
+    
     def __repr__(self) -> str:
         return self.__str__()
     

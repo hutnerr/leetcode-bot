@@ -40,16 +40,16 @@ def generateTestServers(n: int) -> list[Server]:
         lst.append(temp)
     return lst
 
-def generateTestUsers(n: int) -> list[User]:
-    lst = []
+def generateTestUsers(n: int) -> dict[int, User]:
+    users = dict()
     for i in range(0, n):
         user = User(
             discordID=random.randint(1000000000, 9999999999),
             leetcodeUsername=f"user{i}",
             points=random.randint(0, 1000)
         )
-        lst.append(user)
-    return lst
+        users[user.discordID] = user
+    return users
 
 # generates servers, then generates problems and adds them to the servers
 def generate(nservers = 10, nproblems = 50):
