@@ -66,3 +66,6 @@ testAll()
 # buckets_integration_tests()
 # mediators_integration_tests()
 # other_integration_tests()
+
+# FIXME: TO GET THESE TO WORK AGAIN, YOU WOULD HAVE TO PUT THEM BACK INTO THE MAIN FILES,
+# IE PUT THEM DIRECTLY INTO DATA/SERVER and DATA/USERS instead of having them in the testing folder.

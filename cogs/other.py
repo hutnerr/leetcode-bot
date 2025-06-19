@@ -25,7 +25,15 @@ helpDictionary = {
     "about" : {
         "description" : "Displays information about the bot.",
         "usage" : "/about",
-    }
+    },
+    "uinfo" : {
+        "description" : "Gets information about a user, such as their LeetCode username and problem completion stats.\n\nIf no user is specified, it will use whoever called the command.",
+        "usage" : "/uinfo <user>",
+    },
+    "setusername" : {
+        "description" : "Sets your LeetCode username for the bot to use.",
+        "usage" : "/setusername <username>",
+    },
 }
 
 class OtherCog(commands.Cog):
@@ -35,7 +43,7 @@ class OtherCog(commands.Cog):
     
     # help command to display help information for the bot
     # uses a dictionary to store the help information for each command
-    @app_commands.command(name='help', description='Displays help information for the bot.')
+    @app_commands.command(name='help', description='Displays help information for the bot')
     @app_commands.choices(command = [app_commands.Choice(name=cmd, value=cmd) for cmd in helpDictionary.keys()])
     async def help(self, interaction: discord.Interaction, command: app_commands.Choice[str]):
         helpIcon = "https://icons.veryicon.com/png/o/miscellaneous/flat-icon/help-252.png"
@@ -52,12 +60,12 @@ class OtherCog(commands.Cog):
 
     # report command to provide a link to report issues
     # this is a simple command that just sends a message with a link to the GitHub
-    @app_commands.command(name='report', description='Report an issue to the GitHub.')
+    @app_commands.command(name='report', description='Report an issue to the GitHub')
     async def report(self, interaction: discord.Interaction):
         await interaction.response.send_message("Please report issues **[here](https://github.com/hutnerr/leetcode-bot/issues)**.", ephemeral=True)
 
     # about command to display information about the bot
-    @app_commands.command(name='about', description='Displays information about the bot.')
+    @app_commands.command(name='about', description='Displays information about the bot')
     async def about(self, interaction: discord.Interaction):
         embed = discord.Embed(
             title="About",

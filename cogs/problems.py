@@ -2,7 +2,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from utils import problem_helper as probh
 from errors.simple_exception import SimpleException
 from view.problem_embed import ProblemEmbed
 
@@ -14,14 +13,12 @@ from services.query_service import QueryService
 from services.cache_service import CacheService
 
 # related to simply getting and producing problems
-# - problem
-# - dailyproblem
 class Problems(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
         self.app: App = client.app
 
-    @app_commands.command(name = "problem", description = "Gets a LeeetCode problem. Default is free problems.")
+    @app_commands.command(name = "problem", description = "Gets a LeeetCode problem. Default is free problems")
     @app_commands.choices(difficulty = [
         app_commands.Choice(name = "Easy", value = "easy"),
         app_commands.Choice(name = "Medium", value = "medium"),
@@ -53,7 +50,7 @@ class Problems(commands.Cog):
         embed = ProblemEmbed(slug, problemInfo)
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name = "dailyproblem", description = "Gets the LeeetCode daily problem.")
+    @app_commands.command(name = "dailyproblem", description = "Gets the LeeetCode daily problem")
     async def dailyproblem(self, interaction: discord.Interaction):
         queryService: QueryService = self.app.queryService
         if not queryService:

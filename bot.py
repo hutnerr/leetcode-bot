@@ -17,15 +17,16 @@ class Client(commands.Bot):
         intents = discord.Intents().all()
         super().__init__(command_prefix = commands.when_mentioned_or("/"), intents = intents)
         
-        self.app = None # the app instance will be set in on_ready, it is the main backend 
+        self.app: App = None # the app instance will be set in on_ready, it is the main backend 
         self.cogslist = [
             "cogs.problems",
+            "cogs.other",
+            "cogs.contests",
+            "cogs.user",
             # "cogs.submitter", # TODO: Add this back when I finish the working version 
             # "cogs.looper",
-            "cogs.contests",
             # "cogs.user_settings",
             # "cogs.server_settings",
-            "cogs.other",
         ]
 
     async def setup_hook(self) -> None:

@@ -1,0 +1,95 @@
+import discord
+from discord import app_commands
+from discord.ext import commands
+
+from errors.simple_exception import SimpleException
+
+from services.query_service import QueryService
+
+from models.app import App
+from models.user import User
+
+from view.user_info_embed import UserInfoEmbed
+
+class UserCog(commands.Cog):
+    def __init__(self, client: commands.Bot):
+        self.client: commands.Bot = client
+        self.app: App = client.app
+
+    @app_commands.command(name = "uinfo", description = "Displays information about a user")
+    async def uinfo(self, interaction: discord.Interaction, user: discord.User = None):
+        if user is None: # get self
+            user = interaction.user
+
+        userID = user.id
+        users = self.app.users
+        if not users:
+            raise SimpleException("BACKEND FAILURE")
+        
+        if userID in users:
+            userObj = users[userID]
+        else:
+            userObj = self.newUser(userID)
+            
+        profileInfo = None
+        if userObj.leetcodeUsername is not None:
+            queryService: QueryService = self.app.queryService
+            if not queryService:
+                raise SimpleException("BACKEND FAILURE")
+            
+            profileInfo = queryService.getUserProblemsSolved(userObj.leetcodeUsername)
+            
+            if "errors" in profileInfo:
+                raise SimpleException("ACCOUNT NOT FOUND")
+
+        embed = UserInfoEmbed(user, userObj, profileInfo)
+        await interaction.response.send_message(embed=embed)
+    
+    
+    @app_commands.command(name = "setusername", description = "Set your LeetCode Username")
+    async def setusername(self, interaction: discord.Interaction, leetcodeusername: str):
+        if leetcodeusername is None or len(leetcodeusername) <= 0:
+            raise SimpleException("EMPTY USERNAME")
+        
+        discUser = interaction.user
+        userID = discUser.id
+        users = self.app.users
+        if not users:
+            raise SimpleException("BACKEND FAILURE")
+        
+        if userID in users:
+            user = users[userID]
+        else:
+            user = self.newUser(userID)
+            
+        # perform query
+        queryService: QueryService = self.app.queryService
+        profileInfo = queryService.getUserProfile(leetcodeusername)
+        
+        if "errors" in profileInfo:
+            raise SimpleException("ACCOUNT NOT FOUND")
+                
+        user.setLeetCodeUsername(leetcodeusername)
+        await interaction.response.send_message("Your username has been successfuly set!", ephemeral=True)        
+    
+    
+    def newUser(self, discID: int) -> User:
+        # if the user doesnt exist, then make a blank slate
+        user = User(
+            discordID=discID,
+            leetcodeUsername=None,
+            points=0
+        )
+        user.toJSON() # save the user
+        return user
+    
+    
+    @uinfo.error
+    @setusername.error
+    async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):
+        reportMSG = "Try again later. If you believe this is an issue please submit on GitHub using /report."
+        await interaction.response.send_message(f"**{error.original}**: {reportMSG}", ephemeral=True)
+
+    
+async def setup(client: commands.Bot) -> None: 
+    await client.add_cog(UserCog(client))

@@ -24,6 +24,12 @@ class QueryService:
             }
         return self._performQuery(QueryStrings.USER_PROFILE, args)
     
+    def getUserProblemsSolved(self, username: str) -> dict:
+        args = {
+            "username" : username
+        }
+        return self._performQuery(QueryStrings.USER_PROBLEMS_SOLVED, args)
+    
     def getQuestionInfo(self, slug: str) -> dict:
         args = {
             "titleSlug" : slug
@@ -85,6 +91,20 @@ class QueryStrings(Enum):
                 userAvatar
                 reputation
                 ranking
+            }
+        }
+    }
+    """
+    
+    # TODO: Write tests for this query
+    USER_PROBLEMS_SOLVED = """
+    query userProblemsSolved($username: String!) {
+        matchedUser(username: $username) {
+            submitStatsGlobal {
+            acSubmissionNum {
+                difficulty
+                count
+                }
             }
         }
     }
