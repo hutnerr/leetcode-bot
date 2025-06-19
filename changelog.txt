@@ -82,3 +82,6 @@
 - finished testing the submitter
 - finished some other misc testing 
 - started on the discord integration
+- finished problem cog and embed
+- finished contest cog and embed
+- finished other cog for about, help, and report

@@ -25,6 +25,7 @@ class Client(commands.Bot):
             "cogs.contests",
             # "cogs.user_settings",
             # "cogs.server_settings",
+            "cogs.other",
         ]
 
     async def setup_hook(self) -> None:

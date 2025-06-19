@@ -16,7 +16,7 @@ from services.cache_service import CacheService
 # related to simply getting and producing problems
 # - problem
 # - dailyproblem
-class problems(commands.Cog):
+class Problems(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
         self.app: App = client.app
@@ -90,11 +90,11 @@ class problems(commands.Cog):
         
         return problemInfo
     
-    # @problem.error
+    @problem.error
     @dailyproblem.error
     async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):
         reportMSG = "Try again later. If you believe this is an issue please submit on GitHub using /report."
         await interaction.response.send_message(f"**{error.original}**: {reportMSG}", ephemeral=True)
 
 async def setup(client: commands.Bot) -> None: 
-    await client.add_cog(problems(client))
+    await client.add_cog(Problems(client))
