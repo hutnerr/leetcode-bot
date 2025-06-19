@@ -7,6 +7,8 @@
 
 # When allowing the problem settings to be selected, allow them to select the timezone of the problem. Before it is sent back and saved, convert it to EST (since that is where I'm at)
 
+# set the channel to whatever settings is first called in on the creation of a new server
+
 # setchannel - set the channel for the bot to post in
 # setrole - set the role for the bot to use
 
