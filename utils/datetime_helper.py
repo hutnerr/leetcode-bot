@@ -77,3 +77,10 @@ def formatDateTime(timeStruct: time.struct_time) -> str:
         return "INVALID INPUT"
     
     return time.strftime("%A, %B %d at %I:%M %p", timeStruct).replace(" 0", " ").lstrip("0")
+
+
+def numToDayOfWeek(num: int) -> str:
+    days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    if 0 <= num < len(days):
+        return days[num]
+    return "INVALID DAY NUMBER"

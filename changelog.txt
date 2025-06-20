@@ -87,3 +87,4 @@
 - finished other cog for about, help, and report
 - finished user cog for user related cmds 
 - deleted a bunch of junk from archives
+- stubbed out the looper

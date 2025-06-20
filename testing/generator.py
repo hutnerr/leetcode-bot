@@ -12,7 +12,7 @@ def generateRandomProblems(n) -> list[Problem]:
         pid = random.randint(1, Server.MAXPROBLEMS)  # problem IDs are 1-5
         sid = random.randint(1, 10)
         difs = random.choice(["easy", "medium", "hard", "easy-medium", "medium-hard", "easy-medium-hard", "hard-easy-medium"])
-        dow = random.randint(1, 7) # 1-7
+        dow = random.randint(1, 7) # 1-7, #FIXME: really should be 0-6 
         hour = random.randint(0, 10) # 0-23
         interval = random.randint(0, 2) # 0-3
         premium = random.randint(0, 2) # 0=free, 1=premium, 2=either

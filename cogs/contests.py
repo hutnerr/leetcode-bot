@@ -5,7 +5,7 @@ from discord.ext import commands
 from errors.simple_exception import SimpleException
 from models.app import App
 from services.query_service import QueryService
-from utils import time_helper as timeh
+from utils import datetime_helper as timeh
 from view.contest_embed import ContestEmbed
 
 class Contests(commands.Cog):

@@ -23,10 +23,9 @@ class Client(commands.Bot):
             "cogs.other",
             "cogs.contests",
             "cogs.user",
-            # "cogs.submitter", # TODO: Add this back when I finish the working version 
-            # "cogs.looper",
-            # "cogs.user_settings",
-            # "cogs.server_settings",
+            "cogs.looper",
+            # "cogs.server",
+            # "cogs.submission",
         ]
 
     async def setup_hook(self) -> None:
