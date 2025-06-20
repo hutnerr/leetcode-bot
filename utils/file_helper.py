@@ -33,3 +33,14 @@ def getFilesInDirectory(directory: str, showExtensions: bool = True) -> list[str
         return [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
     else:
         return [os.path.splitext(f)[0] for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+    
+    
+def deleteFile(filePath: str) -> bool:
+    try:
+        if os.path.isfile(filePath):
+            os.remove(filePath)
+            return True
+        return False
+    except Exception as e:
+        print(f"Error deleting file: {e}")
+        return False

@@ -1,0 +1,2 @@
+when i add points or whatever, make sure its done to the object
+then saved to file so its updated in both life and saved memory

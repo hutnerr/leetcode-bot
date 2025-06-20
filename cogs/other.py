@@ -30,9 +30,21 @@ helpDictionary = {
         "description" : "Gets information about a user, such as their LeetCode username and problem completion stats.\n\nIf no user is specified, it will use whoever called the command.",
         "usage" : "/uinfo <user>",
     },
+    "deleteuser" : {
+        "description" : "Deletes your user data from the bot.\n\nThis will remove your LeetCode username and any other data associated with your user. It is NOT server specific, it will delete your data entirely.\n\nThis is useful if you want to reset your data or if you no longer want to use the bot.",
+        "usage" : "/deleteuser",
+    },
     "setusername" : {
         "description" : "Sets your LeetCode username for the bot to use.",
         "usage" : "/setusername <username>",
+    },
+    "leaderboard" : {
+        "description" : "Displays the leaderboard for a specific server.\n\nThis will show the top users in the server based on their points.",
+        "usage" : "/leaderboard",
+    },
+    "rank" : {
+        "description" : "Gets a users rank in the server based on your points.\n\nThis will show your rank and how many points you have.\n\nBy default it will use the user who called the command, but you can specify another user.",
+        "usage" : "/rank <user>",
     },
 }
 
@@ -45,15 +57,13 @@ class OtherCog(commands.Cog):
     # uses a dictionary to store the help information for each command
     @app_commands.command(name='help', description='Displays help information for the bot')
     @app_commands.choices(command = [app_commands.Choice(name=cmd, value=cmd) for cmd in helpDictionary.keys()])
-    async def help(self, interaction: discord.Interaction, command: app_commands.Choice[str]):
-        helpIcon = "https://icons.veryicon.com/png/o/miscellaneous/flat-icon/help-252.png"
-        
+    async def help(self, interaction: discord.Interaction, command: app_commands.Choice[str]):        
         command = command.value
         info = helpDictionary.get(command)
         if info:
             embed = discord.Embed(title=f"Help for `{command}`", description=info['description'], color=discord.Color.blue())
             embed.add_field(name="Usage", value=f"`{info['usage']}`", inline=False)
-            embed.set_thumbnail(url=helpIcon)
+            # embed.set_thumbnail(url="https://icons.veryicon.com/png/o/miscellaneous/flat-icon/help-252.png")
             await interaction.response.send_message(embed=embed, ephemeral=True)
         else:
             raise SimpleException(f"{command} NOT FOUND")

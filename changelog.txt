@@ -88,3 +88,9 @@
 - finished user cog for user related cmds 
 - deleted a bunch of junk from archives
 - stubbed out the looper
+
+6/20/2025
+~~~~~~~~~~
+- added a deluser command so users can delete their data
+- added a view which allows for yes/no confirmations
+- added leaderboard and rank commands

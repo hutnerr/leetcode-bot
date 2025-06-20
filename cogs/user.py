@@ -1,8 +1,10 @@
+import os
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from errors.simple_exception import SimpleException
+from utils import file_helper as fileh
 
 from services.query_service import QueryService
 
@@ -10,6 +12,7 @@ from models.app import App
 from models.user import User
 
 from view.user_info_embed import UserInfoEmbed
+from view.confirmation_view import ConfirmationView, ConfirmationEmbed
 
 class UserCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -72,6 +75,37 @@ class UserCog(commands.Cog):
         user.setLeetCodeUsername(leetcodeusername)
         await interaction.response.send_message("Your username has been successfuly set!", ephemeral=True)        
     
+    @app_commands.command(name = "deluser", description = "Deletes your user profile")
+    async def deleteuser(self, interaction: discord.Interaction):
+        # remove from the dict
+        # delete the file
+        # send an are you sure embed, say that user profiles are NOT server specific
+        confirmationMSG = "User profiles are **NOT** server specific. If you delete it, your progress will be lost **entirely**."
+        embed: discord.Embed = ConfirmationEmbed(confirmationMSG)
+        view: discord.View = ConfirmationView()
+        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+    
+        await view.wait()
+        if view.is_finished() and view.result is None:
+            await interaction.followup.send("Timed out. Please try again.", ephemeral=True)
+            return
+        
+        if view.result: # user clicked yes
+            discUser = interaction.user
+            userID = discUser.id
+            users = self.app.users
+
+            if userID in users:
+                del users[userID] # delete from the dict
+                path = os.path.join("data", "users", f"{userID}.json")
+                if fileh.fileExists(path):
+                    fileh.deleteFile(path) # delete the file
+                await interaction.followup.send("Your user profile has been deleted successfully.", ephemeral=True)
+            else:
+                raise SimpleException("USER NOT FOUND")
+        else: # user clicked no
+            await interaction.followup.send("User profile deletion cancelled.", ephemeral=True)
+            
     
     def newUser(self, discID: int) -> User:
         # if the user doesnt exist, then make a blank slate
@@ -80,12 +114,14 @@ class UserCog(commands.Cog):
             leetcodeUsername=None,
             points=0
         )
+        self.app.users[discID] = user # add to the dict
         user.toJSON() # save the user
         return user
     
     
     @uinfo.error
     @setusername.error
+    @deleteuser.error
     async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):
         reportMSG = "Try again later. If you believe this is an issue please submit on GitHub using /report."
         await interaction.response.send_message(f"**{error.original}**: {reportMSG}", ephemeral=True)
