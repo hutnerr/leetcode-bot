@@ -12,6 +12,6 @@
 # setchannel - set the channel for the bot to post in
 # setrole - set the role for the bot to use
 
-# deleteconfig - delete the config for the server
+# deleteserver - delete the server config. admin only 
 
 # resetduplicates
