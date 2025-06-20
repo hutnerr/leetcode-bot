@@ -24,8 +24,8 @@ class Client(commands.Bot):
             "cogs.contests",
             "cogs.user",
             "cogs.looper",
+            "cogs.competition",
             # "cogs.server",
-            # "cogs.submission",
         ]
 
     async def setup_hook(self) -> None:
