@@ -21,4 +21,4 @@ class UserInfoEmbed(discord.Embed):
             strbuilder = ""
             for difficulty, count in result.items():
                 strbuilder += f"**{difficulty.capitalize()}**: {count}\n"
-            self.add_field(name="Problem Completed", value=strbuilder, inline=False)
+            self.add_field(name="Problems Completed", value=strbuilder, inline=False)

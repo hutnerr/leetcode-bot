@@ -66,7 +66,8 @@ class CompetitionCog(commands.Cog):
     @app_commands.command(name="submit", description="Gives you points if you've completed any active problems")
     async def submit(self, interaction: discord.Interaction):
         # have this just scrape the recent submissions, then use them to check in the servers recent problems
-        pass
+        await interaction.response.send_message("This command is not implemented yet.", ephemeral=True)
+        
     
     
     @leaderboard.error
