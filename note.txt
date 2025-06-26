@@ -1,8 +1,13 @@
 when i add points or whatever, make sure its done to the object
 then saved to file so its updated in both life and saved memory
 
+try and go for more conformity. maybe similar to the error embed, have a general msg embed or something
+make everything consistent, then look over everything for polish
+
 whats left:
 - pinfo, pconfig, pactive
 - the submit function in competition.py
 - the bucket looping in looper.py
+- add all the commands to the help
 - native testing and code review 
+- documentation and comments

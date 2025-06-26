@@ -13,8 +13,6 @@ from utils import file_helper as fileh
 from view.confirmation_view import ConfirmationView, ConfirmationEmbed
 from view.server_config_view import ServerConfigView
 from view.server_info_embed import ServerInfoEmbed
-from view.role_selector_view import RoleSelectorView
-from view.channel_selector_view import ChannelSelectorView
 from view.error_embed import ErrorEmbed
 
 class ServerCog(commands.Cog):
@@ -60,17 +58,15 @@ class ServerCog(commands.Cog):
     # setchannel - set the channel for the bot to post in
     @app_commands.command(name="setchannel", description="Sets the bot's output feed channel")
     @app_commands.checks.has_permissions(administrator=True) # only admins can change the server settings
-    async def setchannel(self, interaction: discord.Interaction):
+    async def setchannel(self, interaction: discord.Interaction, channel: discord.TextChannel = None):
+        if channel is None:
+            channel = interaction.channel # if no channel is specified, use the current channel
+            
         server = self.getServer(interaction)
-        await interaction.response.send_message(view=ChannelSelectorView(server))
-    
-    # setrole - set the role for the bot to use
-    @app_commands.command(name="setrole", description="Sets the bot's role to @mention if the mention flag is active")
-    @app_commands.checks.has_permissions(administrator=True) # only admins can change the server settings
-    async def setrole(self, interaction: discord.Interaction):
-        server = self.getServer(interaction)
-        await interaction.response.send_message(view=RoleSelectorView(server))
-    
+        server.settings.postingChannelID = channel.id # set the channel id
+        server.toJSON()
+        await interaction.response.send_message(f"Bot's output feed channel has been set to {channel.mention}", ephemeral=True)
+        
     # resetduplicates
     @app_commands.command(name="resetdupes", description="Reset the stored duplicate problems")
     @app_commands.checks.has_permissions(administrator=True) # only admins can change the server settings
@@ -158,7 +154,6 @@ class ServerCog(commands.Cog):
     @pinfo.error
     @pactive.error
     @setchannel.error
-    @setrole.error
     @resetdupes.error
     @deleteserver.error
     async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):

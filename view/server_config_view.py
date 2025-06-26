@@ -3,6 +3,7 @@ from models.server import Server
 from models.app import App
 from buckets.static_time_bucket import StaticTimeAlert
 from errors.simple_exception import SimpleException
+from view.error_embed import ErrorEmbed
 
 class ServerConfigView(discord.ui.View):
     def __init__(self, server: Server, app: App, setting: str):
@@ -16,8 +17,10 @@ class ServerConfigView(discord.ui.View):
                 self.add_item(BiweeklyContestAlertMenu(server, app))
                 self.add_item(DailyProblemAlertMenu(server, app))
             case "other":
+                self.add_item(ChannelSelector(server))
                 self.add_item(AllowDuplicatesMenu(server, app))
-                self.add_item(UseAlertRoleMenu(server, app))          
+                self.add_item(UseAlertRoleMenu(server, app))       
+                self.add_item(RoleSelector(server))   
             case _:
                 raise SimpleException("SERVERCONFVIEW", "Backend failure")
 
@@ -252,3 +255,50 @@ class UseAlertRoleMenu(discord.ui.Select):
 
         word = "enabled" if change else "disabled"
         await interaction.response.send_message(f"**Alert Role** is now {word}", ephemeral=True)
+
+# =================================
+# ROLE SELECTOR 
+# =================================
+class RoleSelector(discord.ui.RoleSelect):
+    def __init__(self, server: Server):
+        super().__init__()
+        self.server = server
+        self.min_values = 1
+        self.max_values = 1
+
+    async def callback(self, interaction: discord.Interaction):
+        if self.values is None or len(self.values) == 0:
+            raise SimpleException("ROLES", "Invalid role selection.", "Please select a valid role from the dropdown menu.")
+        
+        # update the server settings with the selected role
+        role = self.values[0]
+        self.server.settings.alertRoleID = int(role.id)
+        self.server.toJSON()
+        await interaction.response.send_message(f"Server Role set to: <@&{role.id}>", ephemeral=True)
+        
+class ChannelSelector(discord.ui.ChannelSelect):
+    def __init__(self, server: Server):
+        super().__init__()
+        self.server = server
+        self.min_values = 1
+        self.max_values = 1
+
+    async def callback(self, interaction: discord.Interaction):
+        if self.values is None or len(self.values) == 0:
+            raise SimpleException("INVALID SELECTION")
+        
+        channel = self.values[0]
+        if channel.type != discord.ChannelType.text:
+            # FIXME: this exception isn't being caught by the error handler
+            # it should be caught and handled gracefully, but currently it raises an unhandled exception
+            code = "CHNSELVW"
+            msg = "The selected channel is not a text channel."
+            help = "If your channel is not listed, try doing `/setchannel #channel_name` to set it as the output channel directly."
+            await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
+            return
+            
+        # update the server settings with the selected channel
+        channel = self.values[0]
+        self.server.settings.postingChannelID = int(channel.id)
+        self.server.toJSON()
+        await interaction.response.send_message(f"Server Channel set to: <#{channel.id}>", ephemeral=True)
