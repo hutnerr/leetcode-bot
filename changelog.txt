@@ -94,3 +94,8 @@
 - added a deluser command so users can delete their data
 - added a view which allows for yes/no confirmations
 - added leaderboard and rank commands
+
+6/25/2025
+~~~~~~~~~~
+- stubbed out the server cog
+- fully added /sconfig
