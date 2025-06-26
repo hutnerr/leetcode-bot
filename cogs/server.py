@@ -10,6 +10,7 @@ from errors.simple_exception import SimpleException
 
 from view.confirmation_view import ConfirmationView, ConfirmationEmbed
 from view.server_config_view import ServerConfigView
+from view.server_info_embed import ServerInfoEmbed
 
 class ServerCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -30,7 +31,8 @@ class ServerCog(commands.Cog):
     # sinfo - display the settings
     @app_commands.command(name="sinfo", description="Displays the servers config")
     async def sinfo(self, interaction: discord.Interaction):
-        pass
+        server = self.getServer(interaction)
+        await interaction.response.send_message(embed=ServerInfoEmbed(server, interaction.guild))
     
     # pconfig <pid> - change a problem config  
     # When allowing the problem settings to be selected, allow them to select the timezone of the problem.
@@ -59,6 +61,7 @@ class ServerCog(commands.Cog):
     @app_commands.command(name="setrole", description="Sets the bot's role to @mention if the mention flag is active")
     async def setrole(self, interaction: discord.Interaction):
         # use the role select menu
+        await interaction.response.send_message(view=discord.ui.RoleSelect())
         pass
     
     # resetduplicates
