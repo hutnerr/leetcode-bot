@@ -18,6 +18,10 @@
 - Added JSON support in file helper
 - Setup basic querying 
 
+-------------------------------
+WAS FINISHING UP THE SEMESTER
+-------------------------------
+
 5/28/2025
 ~~~~~~~~~~
 - Changing file structure to use individual JSON files
@@ -77,6 +81,10 @@
 - made the submitter
 - minor to make it work and make it flow better
 
+-------------------------------
+MOVED OUT. WAS TOO BUSY TO WORK
+-------------------------------
+
 6/19/2025
 ~~~~~~~~~~
 - finished testing the submitter
@@ -105,3 +113,5 @@
 6/26/2025
 ~~~~~~~~~~
 - combined setrole and setchannel into sconfig
+- added most of the problem commands
+- change dow so it can be multiple days
