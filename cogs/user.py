@@ -13,6 +13,7 @@ from models.user import User
 
 from view.user_info_embed import UserInfoEmbed
 from view.confirmation_view import ConfirmationView, ConfirmationEmbed
+from view.error_embed import ErrorEmbed
 
 class UserCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -27,8 +28,8 @@ class UserCog(commands.Cog):
         userID = user.id
         users = self.app.users
         if not users:
-            raise SimpleException("BACKEND FAILURE")
-        
+            raise SimpleException("UINFOURS", "Backend failure")
+
         if userID in users:
             userObj = users[userID]
         else:
@@ -38,12 +39,12 @@ class UserCog(commands.Cog):
         if userObj.leetcodeUsername is not None:
             queryService: QueryService = self.app.queryService
             if not queryService:
-                raise SimpleException("BACKEND FAILURE")
+                raise SimpleException("UINFOQS", "Backend failure")
             
             profileInfo = queryService.getUserProblemsSolved(userObj.leetcodeUsername)
             
             if "errors" in profileInfo:
-                raise SimpleException("ACCOUNT NOT FOUND")
+                raise SimpleException("UINFOPROFILE", "LeetCode account not found", "Please set your username using `/setusername <username>`")
 
         embed = UserInfoEmbed(user, userObj, profileInfo)
         await interaction.response.send_message(embed=embed)
@@ -58,7 +59,7 @@ class UserCog(commands.Cog):
         userID = discUser.id
         users = self.app.users
         if not users:
-            raise SimpleException("BACKEND FAILURE")
+            raise SimpleException("USRSETURS", "Backend failure")
         
         if userID in users:
             user = users[userID]
@@ -70,8 +71,8 @@ class UserCog(commands.Cog):
         profileInfo = queryService.getUserProfile(leetcodeusername)
         
         if "errors" in profileInfo:
-            raise SimpleException("ACCOUNT NOT FOUND")
-                
+            raise SimpleException("USRSETUP", "LeetCode account not found", "Make sure you have a valid LeetCode account and that the username is typed correctly.")
+
         user.setLeetCodeUsername(leetcodeusername)
         await interaction.response.send_message("Your username has been successfuly set!", ephemeral=True)        
     
@@ -102,7 +103,7 @@ class UserCog(commands.Cog):
                     fileh.deleteFile(path) # delete the file
                 await interaction.followup.send("Your user profile has been deleted successfully.", ephemeral=True)
             else:
-                raise SimpleException("USER NOT FOUND")
+                raise SimpleException("USRDEL", "User profile not found", "You do not have a user profile to delete.")
         else: # user clicked no
             await interaction.followup.send("User profile deletion cancelled.", ephemeral=True)
 
@@ -123,8 +124,11 @@ class UserCog(commands.Cog):
     @setusername.error
     @deleteuser.error
     async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):
-        reportMSG = "Try again later. If you believe this is an issue please submit on GitHub using /report."
-        await interaction.response.send_message(f"**{error.original}**: {reportMSG}", ephemeral=True)
+        exception: SimpleException = error.original
+        code: SimpleException = exception.code if isinstance(error.original, SimpleException) else "BACKEND FAILURE"
+        msg = error.original.message if isinstance(error.original, SimpleException) else str(error.original)
+        help = error.original.help if isinstance(error.original, SimpleException) else None
+        await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
 
     
 async def setup(client: commands.Bot) -> None: 

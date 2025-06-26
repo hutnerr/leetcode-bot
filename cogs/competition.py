@@ -5,6 +5,7 @@ from discord.ext import commands
 from models.app import App
 from errors.simple_exception import SimpleException
 from view.competition_embed import LeaderboardEmbed
+from view.error_embed import ErrorEmbed
 
 class CompetitionCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -14,7 +15,7 @@ class CompetitionCog(commands.Cog):
     def buildLeaderboard(self, members: list[discord.Member]):
         users = self.app.users
         if not users:
-            raise SimpleException("BACKEND FAILURE")
+            raise SimpleException("COMPUSERS", "Backend failure")
 
         board = []
         for member in members:
@@ -59,23 +60,23 @@ class CompetitionCog(commands.Cog):
                 await interaction.response.send_message(f"**{member.name}** is ranked `{place}`/`{len(boardData)}` with {points} pts")
                 return # exit
             
-        raise SimpleException("USER NOT FOUND")
-    
+        raise SimpleException("COMPRANK", "User not found in leaderboard", "Make sure the user has completed problems and has points. If this persists, try `/deluser` to reset.")
 
     # submit pid
     @app_commands.command(name="submit", description="Gives you points if you've completed any active problems")
     async def submit(self, interaction: discord.Interaction):
         # have this just scrape the recent submissions, then use them to check in the servers recent problems
         await interaction.response.send_message("This command is not implemented yet.", ephemeral=True)
-        
-    
     
     @leaderboard.error
     @rank.error
     @submit.error
     async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):
-        reportMSG = "Try again later. If you believe this is an issue please submit on GitHub using /report."
-        await interaction.response.send_message(f"**{error.original}**: {reportMSG}", ephemeral=True)
+        exception: SimpleException = error.original
+        code: SimpleException = exception.code if isinstance(error.original, SimpleException) else "BACKEND FAILURE"
+        msg = error.original.message if isinstance(error.original, SimpleException) else str(error.original)
+        help = error.original.help if isinstance(error.original, SimpleException) else None
+        await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
 
 async def setup(client: commands.Bot) -> None: 
     await client.add_cog(CompetitionCog(client))

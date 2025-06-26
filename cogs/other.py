@@ -5,6 +5,8 @@ from discord.ext import commands
 from models.app import App
 from errors.simple_exception import SimpleException
 
+from view.error_embed import ErrorEmbed
+
 helpDictionary = {
     "problem": {
         "description": "Gets a LeetCode problem using certain parameters.\n\nThe parameters are difficulty and premium.\nPremium is optional. It is free by default.\n\nDifficulty can be easy, medium, hard, or random.\nPremium can be free, paid, or all.\n",
@@ -69,7 +71,7 @@ class OtherCog(commands.Cog):
             # embed.set_thumbnail(url="https://icons.veryicon.com/png/o/miscellaneous/flat-icon/help-252.png")
             await interaction.response.send_message(embed=embed, ephemeral=True)
         else:
-            raise SimpleException(f"{command} NOT FOUND")
+            raise SimpleException("HELP", f"{command} was not found")
 
     # report command to provide a link to report issues
     # this is a simple command that just sends a message with a link to the GitHub
@@ -97,8 +99,11 @@ class OtherCog(commands.Cog):
     @report.error
     @about.error
     async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):
-        reportMSG = "Try again later. If you believe this is an issue please submit on GitHub using /report."
-        await interaction.response.send_message(f"**{error.original}**: {reportMSG}", ephemeral=True)
+        exception: SimpleException = error.original
+        code: SimpleException = exception.code if isinstance(error.original, SimpleException) else "BACKEND FAILURE"
+        msg = error.original.message if isinstance(error.original, SimpleException) else str(error.original)
+        help = error.original.help if isinstance(error.original, SimpleException) else None
+        await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
 
 
 async def setup(client: commands.Bot) -> None:

@@ -19,7 +19,7 @@ class ServerConfigView(discord.ui.View):
                 self.add_item(AllowDuplicatesMenu(server, app))
                 self.add_item(UseAlertRoleMenu(server, app))          
             case _:
-                raise SimpleException("INVALID SETTING")
+                raise SimpleException("SERVERCONFVIEW", "Backend failure")
 
 # FIXME: These 3 static alert menu classes can def be combined to reduce some copy pasted code
 # =================================
@@ -49,7 +49,7 @@ class WeeklyContestAlertMenu(discord.ui.Select):
         result = self.app.synchronizer.changeStaticAlert(
             self.server.serverID, StaticTimeAlert.WEEKLY_CONTEST, change)
         if not result:
-            raise SimpleException("FAILED CHANGING")
+            raise SimpleException("CONTSQSEMB", "Failing to change weekly contest alert setting")
 
         word = "enabled" if change else "disabled"
         await interaction.response.send_message(f"**Weekly contest alerts** are now {word}", ephemeral=True)
@@ -81,7 +81,7 @@ class BiweeklyContestAlertMenu(discord.ui.Select):
         result = self.app.synchronizer.changeStaticAlert(
             self.server.serverID, StaticTimeAlert.BIWEEKLY_CONTEST, change)
         if not result:
-            raise SimpleException("FAILED CHANGING")
+            raise SimpleException("CONTSQSEMB", "Failing to change biweekly contest alert setting")
 
         word = "enabled" if change else "disabled"
         await interaction.response.send_message(f"**Biweekly contest alerts** are now {word}", ephemeral=True)
@@ -113,7 +113,7 @@ class DailyProblemAlertMenu(discord.ui.Select):
         result = self.app.synchronizer.changeStaticAlert(
             self.server.serverID, StaticTimeAlert.DAILY_PROBLEM, change)
         if not result:
-            raise SimpleException("FAILED CHANGING")
+            raise SimpleException("DAILYPROB", "Failing to change daily problem alert setting")
 
         word = "enabled" if change else "disabled"
         await interaction.response.send_message(f"**Daily problem alerts** are now {word}", ephemeral=True)
@@ -157,7 +157,7 @@ class ContestTimeIntervalsMenu(discord.ui.Select):
         newIntervals = [int(interval) for interval in self.values]
         result = self.app.synchronizer.changeAlertIntervals(self.server.serverID, newIntervals)
         if not result:
-            raise SimpleException("FAILED CHANGING")
+            raise SimpleException("CONTSQS", "Failing to change contest time alert intervals")
 
         await interaction.response.send_message("**Contest Intervals** have been updated", ephemeral=True)
         self.app.contestTimeBucket.printBucketClean()
@@ -188,7 +188,7 @@ class ContestTimeAlertMenu(discord.ui.Select):
         change = self.values[0] == "True"  # convert to bool
         result = self.app.synchronizer.changeContestAlertParticpation(self.server.serverID, change)
         if not result:
-            raise SimpleException("FAILED CHANGING")
+            raise SimpleException("CONTSQS", "Failing to change upcoming contest alert setting")
 
         word = "enabled" if change else "disabled"
         await interaction.response.send_message(f"**Upcoming contest alerts** are now {word} on your selected intervals", ephemeral=True)
