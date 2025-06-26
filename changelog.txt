@@ -99,3 +99,5 @@
 ~~~~~~~~~~
 - stubbed out the server cog
 - fully added /sconfig
+- redid the simple exception and error embed
+- more server commands and views
