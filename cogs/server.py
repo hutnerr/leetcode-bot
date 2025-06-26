@@ -56,16 +56,16 @@ class ServerCog(commands.Cog):
         pass
     
     # setchannel - set the channel for the bot to post in
-    @app_commands.command(name="setchannel", description="Sets the bot's output feed channel")
-    @app_commands.checks.has_permissions(administrator=True) # only admins can change the server settings
-    async def setchannel(self, interaction: discord.Interaction, channel: discord.TextChannel = None):
-        if channel is None:
-            channel = interaction.channel # if no channel is specified, use the current channel
+    # @app_commands.command(name="setchannel", description="Sets the bot's output feed channel")
+    # @app_commands.checks.has_permissions(administrator=True) # only admins can change the server settings
+    # async def setchannel(self, interaction: discord.Interaction, channel: discord.TextChannel = None):
+    #     if channel is None:
+    #         channel = interaction.channel # if no channel is specified, use the current channel
             
-        server = self.getServer(interaction)
-        server.settings.postingChannelID = channel.id # set the channel id
-        server.toJSON()
-        await interaction.response.send_message(f"Bot's output feed channel has been set to {channel.mention}", ephemeral=True)
+    #     server = self.getServer(interaction)
+    #     server.settings.postingChannelID = channel.id # set the channel id
+    #     server.toJSON()
+    #     await interaction.response.send_message(f"Bot's output feed channel has been set to {channel.mention}", ephemeral=True)
         
     # resetduplicates
     @app_commands.command(name="resetdupes", description="Reset the stored duplicate problems")
@@ -153,7 +153,6 @@ class ServerCog(commands.Cog):
     @pconfig.error
     @pinfo.error
     @pactive.error
-    @setchannel.error
     @resetdupes.error
     @deleteserver.error
     async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):

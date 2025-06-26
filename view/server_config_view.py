@@ -17,10 +17,10 @@ class ServerConfigView(discord.ui.View):
                 self.add_item(BiweeklyContestAlertMenu(server, app))
                 self.add_item(DailyProblemAlertMenu(server, app))
             case "other":
-                self.add_item(ChannelSelector(server))
                 self.add_item(AllowDuplicatesMenu(server, app))
                 self.add_item(UseAlertRoleMenu(server, app))       
                 self.add_item(RoleSelector(server))   
+                self.add_item(ChannelSelector(server))
             case _:
                 raise SimpleException("SERVERCONFVIEW", "Backend failure")
 
@@ -261,7 +261,9 @@ class UseAlertRoleMenu(discord.ui.Select):
 # =================================
 class RoleSelector(discord.ui.RoleSelect):
     def __init__(self, server: Server):
-        super().__init__()
+        super().__init__(
+            placeholder="Select Alert Role - Type Role Name Here",
+        )
         self.server = server
         self.min_values = 1
         self.max_values = 1
@@ -278,15 +280,18 @@ class RoleSelector(discord.ui.RoleSelect):
         
 class ChannelSelector(discord.ui.ChannelSelect):
     def __init__(self, server: Server):
-        super().__init__()
+        super().__init__(
+            placeholder="Select Output Channel - Type Channel Name Here",
+            channel_types=[discord.ChannelType.text],  # only allow text channels
+        )
         self.server = server
         self.min_values = 1
         self.max_values = 1
 
     async def callback(self, interaction: discord.Interaction):
         if self.values is None or len(self.values) == 0:
-            raise SimpleException("INVALID SELECTION")
-        
+            raise SimpleException("CHNSELVW", "No channel selected.", "Please select a valid text channel from the dropdown menu.")
+
         channel = self.values[0]
         if channel.type != discord.ChannelType.text:
             # FIXME: this exception isn't being caught by the error handler
