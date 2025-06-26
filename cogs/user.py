@@ -33,7 +33,7 @@ class UserCog(commands.Cog):
             userObj = users[userID]
         else:
             userObj = self.newUser(userID)
-            
+                        
         profileInfo = None
         if userObj.leetcodeUsername is not None:
             queryService: QueryService = self.app.queryService
@@ -105,7 +105,7 @@ class UserCog(commands.Cog):
                 raise SimpleException("USER NOT FOUND")
         else: # user clicked no
             await interaction.followup.send("User profile deletion cancelled.", ephemeral=True)
-            
+
     
     def newUser(self, discID: int) -> User:
         # if the user doesnt exist, then make a blank slate

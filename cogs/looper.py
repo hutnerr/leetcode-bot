@@ -25,11 +25,12 @@ class Looper(commands.Cog):
         hour = int(time.strftime('%H'))
         minute = int(time.strftime('%M'))
         
-        testmins = [0, 15, 30, 45]  # 0=0, 15=1, 30=2, 45=3. problem intervals are 15 minutes
-        if minute not in testmins:
-            interval = -1
+        intervals = [0, 15, 30, 45]  # 0=0, 15=1, 30=2, 45=3. problem intervals are 15 minutes
+        if minute not in intervals:
+            interval = None
         else:
             interval = minute // 15
+            print(f"Interval: {interval}")  # debug print
             
         print(dow, hour, minute)
         
