@@ -2,6 +2,7 @@ when i add points or whatever, make sure its done to the object
 then saved to file so its updated in both life and saved memory
 
 whats left:
-- all of the server related integration
+- pinfo, pconfig, pactive
 - the submit function in competition.py
 - the bucket looping in looper.py
+- native testing and code review 
