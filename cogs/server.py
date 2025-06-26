@@ -156,7 +156,7 @@ class ServerCog(commands.Cog):
     @sinfo.error
     @pconfig.error
     @pinfo.error
-    @activeproblems.error
+    @pactive.error
     @setchannel.error
     @setrole.error
     @resetdupes.error
