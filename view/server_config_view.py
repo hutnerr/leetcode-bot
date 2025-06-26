@@ -17,10 +17,13 @@ class ServerConfigView(discord.ui.View):
                 self.add_item(BiweeklyContestAlertMenu(server, app))
                 self.add_item(DailyProblemAlertMenu(server, app))
             case "other":
+                self.add_item(TimezoneSelector(server))
                 self.add_item(AllowDuplicatesMenu(server, app))
                 self.add_item(UseAlertRoleMenu(server, app))       
                 self.add_item(RoleSelector(server))   
                 self.add_item(ChannelSelector(server))
+            case "timezone":
+                self.add_item(TimezoneSelector(server))
             case _:
                 raise SimpleException("SERVERCONFVIEW", "Backend failure")
 
@@ -307,3 +310,44 @@ class ChannelSelector(discord.ui.ChannelSelect):
         self.server.settings.postingChannelID = int(channel.id)
         self.server.toJSON()
         await interaction.response.send_message(f"Server Channel set to: <#{channel.id}>", ephemeral=True)
+        
+class TimezoneSelector(discord.ui.Select):
+    def __init__(self, server: Server):
+        timezone_map = [
+            ("UTC", "UTC"),
+            ("EST", "America/New_York (Eastern Time)"),
+            ("CST", "America/Chicago (Central Time, US)"),
+            ("MST", "America/Denver (Mountain Time)"),
+            ("PST", "America/Los_Angeles (Pacific Time)"),
+            ("GMT", "Europe/London (London)"),
+            ("CET", "Europe/Berlin/Paris (Central European Time)"),
+            ("MSK", "Europe/Moscow (Moscow)"),
+            ("IST", "Asia/Kolkata (India Standard Time)"),
+            ("CST-CHINA", "Asia/Shanghai (China Standard Time)"),
+            ("JST", "Asia/Tokyo (Japan Standard Time)"),
+            ("SGT", "Asia/Singapore (Singapore Time)"),
+            ("AEST", "Australia/Sydney (Australian Eastern Standard Time)"),
+            ("NZST", "Pacific/Auckland (New Zealand Standard Time)"),
+        ]
+        options = [discord.SelectOption(label=f"{zone}", description=descriptor, value=zone) for zone, descriptor in timezone_map]
+
+        super().__init__(
+            placeholder=f"Select Timezone ({server.settings.timezone})",
+            options=options, min_values=1, max_values=1,
+        )
+        self.server = server
+
+    async def callback(self, interaction: discord.Interaction):
+        if len(self.values) != 1:
+            if interaction.response.is_done():
+                await interaction.followup.send("Invalid selection", ephemeral=True)
+            else:
+                await interaction.response.send_message("Invalid selection", ephemeral=True)
+            return
+        
+        self.server.settings.timezone = self.values[0]
+        self.server.toJSON()
+        if interaction.response.is_done():
+            await interaction.followup.send(f"Timezone set to: {self.values[0]}", ephemeral=True)
+        else:
+            await interaction.response.send_message(f"Timezone set to: {self.values[0]}", ephemeral=True)

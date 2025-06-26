@@ -42,7 +42,7 @@ class Problems(commands.Cog):
 
         # build a Problem object, we can ignore most of its attributes
         # we only need the difficulties and premium
-        problem = Problem(pid=-1, sid=-1, dow=-1, hour=-1, interval=-1,
+        problem = Problem(pid=-1, sid=-1, dows=[-1], hour=-1, interval=-1,
             difs=difficulty.value,
             premium=premium
         )

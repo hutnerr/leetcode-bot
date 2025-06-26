@@ -26,8 +26,9 @@ class ServerInfoEmbed(discord.Embed):
         self.add_field(name="\nStatic Times Config", value=staticTimeAlerts, inline=True)
         
         otherConfigs = ""
-        otherConfigs += f"Bot Channel.\n> <#{server.settings.postingChannelID}>\n"
+        otherConfigs += f"Timezone.\n> `{server.settings.timezone}`\n"
         otherConfigs += f"Duplicates Allowed.\n> `{ 'Enabled' if server.settings.duplicatesAllowed else 'Disabled'}`\n"
         otherConfigs += f"Use Alert Role.\n> `{ 'Enabled' if server.settings.useAlertRole else 'Disabled'}`\n"
         otherConfigs += f"Alert Role.\n> {f'<@&{server.settings.alertRoleID}>' if server.settings.alertRoleID else 'None'}\n"
+        otherConfigs += f"Bot Channel.\n> <#{server.settings.postingChannelID}>\n"
         self.add_field(name="\nOther Configs", value=otherConfigs, inline=True)

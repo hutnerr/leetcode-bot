@@ -58,6 +58,7 @@ class OtherCog(commands.Cog):
 
     # help command to display help information for the bot
     # uses a dictionary to store the help information for each command
+    # TODO: if no parameter give information and how to use the bot
     @app_commands.command(name='help', description='Displays help information for the bot')
     @app_commands.choices(command=[app_commands.Choice(name=cmd, value=cmd) for cmd in helpDictionary.keys()])
     async def help(self, interaction: discord.Interaction, command: app_commands.Choice[str]):

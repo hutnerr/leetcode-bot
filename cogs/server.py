@@ -5,6 +5,7 @@ from discord.ext import commands
 
 from models.app import App
 from models.server import Server
+from models.problem import Problem
 from models.server_settings import ServerSettings
 
 from errors.simple_exception import SimpleException
@@ -14,6 +15,9 @@ from view.confirmation_view import ConfirmationView, ConfirmationEmbed
 from view.server_config_view import ServerConfigView
 from view.server_info_embed import ServerInfoEmbed
 from view.error_embed import ErrorEmbed
+from view.active_problems_embed import ActiveProblemsEmbed
+from view.problem_info_embed import ProblemInfoEmbed
+from view.problem_config_view import ProblemConfigView
 
 class ServerCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -42,18 +46,88 @@ class ServerCog(commands.Cog):
     # Before it is sent back and saved, convert it to EST (since that is where I'm at)
     @app_commands.command(name="pconfig", description="Change a problem's settings")
     @app_commands.checks.has_permissions(administrator=True) # only admins can change the server settings
-    async def pconfig(self, interaction: discord.Interaction):
-        pass
-    
+    @app_commands.choices(pids = [
+            app_commands.Choice(name=1, value=1),
+            app_commands.Choice(name=2, value=2),
+            app_commands.Choice(name=3, value=3),
+            app_commands.Choice(name=4, value=4),
+            app_commands.Choice(name=5, value=5),
+        ])
+    async def pconfig(self, interaction: discord.Interaction, pids: discord.app_commands.Choice[int]):
+        server = self.getServer(interaction)
+        
+        # if the timezone is not set, then we need to ask the user to set it
+        if server.settings.timezone is None:
+            raise SimpleException("TIMEZONE", "Timezone not set", "The server's timezone is not set. Please set it using `/sconfig <Other Settings>` before configuring problems. This ensures time accuracy.")
+
+        if server.problems[pids.value] is None:
+            embed = ConfirmationEmbed("This problem does not exist. Would you like to create one with default parameters?")
+            view = ConfirmationView()
+            
+            if interaction.response.is_done():
+                await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            else:
+                await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+            if await view.wait():
+                raise SimpleException("TIMEOUT", "Problem creation timed out", "The problem creation request timed out. Please try again.")
+
+            if not view.result:  # user clicked no
+                await interaction.followup.send("Problem configuration cancelled.", ephemeral=True)
+                return
+                        
+            # user clicked yes, so we will create a new problem
+            problem = Problem(
+                    pid=pids.value,
+                    sid=server.serverID,
+                    difs="easy-medium-hard",  # default difficulties
+                    dows=[1, 2, 3, 4, 5, 6, 7],  # default days of the week (all)
+                    hour=0,  # default hour
+                    interval=0,  # default interval
+                    premium=0  # default premium
+                )
+        else:
+            problem = server.problems[pids.value]
+            if problem is None:
+                raise SimpleException("PROBNOTFOUND", "Problem not found", "The problem you are trying to configure does not exist in the server's config. Use `/pinfo` to see the current problems and their configs.")
+                
+        view=ProblemConfigView(server, problem, self.app)
+        if interaction.response.is_done():
+            await interaction.followup.send(view=view, ephemeral=True)
+        else:
+            await interaction.response.send_message(view=view, ephemeral=True)
+
     # pinfo - display the problem info
     @app_commands.command(name="pinfo", description="Displays a problems info")
     async def pinfo(self, interaction: discord.Interaction):
-        pass
+        server = self.getServer(interaction)
+        await interaction.response.send_message(embed=ProblemInfoEmbed(server.problems))
     
     # pactive - display the problems
     @app_commands.command(name="pactive", description="Displays the current active problems")
     async def pactive(self, interaction: discord.Interaction):
-        pass
+        server = self.getServer(interaction)
+        await interaction.response.send_message(embed=ActiveProblemsEmbed(server))
+
+    @app_commands.command(name="delproblem", description="Deletes a problem from the server's config")
+    @app_commands.checks.has_permissions(administrator=True) # only admins can change the server settings
+    @app_commands.choices(pids = [
+            app_commands.Choice(name=1, value=1),
+            app_commands.Choice(name=2, value=2),
+            app_commands.Choice(name=3, value=3),
+            app_commands.Choice(name=4, value=4),
+            app_commands.Choice(name=5, value=5),
+        ])
+    @app_commands.describe(pids="The problem ID to delete")
+    async def delproblem(self, interaction: discord.Interaction, pids: discord.app_commands.Choice[int]):
+        server: Server = self.getServer(interaction)
+        if pids.value not in server.problems:
+            raise SimpleException("PROBDEL", "Problem not found", "The problem you are trying to delete does not exist in the server's config. Use `/pinfo` to see the current problems and their configs.")
+        
+        problemToRemove = server.problems[pids.value]
+        if not self.app.synchronizer.removeProblem(problemToRemove):
+            raise SimpleException("PROBDEL", "Failed to delete problem", "The problem could not be deleted. It may not exist or there was an error in the backend.")
+
+        server.toJSON()  # save the server
     
     # setchannel - set the channel for the bot to post in
     # @app_commands.command(name="setchannel", description="Sets the bot's output feed channel")
@@ -91,7 +165,7 @@ class ServerCog(commands.Cog):
     # deleteserver - delete the server config. admin only 
     @app_commands.command(name="delserver", description="Deletes the server configuration")
     @app_commands.checks.has_permissions(administrator=True) # only admins can change the server settings
-    async def deleteserver(self, interaction: discord.Interaction):
+    async def delserver(self, interaction: discord.Interaction):
         confirmationMSG = "Are you sure you want to delete the server configuration? This action cannot be undone."
         embed: discord.Embed = ConfirmationEmbed(confirmationMSG)
         view: discord.ui.View = ConfirmationView()
@@ -150,17 +224,21 @@ class ServerCog(commands.Cog):
 
     @sconfig.error
     @sinfo.error
-    @pconfig.error
+    # @pconfig.error
     @pinfo.error
     @pactive.error
     @resetdupes.error
-    @deleteserver.error
+    @delserver.error
+    @delproblem.error
     async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):
         exception: SimpleException = error.original
         code: SimpleException = exception.code if isinstance(error.original, SimpleException) else "BACKEND FAILURE"
         msg = error.original.message if isinstance(error.original, SimpleException) else str(error.original)
         help = error.original.help if isinstance(error.original, SimpleException) else None
-        await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
+        if interaction.response.is_done():
+            await interaction.followup.send(embed=ErrorEmbed(code, msg, help), ephemeral=True)
+        else:
+            await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
 
 async def setup(client: commands.Bot) -> None: 
     await client.add_cog(ServerCog(client))

@@ -10,7 +10,8 @@ class ServerSettings:
                  contestTimeAlerts: bool = False,         # whether to alert for contest time
                  duplicatesAllowed: bool = False,         # whether duplicates are allowed in the problem selection
                  alertRoleID: int = None,                 # the role ID to mention in alerts, if applicable
-                 useAlertRole: bool = False               # whether to use the alert role in the alerts
+                 useAlertRole: bool = False,               # whether to use the alert role in the alerts
+                 timezone: str = None                     # the timezone for the server, default is None
                  ):
         self.postingChannelID = postingChannelID
         self.weeklyContestAlerts = weeklyContestAlerts
@@ -21,6 +22,7 @@ class ServerSettings:
         self.duplicatesAllowed = duplicatesAllowed
         self.alertRoleID = alertRoleID
         self.useAlertRole = useAlertRole
+        self.timezone = timezone
 
     def __str__(self) -> str:
         return (f"postingChannelID={self.postingChannelID}\n"
@@ -32,6 +34,7 @@ class ServerSettings:
                 f"\t\tduplicatesAllowed={self.duplicatesAllowed}\n"
                 f"\t\talertRoleID={self.alertRoleID}\n"
                 f"\t\tuseAlertRole={self.useAlertRole}\n"
+                f"\t\ttimezone={self.timezone}\n"
                 )
 
     def toJSON(self) -> dict:
@@ -44,7 +47,8 @@ class ServerSettings:
             "contestTimeAlerts": self.contestTimeAlerts,
             "duplicatesAllowed": self.duplicatesAllowed,
             "alertRoleID": self.alertRoleID,
-            "useAlertRole": self.useAlertRole
+            "useAlertRole": self.useAlertRole,
+            "timezone": self.timezone
         }
 
     @staticmethod
@@ -58,5 +62,6 @@ class ServerSettings:
             contestTimeAlerts=settings.get("contestTimeAlerts", []),
             duplicatesAllowed=settings.get("duplicatesAllowed", False),
             alertRoleID=settings.get("alertRoleID"),
-            useAlertRole=settings.get("useAlertRole", False)
+            useAlertRole=settings.get("useAlertRole", False),
+            timezone=settings.get("timezone", None)
         )

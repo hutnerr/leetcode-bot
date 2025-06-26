@@ -101,3 +101,7 @@
 - fully added /sconfig
 - redid the simple exception and error embed
 - more server commands and views
+
+6/26/2025
+~~~~~~~~~~
+- combined setrole and setchannel into sconfig

@@ -11,9 +11,10 @@ class ProblemBucket:
     NUMBUCKETS = (24 * NUMINTERVALS) # this is hours per day * num of 15 min intervals in hour
 
     def __init__(self):
-        # dict with the days of week (1-7), then inside is a list of sets
+        # dict with the days of week (0-6), then inside is a list of sets
         # use _calculateBucketIndex with the hour and interval for the right index
-        self.buckets = {i: [set() for _ in range(self.NUMBUCKETS)] for i in range(1, 8)}
+        # sunday is 0, monday is 1, etc. saturday is 6
+        self.buckets = {i: [set() for _ in range(self.NUMBUCKETS)] for i in range(0, 7)}
 
     def __str__(self) -> str:
         non_empty = [bucket for bucket in self.buckets if bucket]
@@ -23,33 +24,36 @@ class ProblemBucket:
     # ADDING AND REMOVING SHOULD BE CALLED BY A SYNCRONIZER
     # TO ENSURE THAT THE BUCKET AND MODEL CONTAIN THE SAME DATA
     def addToBucket(self, prob: Problem) -> bool:
-        if (prob.problemID < 0) or (prob.problemID > Server.MAXPROBLEMS) or (prob.dow not in self.buckets):
+        if (prob.problemID < 0) or (prob.problemID > Server.MAXPROBLEMS) or (not prob.dows):
             return False
         
         index = self._calculateBucketIndex(prob.hour, prob.interval)
         if index == -1:
             return False
         
-        key = prob.getKey() # the key is the serverID::problemID, used later to trace back
-        self.buckets[prob.dow][index].add(key)
+        for dow in prob.dows:
+            key = prob.getKey() # the key is the serverID::problemID, used later to trace back
+            self.buckets[dow][index].add(key)
         return True
     
     # ADDING AND REMOVING SHOULD BE CALLED BY A SYNCRONIZER
     # TO ENSURE THAT THE BUCKET AND MODEL CONTAIN THE SAME DATA
     def removeFromBucket(self, prob: Problem) -> bool:
-        if prob.dow not in self.buckets:
+        if not prob.dows:
             return False
         
         index = self._calculateBucketIndex(prob.hour, prob.interval)
         if index == -1:
             return False
-        
-        key = prob.getKey() # the key is the serverID::problemID, used later to trace back
-        if key in self.buckets[prob.dow][index]:
-            self.buckets[prob.dow][index].remove(key)
-            return True
-        return False
-        
+
+        for dow in prob.dows:
+            key = prob.getKey() # the key is the serverID::problemID, used later to trace back
+            if key in self.buckets[dow][index]:
+                self.buckets[dow][index].remove(key)
+            else:
+                return False
+        return True
+
 
     def getBucket(self, dow: int, hour: int, interval: int) -> set | None:
         if dow not in self.buckets:

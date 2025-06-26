@@ -6,10 +6,13 @@ from utils import csv_helper as csvh
 
 PROBLEMS_URL = "https://www.leetcode.com/problems/"
 
-# converts a title to a slug
-# i.e. Two Sum -> two-sum
 def titleToSlug(title: str) -> str:
+    # i.e. Two Sum -> two-sum
     return title.replace(" ", "-").lower()
+
+def slugToTitle(slug: str) -> str:
+    # i.e. two-sum -> Two Sum
+    return " ".join([word.capitalize() for word in slug.split("-")])
 
 # creates a link to a problem using its slug
 def slugToURL(slug: str) -> str:

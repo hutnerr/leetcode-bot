@@ -11,3 +11,7 @@ whats left:
 - add all the commands to the help
 - native testing and code review 
 - documentation and comments
+
+
+@app_commands.describe(pid="The problem ID to delete")
+@app_commands.rename(pid="problemid")
