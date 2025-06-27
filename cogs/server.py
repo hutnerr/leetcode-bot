@@ -84,7 +84,9 @@ class ServerCog(commands.Cog):
                     hour=0,  # default hour
                     interval=0,  # default interval
                     premium=0  # default premium
-                )
+                ) 
+            self.app.synchronizer.addProblem(problem)
+            
         else:
             problem = server.problems[pids.value]
             if problem is None:

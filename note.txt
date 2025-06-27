@@ -20,3 +20,8 @@ whats left:
 so the error handler isnt working
 needs to work on admin failure
 isnt working on something like when a user needs to set the timezone either, just failing
+
+check interaction status on things to see if its been interacted already or nah
+
+implement the timezone to utc conversion or problem change
+implement the using alert role
