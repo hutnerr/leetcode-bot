@@ -16,7 +16,7 @@ class ProblemInfoEmbed(discord.Embed):
         if not problemAdded:
             self.description = "There are no problems configured for this server. Use `/pconfig` to add a problem."
 
-        self.set_footer(text="Use /pconfig add & manage problems. Use /delproblem to delete a problem.")
+        self.set_footer(text="Change the config with /pconfig <ID>. Delete with /delproblem <ID>.")
 
     def addProblem(self, problem: Problem):
 
