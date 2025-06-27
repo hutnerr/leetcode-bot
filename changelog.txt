@@ -115,3 +115,5 @@ MOVED OUT. WAS TOO BUSY TO WORK
 - combined setrole and setchannel into sconfig
 - added most of the problem commands
 - change dow so it can be multiple days
+- finished the looper and rest of commands
+- mostly polishing and some minor bug fixes left
