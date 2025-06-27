@@ -15,3 +15,8 @@ whats left:
 
 @app_commands.describe(pid="The problem ID to delete")
 @app_commands.rename(pid="problemid")
+
+
+so the error handler isnt working
+needs to work on admin failure
+isnt working on something like when a user needs to set the timezone either, just failing

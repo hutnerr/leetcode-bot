@@ -236,7 +236,7 @@ class IntervalSelect(discord.ui.Select):
         ]
         
         super().__init__(
-            placeholder=f"Select Problem Hour ({problem.hour})",
+            placeholder=f"Select Problem Minute Interval ({problem.hour})",
             options=options, min_values=1, max_values=1,
         )
 

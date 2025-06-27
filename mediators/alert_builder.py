@@ -75,17 +75,39 @@ class AlertBuilder:
 
 
     # collects the server & channel IDs and builds the alert message for the contest alerts
-    def buildContestAlerts(self, interval: int, alertType: AlertType) -> list[Alert]:
+    def buildContestAlerts(self, interval: int, alertType: AlertType, contestAlertType: AlertType) -> list[Alert]:
         alerts = []
 
-        if alertType == AlertType.WEEKLY_CONTEST:
+        if contestAlertType == AlertType.WEEKLY_CONTEST:
             contestType = "Weekly"
-        elif alertType == AlertType.BIWEEKLY_CONTEST:
+        elif contestAlertType == AlertType.BIWEEKLY_CONTEST:
             contestType = "Biweekly"
         else:
             return []
 
-        alertString = f"Upcoming {contestType} Contest in {timeh.minutesToHours(interval)}"
+        info = self.queryService.getUpcomingContests()
+        contests = info["data"]["upcomingContests"]
+        title = None
+        titleSlug = None
+        for contest in contests:
+            if contest["title"].startswith(contestType):
+                title = contest["title"]
+                titleSlug = contest["titleSlug"]
+                break
+        
+        url = f"https://leetcode.com/contest/{titleSlug}/"
+        
+        if not title or not titleSlug:
+            # if we don't have a contest, we can't build an alert
+            print("Contest Query Failed")
+            return []
+        
+        # FIXME: Might have to -1 this. it deteremines how fast this updates
+        if not title or not titleSlug:
+            print("Contest Query Failed")
+            return None
+
+        alertString = f"[{title}]({url}) is upcoming in **{timeh.minutesToHours(interval)}**! Remember to register and prepare!"
 
         serversToNotify = self.contestTimeBucket.getBucket(interval)
         if not serversToNotify: # no servers to notify
@@ -100,7 +122,8 @@ class AlertBuilder:
                 continue
             
             info = {
-                "alertString" : alertString
+                "alertString" : alertString,
+                "url" : f"https://leetcode.com/contest/{titleSlug}/",
             }
             alerts.append(Alert(alertType, server.serverID, server.settings.postingChannelID, info))
         
@@ -110,7 +133,7 @@ class AlertBuilder:
     # these alerts all happen at a static time, so we can just get the channel IDs, build the alert message, and return them
     def buildStaticAlerts(self, alert: StaticTimeAlert) -> list[Alert]:
 
-        def buildStaticAlertString() -> str | None:
+        def buildStaticAlertInfo() -> dict | None:
             # we have a contest
             if (alert == StaticTimeAlert.WEEKLY_CONTEST) or (alert == StaticTimeAlert.BIWEEKLY_CONTEST):
                 contestType = alert.value.capitalize() # FIXME: uses the enum value, might be ugly
@@ -118,24 +141,34 @@ class AlertBuilder:
                 info = self.queryService.getUpcomingContests()
                 contests = info["data"]["upcomingContests"]
                 title = None
+                titleSlug = None
                 for contest in contests:
                     if contest["title"].startswith(contestType):
                         title = contest["title"]
+                        titleSlug = contest["titleSlug"]
                         break
-                
+
                 # FIXME: Might have to -1 this. it deteremines how fast this updates
-                if not title:
+                if not title or not titleSlug:
                     print("Contest Query Failed")
                     return None
 
-                return f"{title} Opened!"
+                url = f"https://leetcode.com/contest/{titleSlug}/"
+                alertString = f"LeetCode [{title}]({url}) is now open!"
 
             # FIXME: also might need a delay on this 
             elif alert == StaticTimeAlert.DAILY_PROBLEM:
-                slug = self.queryService.getDailyProblem()["data"]["challenge"]["question"]["titleSlug"]
-                return f"Daily Problem Released: {probh.slugToURL(slug)}"
+                titleSlug = self.queryService.getDailyProblem()["data"]["challenge"]["question"]["titleSlug"]
+                url = probh.slugToURL(titleSlug)
+                alertString = f"Today's daily problem is now available! It is [{probh.slugToTitle(titleSlug)}]({url})."
             else:
                 return None # invalid alert
+            
+            info = {
+                "alertString" : alertString,
+                "url" : url
+            }
+            return info
         
         alerts = []
         
@@ -143,8 +176,8 @@ class AlertBuilder:
         if not serversToNotify:
             return []
 
-        alertString = buildStaticAlertString()
-        if alertString is None:
+        alertInfo = buildStaticAlertInfo()
+        if alertInfo is None:
             return []
 
         match (alert):
@@ -159,9 +192,7 @@ class AlertBuilder:
 
         for serverID in serversToNotify:
             server = self.servers[serverID]
-            info = {
-                "alertString" : alertString
-            }
+            info = alertInfo
             alerts.append(Alert(alertType, server.serverID, server.settings.postingChannelID, info))
 
         return alerts

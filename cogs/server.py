@@ -80,7 +80,7 @@ class ServerCog(commands.Cog):
                     pid=pids.value,
                     sid=server.serverID,
                     difs="easy-medium-hard",  # default difficulties
-                    dows=[1, 2, 3, 4, 5, 6, 7],  # default days of the week (all)
+                    dows=[0, 1, 2, 3, 4, 5, 6],  # default days of the week (all)
                     hour=0,  # default hour
                     interval=0,  # default interval
                     premium=0  # default premium
