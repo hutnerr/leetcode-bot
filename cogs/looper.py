@@ -32,8 +32,7 @@ class Looper(commands.Cog):
         self.mainloop.start()
         self.updateProblemset.start()
     
-    # 50 seconds should always fall somewhere in the 1 minute mark but minimizes the amount of checks we have to do
-    @tasks.loop(seconds=50)
+    @tasks.loop(minutes=1)
     async def mainloop(self) -> None:
         dow = int(time.strftime('%w'))  # 0 = sunday, 6 = saturday
         hour = int(time.strftime('%H'))
