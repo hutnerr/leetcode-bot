@@ -3,6 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from models.app import App
+from models.user import User
 from errors.simple_exception import SimpleException
 from view.competition_embed import LeaderboardEmbed
 from view.error_embed import ErrorEmbed
@@ -66,7 +67,26 @@ class CompetitionCog(commands.Cog):
     @app_commands.command(name="submit", description="Gives you points if you've completed any active problems")
     async def submit(self, interaction: discord.Interaction):
         # have this just scrape the recent submissions, then use them to check in the servers recent problems
-        await interaction.response.send_message("This command is not implemented yet.", ephemeral=True)
+        userID = interaction.user.id
+        if userID not in self.app.users:
+            # new  user
+            user = User(id=userID)
+            self.app.users[user.id] = user
+            user.toJSON() # save the new user
+        else:
+            user = self.app.users[userID]
+            
+        prevPoints = user.points
+            
+        if user.leetcodeUsername is None:
+            raise SimpleException("LEETCODEUSER", "You have not set your LeetCode username. Use `/setleetcode` to set it.", "Make sure you have a LeetCode account and that you have completed problems.")
+
+        submitted = self.app.submitter.submit(interaction.guild.id, userID)
+        if not submitted:
+            raise SimpleException("SUBMITFAIL", "You have not completed any active problems or you have already submitted them.", "Make sure you have completed problems and that they are active on the server. If this persists, try `/deluser` to reset your user data.")
+        
+        interaction.response.send_message(f"Successfully submitted your problems! You now have {user.points} points. You went up {user.points - prevPoints} points!", ephemeral=True)
+        
     
     @leaderboard.error
     @rank.error
