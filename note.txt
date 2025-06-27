@@ -25,3 +25,5 @@ check interaction status on things to see if its been interacted already or nah
 
 implement the timezone to utc conversion or problem change
 implement the using alert role
+
+go through all things and ensure im using the synchronizer where i should be
