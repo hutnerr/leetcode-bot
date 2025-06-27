@@ -12,7 +12,8 @@ class ProblemConfigView(discord.ui.View):
         self.add_item(DifficultiesSelect(server, problem, app))
         self.add_item(DaysOfWeekSelect(server, problem, app))
         self.add_item(PremiumSelect(server, problem, app))
-        
+        self.add_item(HourSelect(server, problem, app))
+        self.add_item(IntervalSelect(server, problem, app))
         
 class DifficultiesSelect(discord.ui.Select):
     def __init__(self, server: Server, problem: Problem, app: App):
@@ -83,18 +84,18 @@ class DaysOfWeekSelect(discord.ui.Select):
             await interaction.response.send_message("Invalid selection", ephemeral=True)
             return
         
-        # self.app.problemBucket.printBucketClean()
+        self.app.problemBucket.printBucketClean()
         
         remove = self.app.synchronizer.removeProblem(self.problem)
         if not remove:
-            raise SimpleException("REMOFAIL", "Failed to remove the old problem before setting the new one. This should not happen, please report this issue using `/report`.")
-        
+            raise SimpleException("REMOFAIL", "Failed to remove the old problem before setting the new one. This should not happen, please report this issue using `/report`. Also please `/delproblem` and re-add the problem. Sorry for the inconvenience.")
+
         selectedDays = self.values
         self.problem.dows = [int(day) for day in selectedDays]
 
         add = self.app.synchronizer.addProblem(self.problem)
         if not add:
-            raise SimpleException("ADDPFAIL", "Failed to add the new problem after setting the days. This should not happen, please report this issue using `/report`.")
+            raise SimpleException("ADDPFAIL", "Failed to add the new problem after setting the days. This should not happen, please report this issue using `/report`. Also please `/delproblem` and re-add the problem. Sorry for the inconvenience.")
 
         selectedDays = [self.dayTable.get(day, "Unknown") for day in self.problem.dows] if self.problem.dows else []
         if interaction.response.is_done():
@@ -103,7 +104,7 @@ class DaysOfWeekSelect(discord.ui.Select):
             await interaction.response.send_message(f"**Problem days** are now set to {', '.join(selectedDays)}", ephemeral=True)        
         self.server.toJSON()
         
-        # self.app.problemBucket.printBucketClean()
+        self.app.problemBucket.printBucketClean()
 
 
 class PremiumSelect(discord.ui.Select):
@@ -153,7 +154,117 @@ class PremiumSelect(discord.ui.Select):
         self.server.toJSON()
         
 
+class HourSelect(discord.ui.Select):
+    def __init__(self, server: Server, problem: Problem, app: App):
+        self.server = server
+        self.problem = problem
+        self.app = app
 
+        # HARD ENCODING B)
+        options = [
+            discord.SelectOption(label="12 AM", description="Problems will be sent at 12AM + Interval", value=0),
+            discord.SelectOption(label="1 AM", description="Problems will be sent at 1AM + Interval", value=1),
+            discord.SelectOption(label="2 AM", description="Problems will be sent at 2AM + Interval", value=2),
+            discord.SelectOption(label="3 AM", description="Problems will be sent at 3AM + Interval", value=3),
+            discord.SelectOption(label="4 AM", description="Problems will be sent at 4AM + Interval", value=4),
+            discord.SelectOption(label="5 AM", description="Problems will be sent at 5AM + Interval", value=5),
+            discord.SelectOption(label="6 AM", description="Problems will be sent at 6AM + Interval", value=6),
+            discord.SelectOption(label="7 AM", description="Problems will be sent at 7AM + Interval", value=7),
+            discord.SelectOption(label="8 AM", description="Problems will be sent at 8AM + Interval", value=8),
+            discord.SelectOption(label="9 AM", description="Problems will be sent at 9AM + Interval", value=9),
+            discord.SelectOption(label="10 AM", description="Problems will be sent at 10AM + Interval", value=10),
+            discord.SelectOption(label="11 AM", description="Problems will be sent at 11AM + Interval", value=11),
+            discord.SelectOption(label="12 PM", description="Problems will be sent at 12PM + Interval", value=12),
+            discord.SelectOption(label="1 PM", description="Problems will be sent at 1PM + Interval", value=13),
+            discord.SelectOption(label="2 PM", description="Problems will be sent at 2PM + Interval", value=14),
+            discord.SelectOption(label="3 PM", description="Problems will be sent at 3PM + Interval", value=15),
+            discord.SelectOption(label="4 PM", description="Problems will be sent at 4PM + Interval", value=16),
+            discord.SelectOption(label="5 PM", description="Problems will be sent at 5PM + Interval", value=17),
+            discord.SelectOption(label="6 PM", description="Problems will be sent at 6PM + Interval", value=18),
+            discord.SelectOption(label="7 PM", description="Problems will be sent at 7PM + Interval", value=19),
+            discord.SelectOption(label="8 PM", description="Problems will be sent at 8PM + Interval", value=20),
+            discord.SelectOption(label="9 PM", description="Problems will be sent at 9PM + Interval", value=21),
+            discord.SelectOption(label="10 PM", description="Problems will be sent at 10PM + Interval", value=22),
+            discord.SelectOption(label="11 PM", description="Problems will be sent at 11PM + Interval", value=23),
+        ]
+        
+        super().__init__(
+            placeholder=f"Select Problem Hour ({problem.hour})",
+            options=options, min_values=1, max_values=1,
+        )
 
-        # hour
-        # intervals
+    async def callback(self, interaction: discord.Interaction):
+        if len(self.values) != 1:
+            await interaction.response.send_message("Invalid selection", ephemeral=True)
+            return
+        
+        self.app.problemBucket.printBucketClean()
+        
+        remove = self.app.synchronizer.removeProblem(self.problem)
+        if not remove:
+            raise SimpleException("REMOFAIL", "Failed to remove the old problem before setting the new one. This should not happen, please report this issue using `/report`.")
+        
+        selectedHour = int(self.values[0])
+        self.problem.hour = selectedHour
+        
+        add = self.app.synchronizer.addProblem(self.problem)
+        if not add:
+            raise SimpleException("ADDAFAIL", "Failed to add the new problem after removing the old one. This should not happen, please report this issue using `/report`.")
+
+        string = f"**Problem hour** is now set to {selectedHour} ({'AM' if selectedHour < 12 else 'PM'})"
+        string += f"\n(Problems will be sent at {self.problem.hour}:{self.problem.interval * 15:02})"
+        if interaction.response.is_done():
+            await interaction.followup.send(string, ephemeral=True)
+        else:
+            await interaction.response.send_message(string, ephemeral=True)
+
+        print("------------------------------------")
+        self.app.problemBucket.printBucketClean()
+        self.server.toJSON()
+
+class IntervalSelect(discord.ui.Select):
+    def __init__(self, server: Server, problem: Problem, app: App):
+        self.server = server
+        self.problem = problem
+        self.app = app
+
+        options = [
+            discord.SelectOption(label="0  Min", description="Problems will be sent at hour:15", value=0),
+            discord.SelectOption(label="15 Min", description="Problems will be sent at hour:30", value=1),
+            discord.SelectOption(label="30 Min", description="Problems will be sent at hour:45", value=2),
+            discord.SelectOption(label="45 Min", description="Problems will be sent at hour:00", value=3),
+        ]
+        
+        super().__init__(
+            placeholder=f"Select Problem Hour ({problem.hour})",
+            options=options, min_values=1, max_values=1,
+        )
+
+    async def callback(self, interaction: discord.Interaction):
+        if len(self.values) != 1:
+            await interaction.response.send_message("Invalid selection", ephemeral=True)
+            return
+        
+        self.app.problemBucket.printBucketClean()
+        
+        remove = self.app.synchronizer.removeProblem(self.problem)
+        if not remove:
+            raise SimpleException("REMOFAIL", "Failed to remove the old problem before setting the new one. This should not happen, please report this issue using `/report`.")
+        
+        selectedInterval = int(self.values[0])
+        self.problem.interval = selectedInterval
+        
+        add = self.app.synchronizer.addProblem(self.problem)
+        if not add:
+            raise SimpleException("ADDAFAIL", "Failed to add the new problem after removing the old one. This should not happen, please report this issue using `/report`.")
+
+        string = f"**Problem Interval** is now set to {selectedInterval} ({'AM' if selectedInterval < 12 else 'PM'})"
+        string += f"\n(Problems will be sent at {self.problem.hour}:{self.problem.interval * 15:02})"
+        if interaction.response.is_done():
+            await interaction.followup.send(string, ephemeral=True)
+        else:
+            await interaction.response.send_message(string, ephemeral=True)
+
+        print("------------------------------------")
+        self.app.problemBucket.printBucketClean()
+        self.server.toJSON()
