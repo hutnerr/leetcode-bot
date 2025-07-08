@@ -6,6 +6,7 @@ from models.app import App
 from errors.simple_exception import SimpleException
 
 from view.error_embed import ErrorEmbed
+from view.positive_embed import PositiveEmbed
 from view.help_embed import HelpEmbed, CommandHelpEmbed
 
 helpDictionary = {
@@ -59,19 +60,18 @@ class OtherCog(commands.Cog):
 
     # help command to display help information for the bot
     # uses a dictionary to store the help information for each command
-    # TODO: if no parameter give information and how to use the bot
     @app_commands.command(name='help', description='Displays help information for the bot')
     @app_commands.choices(command=[app_commands.Choice(name=cmd, value=cmd) for cmd in helpDictionary.keys()])
     async def help(self, interaction: discord.Interaction, command: app_commands.Choice[str] = None):
         if command is None:
             # if no command is specified, send a general help message
-            await interaction.response.send_message(embed=HelpEmbed(), ephemeral=True)
+            await interaction.response.send_message(embed=HelpEmbed())
             return
         
         command = command.value
         info = helpDictionary.get(command)
         if info:
-            await interaction.response.send_message(embed=CommandHelpEmbed(command, info), ephemeral=True)
+            await interaction.response.send_message(embed=CommandHelpEmbed(command, info))
         else:
             raise SimpleException("HELP", f"{command} was not found")
 
@@ -79,7 +79,13 @@ class OtherCog(commands.Cog):
     # this is a simple command that just sends a message with a link to the GitHub
     @app_commands.command(name='report', description='Report an issue to the GitHub')
     async def report(self, interaction: discord.Interaction):
-        await interaction.response.send_message("Please report issues **[here](https://github.com/hutnerr/leetcode-bot/issues)**.", ephemeral=True)
+        embed = PositiveEmbed(
+            title="Report an Issue",
+            description="If you encounter any issues with the bot, please report them on the [GitHub repository](https://github.com/hutnerr/leetcode-bot/issues).",
+            thumbnail="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+            url="https://github.com/hutnerr/leetcode-bot/issues"
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     # about command to display information about the bot
     @app_commands.command(name='about', description='Displays information about the bot')

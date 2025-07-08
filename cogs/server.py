@@ -33,7 +33,10 @@ class ServerCog(commands.Cog):
     @app_commands.checks.has_permissions(administrator=True) # only admins can change the server settings
     async def sconfig(self, interaction: discord.Interaction, setting: app_commands.Choice[str]):
         server = self.getServer(interaction)
-        await interaction.response.send_message(view=ServerConfigView(server, self.app, setting.value), ephemeral=True)
+        try:
+            await interaction.response.send_message(view=ServerConfigView(server, self.app, setting.value), ephemeral=True)
+        except Exception as e:
+            raise SimpleException("BACKEND FAILURE", "Failed to load server config view", "There was an error loading the server config view. Please try again later.") from e
     
     # sinfo - display the settings
     @app_commands.command(name="sinfo", description="Displays the servers config")
@@ -228,7 +231,7 @@ class ServerCog(commands.Cog):
 
     @sconfig.error
     @sinfo.error
-    # @pconfig.error
+    @pconfig.error
     @pinfo.error
     @pactive.error
     @resetdupes.error

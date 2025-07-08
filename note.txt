@@ -25,3 +25,17 @@ everything in talko
 make the mini embed and make all the styling consistent
 
 fill out the rest of the help commands
+
+put the PositiveEmebed everywhere
+
+fix the timezone not set being thrown by pconfig to gracefully
+
+when setting the timezone, convert it then store it, but this also means whenver i get it, i have to convert it back. 
+
+implement using the alert role on notification alerts
+
+red = bad 
+yellow = warn
+green = success/good 
+blue = general 
+yellow = lc specific

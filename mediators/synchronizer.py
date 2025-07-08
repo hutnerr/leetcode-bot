@@ -145,7 +145,7 @@ class Synchronizer:
 
         currentIntervals = server.settings.contestTimeIntervals
         if not currentIntervals:
-            currentIntervals = [15] # set to a default of 15 mins is empty
+            return True # no intervals to change, so we can just update the setting
             
         # if we now want to participate, add our intervals to the bucket
         # otherwise, remove them from the bucket 
@@ -160,7 +160,7 @@ class Synchronizer:
                 if not self.contestTimeBucket.removeFromBucket(interval, serverID):
                     server.settings = backupSettings
                     self.contestTimeBucket.buckets = backupBucket
-                    print("Failed to remove contest time interval from bucket.")
+                    print(f"Failed to remove contest time interval {interval} from bucket.")
                     return False
                 
         serverSettings.contestTimeAlerts = participate

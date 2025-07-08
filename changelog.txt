@@ -125,3 +125,4 @@ WENT ON VACATION & HOLIDAY
 7/8/2025
 ~~~~~~~~~~
 - many minor bug fixes
+- added a general help part to the help command

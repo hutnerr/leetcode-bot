@@ -6,12 +6,47 @@ from models.problem import Problem
 
 from errors.simple_exception import SimpleException
 
+from view.positive_embed import PositiveEmbed
+
+dayTable = {
+            0: "Sunday",
+            1: "Monday",
+            2: "Tuesday",
+            3: "Wednesday",
+            4: "Thursday",
+            5: "Friday",
+            6: "Saturday"
+}
+
+# gens a string thats like
+# Problems will be sent at 12:00 AM for every day of the week.
+# Problems will be sent at 1:15 PM on Monday and Wednesday. 
+def getProblemSentString(problem: Problem):
+    hour12 = problem.hour % 12
+    hour12 = 12 if hour12 == 0 else hour12
+    ampm = "AM" if problem.hour < 12 else "PM"
+    minute = problem.interval * 15
+
+    days = [dayTable[day] for day in problem.dows] if problem.dows else []
+    if len(days) == 7:
+        daysStr = "for every day of the week"
+    elif len(days) == 1:
+        daysStr = f"on {days[0]}"
+    elif len(days) == 2:
+        daysStr = f"on {days[0]} and {days[1]}"
+    elif len(days) > 2:
+        daysStr = f"on {', '.join(days[:-1])}, and {days[-1]}"
+    else:
+        daysStr = "on no days"
+
+    return f"Problems will be sent at **{hour12}:{minute:02}** {ampm} {daysStr}."
+
 class ProblemConfigView(discord.ui.View):
     def __init__(self, server: Server, problem: Problem, app: App):
         super().__init__(timeout=60)    
         self.add_item(DifficultiesSelect(server, problem, app))
-        self.add_item(DaysOfWeekSelect(server, problem, app))
         self.add_item(PremiumSelect(server, problem, app))
+        self.add_item(DaysOfWeekSelect(server, problem, app))
         self.add_item(HourSelect(server, problem, app))
         self.add_item(IntervalSelect(server, problem, app))
         
@@ -28,7 +63,7 @@ class DifficultiesSelect(discord.ui.Select):
         ]
 
         super().__init__(
-            placeholder=f"Select Problem Difficulty ({', '.join(problem.difficulties) if problem.difficulties else 'None'})",
+            placeholder=f"Select Problem Difficulty ({', '.join([d.capitalize() for d in problem.difficulties]) if problem.difficulties else 'None'})",
             options=options, min_values=1, max_values=3,
         )
 
@@ -39,10 +74,12 @@ class DifficultiesSelect(discord.ui.Select):
 
         selectedDifficulties = self.values
         self.problem.difficulties = selectedDifficulties
+        difString = f"Problem difficulty is now set to {', '.join(selectedDifficulties)}"
+        embed = PositiveEmbed("Problem Difficulty Set", difString)
         if interaction.response.is_done():
-            await interaction.followup.send(f"**Problem difficulty** is now set to {', '.join(selectedDifficulties)}", ephemeral=True)
+            await interaction.followup.send(embed=embed, ephemeral=True)
         else:
-            await interaction.response.send_message(f"**Problem difficulty** is now set to {', '.join(selectedDifficulties)}", ephemeral=True)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
         self.app.synchronizer.addProblem(self.problem)
         self.server.toJSON()
         self.app.problemBucket.printBucketClean()
@@ -64,16 +101,7 @@ class DaysOfWeekSelect(discord.ui.Select):
         ]
 
         # Convert problem.dows (list of ints) to day names for placeholder
-        self.dayTable = {
-            0: "Sunday",
-            1: "Monday",
-            2: "Tuesday",
-            3: "Wednesday",
-            4: "Thursday",
-            5: "Friday",
-            6: "Saturday"
-        }
-        selectedDays = [self.dayTable.get(day, "Unknown") for day in problem.dows] if problem.dows else []
+        selectedDays = [dayTable.get(day, "Unknown") for day in problem.dows] if problem.dows else []
         super().__init__(
             placeholder=f"Select Problem Days ({', '.join(selectedDays) if selectedDays else 'None'})",
             options=options, min_values=1, max_values=7,
@@ -97,11 +125,12 @@ class DaysOfWeekSelect(discord.ui.Select):
         if not add:
             raise SimpleException("ADDPFAIL", "Failed to add the new problem after setting the days. This should not happen, please report this issue using `/report`. Also please `/delproblem` and re-add the problem. Sorry for the inconvenience.")
 
-        selectedDays = [self.dayTable.get(day, "Unknown") for day in self.problem.dows] if self.problem.dows else []
+        selectedDays = [dayTable.get(day, "Unknown") for day in self.problem.dows] if self.problem.dows else []
+        embed = PositiveEmbed("Problem Days Set", getProblemSentString(self.problem))
         if interaction.response.is_done():
-            await interaction.followup.send(f"**Problem days** are now set to {', '.join(selectedDays)}", ephemeral=True)
+            await interaction.followup.send(embed=embed, ephemeral=True)
         else:
-            await interaction.response.send_message(f"**Problem days** are now set to {', '.join(selectedDays)}", ephemeral=True)        
+            await interaction.response.send_message(embed=embed, ephemeral=True)
         self.server.toJSON()
         
         self.app.problemBucket.printBucketClean()
@@ -114,9 +143,9 @@ class PremiumSelect(discord.ui.Select):
         self.app = app
 
         options = [
-            discord.SelectOption(label="Free", description="Only free problems may be selected", value=0),
-            discord.SelectOption(label="Premium", description="Only premium problems may be selected", value=1),
-            discord.SelectOption(label="Either", description="Either free or premium problems may be selected", value=2),
+            discord.SelectOption(label="Free", description="Only **free** problems may be selected", value=0),
+            discord.SelectOption(label="Premium", description="Only **premium** problems may be selected", value=1),
+            discord.SelectOption(label="Either", description="Either **free** or **premium** problems may be selected", value=2),
         ]
         
         table = { 0: "Free", 1: "Premium", 2: "Either" }
@@ -144,10 +173,11 @@ class PremiumSelect(discord.ui.Select):
             case _:
                 string = "Unknown"
         
+        embed = PositiveEmbed("Problem Premium Set", string)
         if interaction.response.is_done():
-            await interaction.followup.send(string, ephemeral=True)
+            await interaction.followup.send(embed=embed, ephemeral=True)
         else:
-            await interaction.response.send_message(string, ephemeral=True)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
 
         # since this setting once matters when a problem is selected
         # we don't have to mess with the problem bucket as its at the same time
@@ -189,7 +219,7 @@ class HourSelect(discord.ui.Select):
         ]
         
         super().__init__(
-            placeholder=f"Select Problem Hour ({problem.hour})",
+            placeholder=f"Select Problem Hour ({problem.hour % 12 if problem.hour % 12 != 0 else 12} {'AM' if problem.hour < 12 else 'PM'})",
             options=options, min_values=1, max_values=1,
         )
 
@@ -211,12 +241,12 @@ class HourSelect(discord.ui.Select):
         if not add:
             raise SimpleException("ADDAFAIL", "Failed to add the new problem after removing the old one. This should not happen, please report this issue using `/report`.")
 
-        string = f"**Problem hour** is now set to {selectedHour} ({'AM' if selectedHour < 12 else 'PM'})"
-        string += f"\n(Problems will be sent at {self.problem.hour}:{self.problem.interval * 15:02})"
+
+        embed = PositiveEmbed("Problem Hour Set", getProblemSentString(self.problem))
         if interaction.response.is_done():
-            await interaction.followup.send(string, ephemeral=True)
+            await interaction.followup.send(embed=embed, ephemeral=True)
         else:
-            await interaction.response.send_message(string, ephemeral=True)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
 
         print("------------------------------------")
         self.app.problemBucket.printBucketClean()
@@ -229,14 +259,14 @@ class IntervalSelect(discord.ui.Select):
         self.app = app
 
         options = [
-            discord.SelectOption(label="0  Min", description="Problems will be sent at hour:15", value=0),
-            discord.SelectOption(label="15 Min", description="Problems will be sent at hour:30", value=1),
-            discord.SelectOption(label="30 Min", description="Problems will be sent at hour:45", value=2),
-            discord.SelectOption(label="45 Min", description="Problems will be sent at hour:00", value=3),
+            discord.SelectOption(label="0  Min", description="Problems will be sent at hour:00", value=0),
+            discord.SelectOption(label="15 Min", description="Problems will be sent at hour:15", value=1),
+            discord.SelectOption(label="30 Min", description="Problems will be sent at hour:30", value=2),
+            discord.SelectOption(label="45 Min", description="Problems will be sent at hour:45", value=3),
         ]
         
         super().__init__(
-            placeholder=f"Select Problem Minute Interval ({problem.hour})",
+            placeholder=f"Select Problem Minute Interval ({problem.interval * 15} Min)",
             options=options, min_values=1, max_values=1,
         )
 
@@ -258,12 +288,11 @@ class IntervalSelect(discord.ui.Select):
         if not add:
             raise SimpleException("ADDAFAIL", "Failed to add the new problem after removing the old one. This should not happen, please report this issue using `/report`.")
 
-        string = f"**Problem Interval** is now set to {selectedInterval} ({'AM' if selectedInterval < 12 else 'PM'})"
-        string += f"\n(Problems will be sent at {self.problem.hour}:{self.problem.interval * 15:02})"
+        embed = PositiveEmbed("Problem Minute Interval Set", getProblemSentString(self.problem))
         if interaction.response.is_done():
-            await interaction.followup.send(string, ephemeral=True)
+            await interaction.followup.send(embed=embed)
         else:
-            await interaction.response.send_message(string, ephemeral=True)
+            await interaction.response.send_message(embed=embed)
 
         print("------------------------------------")
         self.app.problemBucket.printBucketClean()

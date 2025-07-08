@@ -84,3 +84,6 @@ def numToDayOfWeek(num: int) -> str:
     if 0 <= num < len(days):
         return days[num]
     return "INVALID DAY NUMBER"
+
+def timeToEST() -> dict:
+    pass

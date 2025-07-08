@@ -61,11 +61,9 @@ class Looper(commands.Cog):
         # hour = DAILY_PROBLEM_HOUR
         # minInterval = DAILY_PROBLEM_INTERVAL
 
-        print("handling alerts")
         await self.handleProblemAlerts(dow, hour, minInterval)
         await self.handleContestAlerts(dow, hour, minute)
         await self.handleStaticAlerts(dow, hour, minInterval)
-        print("finished handling alerts")
         
         
     # update the problemset every 48 hours
@@ -107,8 +105,6 @@ class Looper(commands.Cog):
         bucket = self.app.problemBucket.getBucket(dow, hour, minInterval)
         if bucket is None or len(bucket) == 0:
             return
-        
-        print(bucket)
         
         # FIXME: use the alert builder to build the alerts. not doing it right
         

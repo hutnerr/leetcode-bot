@@ -14,6 +14,7 @@ from models.user import User
 from view.user_info_embed import UserInfoEmbed
 from view.confirmation_view import ConfirmationView, ConfirmationEmbed
 from view.error_embed import ErrorEmbed
+from view.positive_embed import PositiveEmbed
 
 class UserCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -70,14 +71,15 @@ class UserCog(commands.Cog):
             raise SimpleException("USRSETUP", "LeetCode account not found", "Make sure you have a valid LeetCode account and that the username is typed correctly.")
 
         user.setLeetCodeUsername(leetcodeusername)
-        await interaction.response.send_message("Your username has been successfuly set!", ephemeral=True)        
+        # await interaction.response.send_message("Your username has been successfuly set!", ephemeral=True)
+        await interaction.response.send_message(embed=PositiveEmbed("Username Set", f"Your LeetCode username has been set to `{leetcodeusername}`. You can now use `/uinfo` to view your profile."), ephemeral=True)  
     
     @app_commands.command(name = "deluser", description = "Deletes your user profile")
     async def deleteuser(self, interaction: discord.Interaction):
         # remove from the dict
         # delete the file
         # send an are you sure embed, say that user profiles are NOT server specific
-        confirmationMSG = "User profiles are **NOT** server specific. If you delete it, your progress will be lost **entirely**."
+        confirmationMSG = "User profiles are **NOT** server specific. If you delete it, your points and progress will be lost **entirely**."
         embed: discord.Embed = ConfirmationEmbed(confirmationMSG)
         view: discord.View = ConfirmationView()
         await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
@@ -97,11 +99,13 @@ class UserCog(commands.Cog):
                 path = os.path.join("data", "users", f"{userID}.json")
                 if fileh.fileExists(path):
                     fileh.deleteFile(path) # delete the file
-                await interaction.followup.send("Your user profile has been deleted successfully.", ephemeral=True)
+                    embed = PositiveEmbed("User Profile Deleted", "Your user profile has been deleted successfully. If you wish to use the submission system again, you will need to set your username using `/setusername <username>`.")
+                await interaction.followup.send(embed=embed, ephemeral=True)
             else:
-                raise SimpleException("USRDEL", "User profile not found", "You do not have a user profile to delete.")
+                raise SimpleException("USRDEL", "User profile not found", "You do not have a user profile to delete. Create one using `/setusername <username>` to use the submission system.")
         else: # user clicked no
-            await interaction.followup.send("User profile deletion cancelled.", ephemeral=True)
+            embed = PositiveEmbed("Successfully Cancelled", "Your user profile deletion has been cancelled!")
+            await interaction.followup.send(embed=embed, ephemeral=True)
 
     
     def newUser(self, discID: int) -> User:
@@ -126,7 +130,10 @@ class UserCog(commands.Cog):
         code: SimpleException = exception.code if isinstance(error.original, SimpleException) else "BACKEND FAILURE"
         msg = error.original.message if isinstance(error.original, SimpleException) else str(error.original)
         help = error.original.help if isinstance(error.original, SimpleException) else None
-        await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
+        if interaction.response.is_done():
+            await interaction.followup.send(embed=ErrorEmbed(code, msg, help), ephemeral=True)
+        else:
+            await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
 
     
 async def setup(client: commands.Bot) -> None: 

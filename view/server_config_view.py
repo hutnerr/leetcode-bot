@@ -1,31 +1,38 @@
 import discord
+from discord import app_commands
+
 from models.server import Server
 from models.app import App
 from buckets.static_time_bucket import StaticTimeAlert
 from errors.simple_exception import SimpleException
 from view.error_embed import ErrorEmbed
+from view.positive_embed import PositiveEmbed
+
 
 class ServerConfigView(discord.ui.View):
     def __init__(self, server: Server, app: App, setting: str):
         super().__init__(timeout=60)
-        match setting:
-            case "upcomingcontests":
-                self.add_item(ContestTimeAlertMenu(server, app))
-                self.add_item(ContestTimeIntervalsMenu(server, app))
-            case "staticalerts":
-                self.add_item(WeeklyContestAlertMenu(server, app))
-                self.add_item(BiweeklyContestAlertMenu(server, app))
-                self.add_item(DailyProblemAlertMenu(server, app))
-            case "other":
-                self.add_item(TimezoneSelector(server))
-                self.add_item(AllowDuplicatesMenu(server, app))
-                self.add_item(UseAlertRoleMenu(server, app))       
-                self.add_item(RoleSelector(server))   
-                self.add_item(ChannelSelector(server))
-            case "timezone":
-                self.add_item(TimezoneSelector(server))
-            case _:
-                raise SimpleException("SERVERCONFVIEW", "Backend failure")
+        try:
+            match setting:
+                case "upcomingcontests":
+                    self.add_item(ContestTimeAlertMenu(server, app))
+                    self.add_item(ContestTimeIntervalsMenu(server, app))
+                case "staticalerts":
+                    self.add_item(WeeklyContestAlertMenu(server, app))
+                    self.add_item(BiweeklyContestAlertMenu(server, app))
+                    self.add_item(DailyProblemAlertMenu(server, app))
+                case "other":
+                    self.add_item(TimezoneSelector(server))
+                    self.add_item(AllowDuplicatesMenu(server, app))
+                    self.add_item(UseAlertRoleMenu(server, app))       
+                    self.add_item(RoleSelector(server))   
+                    self.add_item(ChannelSelector(server))
+                case "timezone":
+                    self.add_item(TimezoneSelector(server))
+                case _:
+                    raise SimpleException("SERVERCONFVIEW", "Backend failure")
+        except Exception as e:
+            raise SimpleException("SERVERCONFVIEW", "Failed to load server config view", "There was an error loading the server config view. Please try again later.") from e    
 
 # FIXME: These 3 static alert menu classes can def be combined to reduce some copy pasted code
 # =================================
@@ -48,17 +55,20 @@ class WeeklyContestAlertMenu(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         if len(self.values) != 1:
-            await interaction.response.send_message("Invalid selection", ephemeral=True)
+            embed = ErrorEmbed("CONTSQSEMB", "Invalid Selection", "Please select either ON or OFF to change the weekly contest alert setting.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
 
         change = self.values[0] == "True"  # convert to bool
         result = self.app.synchronizer.changeStaticAlert(
             self.server.serverID, StaticTimeAlert.WEEKLY_CONTEST, change)
         if not result:
-            raise SimpleException("CONTSQSEMB", "Failing to change weekly contest alert setting")
+            embed = ErrorEmbed("CONTSQSEMB", "Failed to Change Weekly Contest Alerts", "There was an error changing the weekly contest alert setting.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
 
         word = "enabled" if change else "disabled"
-        await interaction.response.send_message(f"**Weekly contest alerts** are now {word}", ephemeral=True)
+        await interaction.response.send_message(embed=PositiveEmbed("Weekly Contest Alerts Updated", f"Weekly contest alerts are now **{word}**"), ephemeral=True)
 
 # =================================
 # BIWEEKLY CONTEST ALERT MENU
@@ -80,17 +90,20 @@ class BiweeklyContestAlertMenu(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         if len(self.values) != 1:
-            await interaction.response.send_message("Invalid selection", ephemeral=True)
+            embed = ErrorEmbed("CONTSQSEMB", "Invalid Selection", "Please select either ON or OFF to change the biweekly contest alert setting.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
 
         change = self.values[0] == "True"  # convert to bool
         result = self.app.synchronizer.changeStaticAlert(
             self.server.serverID, StaticTimeAlert.BIWEEKLY_CONTEST, change)
         if not result:
-            raise SimpleException("CONTSQSEMB", "Failing to change biweekly contest alert setting")
+            embed = ErrorEmbed("CONTSQSEMB", "Failed to Change Biweekly Contest Alerts", "There was an error changing the biweekly contest alert setting.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
 
         word = "enabled" if change else "disabled"
-        await interaction.response.send_message(f"**Biweekly contest alerts** are now {word}", ephemeral=True)
+        await interaction.response.send_message(embed=PositiveEmbed("Biweekly Contest Alerts Updated", f"Biweekly contest alerts are now **{word}**"), ephemeral=True)
 
 # =================================
 # DAILY PROBLEM ALERT MENU
@@ -112,17 +125,20 @@ class DailyProblemAlertMenu(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         if len(self.values) != 1:
-            await interaction.response.send_message("Invalid selection", ephemeral=True)
+            embed = ErrorEmbed("CONTSQSEMB", "Invalid Selection", "Please select either ON or OFF to change the daily problem alert setting.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
 
         change = self.values[0] == "True"  # convert to bool
         result = self.app.synchronizer.changeStaticAlert(
             self.server.serverID, StaticTimeAlert.DAILY_PROBLEM, change)
         if not result:
-            raise SimpleException("DAILYPROB", "Failing to change daily problem alert setting")
+            embed = ErrorEmbed("DAILYPROB", "Failed to Change Daily Problem Alerts", "There was an error changing the daily problem alert setting.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
 
         word = "enabled" if change else "disabled"
-        await interaction.response.send_message(f"**Daily problem alerts** are now {word}", ephemeral=True)
+        await interaction.response.send_message(embed=PositiveEmbed("Daily Problem Alerts Updated", f"Daily problem alerts are now **{word}**"), ephemeral=True)
 
 # =================================
 # CONTEST TIME INTERVALS
@@ -134,13 +150,13 @@ class ContestTimeIntervalsMenu(discord.ui.Select):
         self.app = app
         
         options = [
-            discord.SelectOption(label="15 mins", description="Give 15 minutes before the contest starts", value=15),
-            discord.SelectOption(label="30 mins", description="Give 30 minutes before the contest starts", value=30),
-            discord.SelectOption(label="1 hr", description="Give 1 hour before the contest starts", value=60),
-            discord.SelectOption(label="2 hrs", description="Give 2 hours before the contest starts", value=120),
-            discord.SelectOption(label="6 hrs", description="Give 6 hours before the contest starts", value=360),
-            discord.SelectOption(label="12 hrs", description="Give 12 hours before the contest starts", value=720),
-            discord.SelectOption(label="1 day", description="Give 1 day before the contest starts", value=1440),
+            discord.SelectOption(label="15 mins", description="Give an alert 15 minutes before the contest starts", value="15:15 mins"),
+            discord.SelectOption(label="30 mins", description="Give an alert 30 minutes before the contest starts", value="30:30 mins"),
+            discord.SelectOption(label="1 hr", description="Give an alert 1 hour before the contest starts", value="60:1 hr"),
+            discord.SelectOption(label="2 hrs", description="Give an alert 2 hours before the contest starts", value="120:2 hrs"),
+            discord.SelectOption(label="6 hrs", description="Give an alert 6 hours before the contest starts", value="360:6 hrs"),
+            discord.SelectOption(label="12 hrs", description="Give an alert 12 hours before the contest starts", value="720:12 hrs"),
+            discord.SelectOption(label="1 day", description="Give an alert 1 day before the contest starts", value="1440:1 day"),
         ]
 
         timeTable = {15: "15 mins", 30: "30 mins", 60: "1 hr", 120: "2 hrs", 360: "6 hrs", 720: "12 hrs", 1440: "1 day"}
@@ -153,19 +169,24 @@ class ContestTimeIntervalsMenu(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         if len(self.values) <= 0:
-            await interaction.response.send_message("Invalid selection", ephemeral=True)
+            embed = ErrorEmbed("CONTSQS", "No Intervals Selected", "You must select at least one interval to change the contest time alerts.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
-        
+
         if not self.server.settings.contestTimeAlerts:
-            await interaction.response.send_message("**Contest Time Alerts** must be enabled to change intervals", ephemeral=True)
+            embed = ErrorEmbed("CONTSQS", "Contest Time Alerts Disabled", "You must enable **Contest Time Alerts** to change the intervals.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
-    
-        newIntervals = [int(interval) for interval in self.values]
+
+        newIntervals = [int(value.split(":")[0]) for value in self.values]
+        displayIntervals = [value.split(":")[1] for value in self.values]
         result = self.app.synchronizer.changeAlertIntervals(self.server.serverID, newIntervals)
         if not result:
-            raise SimpleException("CONTSQS", "Failing to change contest time alert intervals")
+            embed = ErrorEmbed("CONTSQS", "Failed to Change Intervals", "There was an error changing the contest time alert intervals.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
 
-        await interaction.response.send_message("**Contest Intervals** have been updated", ephemeral=True)
+        await interaction.response.send_message(embed=PositiveEmbed("Contest Intervals Updated", f"Contest Intervals have been updated to {', '.join(displayIntervals)}"), ephemeral=True)
         self.app.contestTimeBucket.printBucketClean()
 
 # =================================
@@ -188,16 +209,19 @@ class ContestTimeAlertMenu(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         if len(self.values) != 1:
-            await interaction.response.send_message("Invalid selection", ephemeral=True)
+            embed = ErrorEmbed("CONTSQS", "Invalid Selection", "Please select either ON or OFF to change the upcoming contest alert setting.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
 
         change = self.values[0] == "True"  # convert to bool
         result = self.app.synchronizer.changeContestAlertParticpation(self.server.serverID, change)
         if not result:
-            raise SimpleException("CONTSQS", "Failing to change upcoming contest alert setting")
+            embed = ErrorEmbed("CONTSQS", "Failed to Change Upcoming Contest Alerts", "There was an error changing the upcoming contest alert setting.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return 
 
         word = "enabled" if change else "disabled"
-        await interaction.response.send_message(f"**Upcoming contest alerts** are now {word} on your selected intervals", ephemeral=True)
+        await interaction.response.send_message(embed=PositiveEmbed("Upcoming Contest Alerts Updated", f"**Upcoming contest alerts** are now {word} on your selected intervals"), ephemeral=True)
 
 # =================================
 # DUPLICATES ALLOWED
@@ -219,7 +243,8 @@ class AllowDuplicatesMenu(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         if len(self.values) != 1:
-            await interaction.response.send_message("Invalid selection", ephemeral=True)
+            embed = ErrorEmbed("DUPSELECT", "Invalid Selection", "Please select either ON or OFF to change the duplicates setting.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
 
         change = self.values[0] == "True"  # convert to bool
@@ -227,8 +252,8 @@ class AllowDuplicatesMenu(discord.ui.Select):
         self.server.toJSON()  # save the change
 
         word = "enabled" if change else "disabled"
-        await interaction.response.send_message(f"**Duplicates** are now {word}", ephemeral=True)
-        
+        await interaction.response.send_message(embed=PositiveEmbed("Duplicates Updated", f"**Duplicates** are now {word}"), ephemeral=True)
+
 # =================================
 # USE ALERT ROLE?
 # =================================
@@ -249,7 +274,8 @@ class UseAlertRoleMenu(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         if len(self.values) != 1:
-            await interaction.response.send_message("Invalid selection", ephemeral=True)
+            embed  = ErrorEmbed("ALERTROLE", "Invalid Selection", "Please select either ON or OFF to change the alert role setting.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
 
         change = self.values[0] == "True"  # convert to bool
@@ -257,7 +283,7 @@ class UseAlertRoleMenu(discord.ui.Select):
         self.server.toJSON()  # save the change
 
         word = "enabled" if change else "disabled"
-        await interaction.response.send_message(f"**Alert Role** is now {word}", ephemeral=True)
+        await interaction.response.send_message(embed=PositiveEmbed("Alert Role Updated", f"**Alert Role** is now {word}"), ephemeral=True)
 
 # =================================
 # ROLE SELECTOR 
@@ -273,14 +299,16 @@ class RoleSelector(discord.ui.RoleSelect):
 
     async def callback(self, interaction: discord.Interaction):
         if self.values is None or len(self.values) == 0:
-            raise SimpleException("ROLES", "Invalid role selection.", "Please select a valid role from the dropdown menu.")
+            embed = ErrorEmbed("ROLES", "No role selected", "Please select a valid role from the dropdown menu.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
         
         # update the server settings with the selected role
         role = self.values[0]
         self.server.settings.alertRoleID = int(role.id)
         self.server.toJSON()
-        await interaction.response.send_message(f"Server Role set to: <@&{role.id}>", ephemeral=True)
-        
+        await interaction.response.send_message(embed=PositiveEmbed("Server Role Updated", f"Server Role set to: <@&{role.id}>"), ephemeral=True)
+
 class ChannelSelector(discord.ui.ChannelSelect):
     def __init__(self, server: Server):
         super().__init__(
@@ -293,23 +321,24 @@ class ChannelSelector(discord.ui.ChannelSelect):
 
     async def callback(self, interaction: discord.Interaction):
         if self.values is None or len(self.values) == 0:
-            raise SimpleException("CHNSELVW", "No channel selected.", "Please select a valid text channel from the dropdown menu.")
+            embed = ErrorEmbed("CHNSELVW", "No channel selected", "Please select a valid text channel from the dropdown menu.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
 
         channel = self.values[0]
         if channel.type != discord.ChannelType.text:
-            # FIXME: this exception isn't being caught by the error handler
-            # it should be caught and handled gracefully, but currently it raises an unhandled exception
             code = "CHNSELVW"
             msg = "The selected channel is not a text channel."
             help = "If your channel is not listed, try doing `/setchannel #channel_name` to set it as the output channel directly."
-            await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
+            embed = ErrorEmbed(code, msg, help)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
             
         # update the server settings with the selected channel
         channel = self.values[0]
         self.server.settings.postingChannelID = int(channel.id)
         self.server.toJSON()
-        await interaction.response.send_message(f"Server Channel set to: <#{channel.id}>", ephemeral=True)
+        await interaction.response.send_message(embed=PositiveEmbed("Server Channel Updated", f"Server Channel set to: <#{channel.id}>"), ephemeral=True)
         
 class TimezoneSelector(discord.ui.Select):
     def __init__(self, server: Server):
@@ -339,15 +368,16 @@ class TimezoneSelector(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         if len(self.values) != 1:
-            if interaction.response.is_done():
-                await interaction.followup.send("Invalid selection", ephemeral=True)
-            else:
-                await interaction.response.send_message("Invalid selection", ephemeral=True)
+            embed = ErrorEmbed("TIMEZONE", "Invalid selection", "Please select a valid timezone from the dropdown menu.")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
         
         self.server.settings.timezone = self.values[0]
         self.server.toJSON()
+        embed = PositiveEmbed("Timezone Updated", f"Timezone set to: {self.values[0]}")
         if interaction.response.is_done():
-            await interaction.followup.send(f"Timezone set to: {self.values[0]}", ephemeral=True)
+            await interaction.followup.send(embed=embed, ephemeral=True)
         else:
-            await interaction.response.send_message(f"Timezone set to: {self.values[0]}", ephemeral=True)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        
+        

@@ -5,8 +5,10 @@ from discord.ext import commands
 from models.app import App
 from models.user import User
 from errors.simple_exception import SimpleException
+
 from view.competition_embed import LeaderboardEmbed
 from view.error_embed import ErrorEmbed
+from view.positive_embed import PositiveEmbed
 
 class CompetitionCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -56,7 +58,7 @@ class CompetitionCog(commands.Cog):
             tempPoints, member = data
             if member.id == userID:
                 points = tempPoints
-                await interaction.response.send_message(f"**{member.name}** is ranked `{place}`/`{len(boardData)}` with {points} pts")
+                await interaction.response.send_message(embed=PositiveEmbed("Rank Information", f"**{member.name}** is ranked `{place}`/`{len(boardData)}` with {points} pts", thumbnail=member.display_avatar.url))
                 return # exit
             
         raise SimpleException("COMPRANK", "User not found in leaderboard", "Make sure the user has completed problems and has points. If this persists, try `/deluser` to reset.")
@@ -82,10 +84,9 @@ class CompetitionCog(commands.Cog):
         submitted = self.app.submitter.submit(interaction.guild.id, userID)
         if not submitted:
             raise SimpleException("SUBMITFAIL", "You have not completed any active problems or you have already submitted them.", "Make sure you have completed problems and that they are active on the server. If this persists, try `/deluser` to reset your user data.")
-        
-        interaction.response.send_message(f"Successfully submitted your problems! You now have {user.points} points. You went up {user.points - prevPoints} points!", ephemeral=True)
-        
-    
+
+        await interaction.response.send_message(embed=PositiveEmbed("Submission Successful", f"Successfully submitted your problems! You now have {user.points} points. You went up {user.points - prevPoints} points!"), ephemeral=True)
+
     @leaderboard.error
     @rank.error
     @submit.error
