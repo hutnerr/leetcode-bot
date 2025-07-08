@@ -6,6 +6,7 @@ from models.app import App
 from errors.simple_exception import SimpleException
 
 from view.error_embed import ErrorEmbed
+from view.help_embed import HelpEmbed, CommandHelpEmbed
 
 helpDictionary = {
     "problem": {
@@ -61,16 +62,16 @@ class OtherCog(commands.Cog):
     # TODO: if no parameter give information and how to use the bot
     @app_commands.command(name='help', description='Displays help information for the bot')
     @app_commands.choices(command=[app_commands.Choice(name=cmd, value=cmd) for cmd in helpDictionary.keys()])
-    async def help(self, interaction: discord.Interaction, command: app_commands.Choice[str]):
+    async def help(self, interaction: discord.Interaction, command: app_commands.Choice[str] = None):
+        if command is None:
+            # if no command is specified, send a general help message
+            await interaction.response.send_message(embed=HelpEmbed(), ephemeral=True)
+            return
+        
         command = command.value
         info = helpDictionary.get(command)
         if info:
-            embed = discord.Embed(
-                title=f"Help for `{command}`", description=info['description'], color=discord.Color.blue())
-            embed.add_field(
-                name="Usage", value=f"`{info['usage']}`", inline=False)
-            # embed.set_thumbnail(url="https://icons.veryicon.com/png/o/miscellaneous/flat-icon/help-252.png")
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+            await interaction.response.send_message(embed=CommandHelpEmbed(command, info), ephemeral=True)
         else:
             raise SimpleException("HELP", f"{command} was not found")
 
@@ -91,9 +92,9 @@ class OtherCog(commands.Cog):
             color=discord.Color.green()
         )
         embed.add_field(
-            name="Developer", value="[My GitHub](https://github.com/hutnerr)\n[My Website](https://hunter-baker.com)", inline=False)
+            name="Developer", value="> [My GitHub](https://github.com/hutnerr)\n> [My Website](https://hunter-baker.com)", inline=False)
         embed.add_field(
-            name="GitHub", value="[LeetCode Bot](https://github.com/hutnerr/leetcode-bot)", inline=False)
+            name="GitHub", value="> [LeetCode Bot](https://github.com/hutnerr/leetcode-bot)", inline=False)
         await interaction.response.send_message(embed=embed)
 
     @help.error

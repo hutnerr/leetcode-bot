@@ -15,8 +15,6 @@ class CompetitionCog(commands.Cog):
     
     def buildLeaderboard(self, members: list[discord.Member]):
         users = self.app.users
-        if not users:
-            raise SimpleException("COMPUSERS", "Backend failure")
 
         board = []
         for member in members:

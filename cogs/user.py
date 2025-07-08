@@ -27,8 +27,6 @@ class UserCog(commands.Cog):
 
         userID = user.id
         users = self.app.users
-        if not users:
-            raise SimpleException("UINFOURS", "Backend failure")
 
         if userID in users:
             userObj = users[userID]
@@ -58,9 +56,7 @@ class UserCog(commands.Cog):
         discUser = interaction.user
         userID = discUser.id
         users = self.app.users
-        if not users:
-            raise SimpleException("USRSETURS", "Backend failure")
-        
+
         if userID in users:
             user = users[userID]
         else:
@@ -110,6 +106,7 @@ class UserCog(commands.Cog):
     
     def newUser(self, discID: int) -> User:
         # if the user doesnt exist, then make a blank slate
+        
         user = User(
             discordID=discID,
             leetcodeUsername=None,
@@ -117,6 +114,7 @@ class UserCog(commands.Cog):
         )
         self.app.users[discID] = user # add to the dict
         user.toJSON() # save the user
+                
         return user
     
     

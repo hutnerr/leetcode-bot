@@ -2,6 +2,7 @@ import discord.embeds
 from utils import problem_helper as probh
 from utils import markdown_helper as markdownh
 import json
+import re
 
 class ProblemEmbed(discord.Embed):
     
@@ -18,6 +19,9 @@ class ProblemEmbed(discord.Embed):
         acceptance = json.loads(problemInfo["stats"])["acRate"]
         
         super().__init__(title=f"{pid} - {title}", url=probh.slugToURL(slug))
+
+        text = re.sub(r'<img[^>]*>', '', text)  # remove <img> tags from the text bc they just showed up as ![](imglink)
+
         self.description = f"**Acceptance:** {acceptance}\n\n{markdownh.convertHTMLToMarkdown(text)}"
         self.color = self.getColor(difficulty)
         # self.set_thumbnail(url="https://leetcode.com/static/images/LeetCode_logo_rvs.png")

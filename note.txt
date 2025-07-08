@@ -4,18 +4,8 @@ then saved to file so its updated in both life and saved memory
 try and go for more conformity. maybe similar to the error embed, have a general msg embed or something
 make everything consistent, then look over everything for polish
 
-whats left:
-- pinfo, pconfig, pactive
-- the submit function in competition.py
-- the bucket looping in looper.py
-- add all the commands to the help
-- native testing and code review 
-- documentation and comments
-
-
 @app_commands.describe(pid="The problem ID to delete")
 @app_commands.rename(pid="problemid")
-
 
 so the error handler isnt working
 needs to work on admin failure
@@ -27,3 +17,11 @@ implement the timezone to utc conversion or problem change
 implement the using alert role
 
 go through all things and ensure im using the synchronizer where i should be
+
+get the active problems and submitter working 
+
+everything in talko
+
+make the mini embed and make all the styling consistent
+
+fill out the rest of the help commands

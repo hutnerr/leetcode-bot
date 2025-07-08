@@ -15,13 +15,13 @@ class ConfirmationView(discord.ui.View):
     @discord.ui.button(label = "Yes", style = discord.ButtonStyle.green)
     async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.result = True 
-        # if not interaction.response.is_done():
-            # await interaction.response.defer()
+        if not interaction.response.is_done():
+            await interaction.response.defer()
         self.stop()
 
     @discord.ui.button(label = "No", style = discord.ButtonStyle.red)
     async def reject(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.result = False
-        # if not interaction.response.is_done():
-            # await interaction.response.defer()
+        if not interaction.response.is_done():
+            await interaction.response.defer()
         self.stop()

@@ -44,10 +44,11 @@ class Looper(commands.Cog):
         else:
             minInterval = minute // 15
 
-        # minute = 15
+        # FOR TESTING INDIVIDUAL PROBLEMS
+        minute = 15
         # dow = 6
-        # hour = 1
-        # minInterval = 3
+        hour = 0
+        minInterval = 0
         
         # dow = WEEKLY_CONTEST_DOW
         # hour = WEEKLY_CONTEST_HOUR
@@ -107,7 +108,9 @@ class Looper(commands.Cog):
         if bucket is None or len(bucket) == 0:
             return
         
-        # FIXME: use the alert builder to build the alerts
+        print(bucket)
+        
+        # FIXME: use the alert builder to build the alerts. not doing it right
         
         for problemKey in bucket:
             # serverid::problemid

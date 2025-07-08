@@ -61,7 +61,7 @@ class ServerCog(commands.Cog):
             raise SimpleException("TIMEZONE", "Timezone not set", "The server's timezone is not set. Please set it using `/sconfig <Other Settings>` before configuring problems. This ensures time accuracy.")
 
         if server.problems[pids.value] is None:
-            embed = ConfirmationEmbed("This problem does not exist. Would you like to create one with default parameters?")
+            embed = ConfirmationEmbed("This problem does not exist. Would you like to create one with default parameters? If created, this problem will begin to run at it's set times.")
             view = ConfirmationView()
             
             if interaction.response.is_done():
@@ -122,14 +122,16 @@ class ServerCog(commands.Cog):
     @app_commands.describe(pids="The problem ID to delete")
     async def delproblem(self, interaction: discord.Interaction, pids: discord.app_commands.Choice[int]):
         server: Server = self.getServer(interaction)
-        if pids.value not in server.problems:
-            raise SimpleException("PROBDEL", "Problem not found", "The problem you are trying to delete does not exist in the server's config. Use `/pinfo` to see the current problems and their configs.")
-        
+
         problemToRemove = server.problems[pids.value]
+        if problemToRemove is None:
+            raise SimpleException("PROBNOTFOUND", "Problem not found", "The problem you are trying to delete does not exist in the server's config. Use `/pinfo` to see the current problems and their configs.")
+        
         if not self.app.synchronizer.removeProblem(problemToRemove):
             raise SimpleException("PROBDEL", "Failed to delete problem", "The problem could not be deleted. It may not exist or there was an error in the backend.")
 
         server.toJSON()  # save the server
+        await interaction.response.send_message(f"Problem with ID `{pids.value}` has been deleted successfully.", ephemeral=True)
     
     # setchannel - set the channel for the bot to post in
     # @app_commands.command(name="setchannel", description="Sets the bot's output feed channel")

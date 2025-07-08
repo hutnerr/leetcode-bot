@@ -4,7 +4,7 @@ class LeaderboardEmbed(discord.Embed):
     def __init__(self, leaderboard: tuple[int, str, int]):
         super().__init__(title="Point Leaderboard")
         
-        leaderboardstr = ""
+        leaderboardstr = "" if leaderboard else "No users on the leaderboard yet. Start by using `/setusername`.\n"
         for i in range(len(leaderboard)):
             if i == 15: # limit of 15 on the board
                 break
