@@ -1,4 +1,0 @@
-@app_commands.describe(pid="The problem ID to delete")
-@app_commands.rename(pid="problemid")
-
-see if sam or kob can break it. 

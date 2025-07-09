@@ -104,7 +104,7 @@ def numToDayOfWeek(num: int) -> str:
         return days[num]
     return "INVALID DAY NUMBER"
 
-def convertTimeZone(hour: int, minute: int, fromtz: str, totz: str, houroffset: int = 0) -> tuple[int, int]:    
+def convertTimeZone(hour: int, minute: int, fromtz: str, totz: str) -> tuple[int, int]:    
     fromZone = timezones.get(fromtz)
     toZone = timezones.get(totz)
 
@@ -118,8 +118,7 @@ def convertTimeZone(hour: int, minute: int, fromtz: str, totz: str, houroffset: 
     dt = datetime(now.year, now.month, now.day, hour, minute)
     dtSrc = sourcetz.localize(dt)
     dtTarget = dtSrc.astimezone(targettz)
-    out = (dtTarget.hour + houroffset, dtTarget.minute // 15)  # convert to intervals 
-    return out
+    return (dtTarget.hour, dtTarget.minute // 15)  # convert to intervals 
 
 def convertFromLocalTimeZone(hour: int, minute: int, totz: str) -> tuple[int, int]:
     return convertTimeZone(hour, minute, "EST", totz)

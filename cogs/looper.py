@@ -1,15 +1,10 @@
 import time
-import discord 
-from discord import app_commands
 from discord.ext import commands, tasks
 from utils import problem_helper as probh
-from utils import datetime_helper as timeh
 from models.app import App
 from models.server import Server
 from models.alert import Alert, AlertType
-from models.problem import Problem
 from mediators.alert_builder import AlertBuilder
-from services.problem_service import ProblemService
 from view.problem_embed import ProblemEmbed
 from view.alert_embed import AlertEmbed
 from buckets.static_time_bucket import StaticTimeAlert
@@ -51,10 +46,10 @@ class Looper(commands.Cog):
             minInterval = minute // 15
 
         # FOR TESTING INDIVIDUAL PROBLEMS
-        minute = 15
+        # minute = 15
         # dow = 6
-        hour = 0
-        minInterval = 0
+        # hour = 0
+        # minInterval = 0
         
         # dow = WEEKLY_CONTEST_DOW
         # hour = WEEKLY_CONTEST_HOUR
@@ -106,7 +101,7 @@ class Looper(commands.Cog):
             slug = alert.info["slug"]
             pid = int(alert.info["pid"])
             difficulty = alert.info["difficulty"]
-            problem = alert.info["problem"]
+            # problem = alert.info["problem"]
             
             server = self.app.servers.get(serverID)
 

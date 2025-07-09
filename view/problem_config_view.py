@@ -219,10 +219,10 @@ class HourSelect(discord.ui.Select):
         ]
         
         self.timezone = self.app.servers[self.problem.serverID].settings.timezone
-        self.tzHour, self.tzInterval = timeh.convertFromLocalTimeZone(self.problem.hour, self.problem.interval * 15, self.timezone) # convert what we have into our timezone
+        tzHour, tzInterval = timeh.convertFromLocalTimeZone(self.problem.hour, self.problem.interval * 15, self.timezone) # convert what we have into our timezone
         
         super().__init__(
-            placeholder=f"Select Problem Hour ({self.tzHour % 12 if self.tzHour % 12 != 0 else 12} {'AM' if self.tzHour < 12 else 'PM'})",
+            placeholder=f"Select Problem Hour ({tzHour % 12 if tzHour % 12 != 0 else 12} {'AM' if tzHour < 12 else 'PM'})",
             options=options, min_values=1, max_values=1,
         )
 
@@ -237,7 +237,8 @@ class HourSelect(discord.ui.Select):
         
         selectedHour = int(self.values[0])
 
-        self.problem.hour, self.problem.interval = timeh.convertToLocalTimeZone(selectedHour, self.tzInterval * 15, self.timezone) # convert back with the new hour and same interval
+        tzHour, tzInterval = timeh.convertFromLocalTimeZone(self.problem.hour, self.problem.interval * 15, self.timezone) # convert what we have into our timezone
+        self.problem.hour, self.problem.interval = timeh.convertToLocalTimeZone(selectedHour, tzInterval * 15, self.timezone) # convert back with the new hour and same interval
 
         add = self.app.synchronizer.addProblem(self.problem)
         if not add:
@@ -265,10 +266,10 @@ class IntervalSelect(discord.ui.Select):
         ]
         
         self.timezone = self.app.servers[self.problem.serverID].settings.timezone
-        self.tzHour, self.tzInterval = timeh.convertFromLocalTimeZone(self.problem.hour, self.problem.interval * 15, self.timezone)
+        tzHour, tzInterval = timeh.convertFromLocalTimeZone(self.problem.hour, self.problem.interval * 15, self.timezone)
         
         super().__init__(
-            placeholder=f"Select Problem Minute Interval ({self.tzInterval * 15} Min)",
+            placeholder=f"Select Problem Minute Interval ({tzInterval * 15} Min)",
             options=options, min_values=1, max_values=1,
         )
 
@@ -282,9 +283,9 @@ class IntervalSelect(discord.ui.Select):
             raise SimpleException("REMOFAIL", "Failed to remove the old problem before setting the new one. This should not happen, please report this issue using `/report`.")
         
         selectedInterval = int(self.values[0])
-        # self.problem.interval = selectedInterval
-
-        self.problem.hour, self.problem.interval = timeh.convertToLocalTimeZone(self.tzHour, selectedInterval * 15, self.timezone)
+        
+        tzHour, tzInterval = timeh.convertFromLocalTimeZone(self.problem.hour, self.problem.interval * 15, self.timezone)
+        self.problem.hour, self.problem.interval = timeh.convertToLocalTimeZone(tzHour, selectedInterval * 15, self.timezone)
 
         add = self.app.synchronizer.addProblem(self.problem)
         if not add:

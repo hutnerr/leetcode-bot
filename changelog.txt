@@ -124,5 +124,9 @@ WENT ON VACATION & HOLIDAY
 
 7/8/2025
 ~~~~~~~~~~
-- many minor bug fixes
+- tons of minor bug fixes
 - added a general help part to the help command
+- added timezone conversions
+- implemented the role usage 
+- finished the help command 
+- 99% done now

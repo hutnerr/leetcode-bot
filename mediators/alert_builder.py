@@ -155,13 +155,13 @@ class AlertBuilder:
                     return None
 
                 url = f"https://leetcode.com/contest/{titleSlug}/"
-                alertString = f"LeetCode [{title}]({url}) is now open!"
+                alertString = f"LeetCode **[{title}]({url})** is now open!"
 
             # FIXME: also might need a delay on this 
             elif alert == StaticTimeAlert.DAILY_PROBLEM:
                 titleSlug = self.queryService.getDailyProblem()["data"]["challenge"]["question"]["titleSlug"]
                 url = probh.slugToURL(titleSlug)
-                alertString = f"Today's daily problem is now available! It is [{probh.slugToTitle(titleSlug)}]({url})."
+                alertString = f"Today's daily problem is now available! It is **[{probh.slugToTitle(titleSlug)}]({url})**."
             else:
                 return None # invalid alert
             
