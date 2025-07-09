@@ -131,9 +131,6 @@ class Synchronizer:
         if serverID not in self.servers:
             print("Server ID not found in servers.")
             return False
-        
-        self.contestTimeBucket.printBucketClean()
-        print("----------")
 
         server = self.servers[serverID]
         serverSettings = server.settings
@@ -166,10 +163,6 @@ class Synchronizer:
                     print(f"Failed to remove contest time interval {interval} from bucket.")
                     return False
               
-        self.contestTimeBucket.printBucketClean()
-        print("--------------------------------------------------")
-        
-                
         serverSettings.contestTimeAlerts = participate
         server.toJSON() # save after we update the setting
         return True

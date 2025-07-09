@@ -143,9 +143,9 @@ class PremiumSelect(discord.ui.Select):
         self.app = app
 
         options = [
-            discord.SelectOption(label="Free", description="Only **free** problems may be selected", value=0),
-            discord.SelectOption(label="Premium", description="Only **premium** problems may be selected", value=1),
-            discord.SelectOption(label="Either", description="Either **free** or **premium** problems may be selected", value=2),
+            discord.SelectOption(label="Free", description="Only free problems may be selected", value=0),
+            discord.SelectOption(label="Premium", description="Only premium problems may be selected", value=1),
+            discord.SelectOption(label="Either", description="Either free or premium problems may be selected", value=2),
         ]
         
         table = { 0: "Free", 1: "Premium", 2: "Either" }
@@ -165,11 +165,11 @@ class PremiumSelect(discord.ui.Select):
         
         match selectedPremium:
             case 0:
-                string = "Only free problems may be selected"
+                string = "Only **free** problems may be selected"
             case 1:
-                string = "Only premium problems may be selected"
+                string = "Only **premium** problems may be selected"
             case 2:
-                string = "Either free or premium problems may be selected"
+                string = "Either **free** or **premium** problems may be selected"
             case _:
                 string = "Unknown"
         
