@@ -293,8 +293,8 @@ class IntervalSelect(discord.ui.Select):
 
         embed = PositiveEmbed("Problem Minute Interval Set", getProblemSentString(self.problem, self.timezone))
         if interaction.response.is_done():
-            await interaction.followup.send(embed=embed)
+            await interaction.followup.send(embed=embed, ephemeral=True)
         else:
-            await interaction.response.send_message(embed=embed)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
 
         self.server.toJSON()
