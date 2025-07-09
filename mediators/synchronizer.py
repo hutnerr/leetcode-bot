@@ -97,8 +97,6 @@ class Synchronizer:
     def changeAlertIntervals(self, serverID: int, newIntervals: list[int]) -> bool:
         if serverID not in self.servers:
             return False
-        
-        self.contestTimeBucket.printBucketClean()
                 
         server = self.servers[serverID]
         
@@ -126,13 +124,16 @@ class Synchronizer:
         
         server.settings.contestTimeIntervals = newIntervals
         server.toJSON() # save after we update the setting
-        
+                
         return True
     
     def changeContestAlertParticpation(self, serverID: int, participate: bool) -> bool:
         if serverID not in self.servers:
             print("Server ID not found in servers.")
             return False
+        
+        self.contestTimeBucket.printBucketClean()
+        print("----------")
 
         server = self.servers[serverID]
         serverSettings = server.settings
@@ -164,6 +165,10 @@ class Synchronizer:
                     self.contestTimeBucket.buckets = backupBucket
                     print(f"Failed to remove contest time interval {interval} from bucket.")
                     return False
+              
+        self.contestTimeBucket.printBucketClean()
+        print("--------------------------------------------------")
+        
                 
         serverSettings.contestTimeAlerts = participate
         server.toJSON() # save after we update the setting

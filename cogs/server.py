@@ -199,6 +199,11 @@ class ServerCog(commands.Cog):
         if server.serverID not in self.app.servers:
             raise SimpleException("SRVDEL", "Server configuration not found", "The server configuration does not exist. It may have already been deleted.")
 
+        # alerts should only be in the bucket if this setting is enabled
+        if server.settings.contestTimeAlerts:
+            if not self.app.synchronizer.changeAlertIntervals(server.serverID, []):  # reset the alert intervals
+                raise SimpleException("SRVDEL", "Failed to reset alert intervals", "The alert intervals could not be reset.")
+
         del self.app.servers[server.serverID]  # delete the server from the dict
         server.toJSON()  # save the server
         path = os.path.join("data", "servers", f"{server.serverID}.json")
