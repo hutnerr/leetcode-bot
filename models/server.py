@@ -90,15 +90,23 @@ class Server:
         return False
 
     def addSubmittedUser(self, userID: int, problemID) -> bool:
+        
+        print(problemID)
+        
         if not self.isProblemIDActive(problemID):
+            print("Problem ID is not active")
             return False
+        
         
         activeProblem = self.activeProblems[problemID]
         if not activeProblem:
+            print("Active problem is empty")
+            print(activeProblem)
             return False
         
         submittedUsers: set = activeProblem[2]
         submittedUsers.add(userID)
+        self.toJSON() # save
         return True
 
     def isProblemDuplicate(self, slug: str) -> bool:

@@ -1,11 +1,21 @@
 import discord.embeds
 from models.problem import Problem
-
+from models.server import Server
+from utils import datetime_helper as timeh
 
 class ProblemInfoEmbed(discord.Embed):
-    def __init__(self, problems: list[Problem]):
+    def __init__(self, problems: list[Problem], server: Server):
         super().__init__(title="Problem Config Info")
         self.color = discord.Color.blurple()
+        self.set_footer(text="Change the config with /pconfig. Delete with /delproblem.")
+        self.server = server
+        
+        helpStr = "There are no problems configured for this server. Use `/pconfig` to add a problem."
+        
+        # set the description to a default message if there is no timezone set then return
+        if server.settings.timezone is None:
+            self.description = helpStr + " The server's timezone is not set. Please set it using `/sconfig <Other Settings>` before configuring problems. This ensures time accuracy."
+            return
 
         problemAdded = False
         for problem in problems:
@@ -14,10 +24,8 @@ class ProblemInfoEmbed(discord.Embed):
                 problemAdded = True
 
         if not problemAdded:
-            self.description = "There are no problems configured for this server. Use `/pconfig` to add a problem."
-
-        self.set_footer(text="Change the config with /pconfig. Delete with /delproblem.")
-
+            self.description = helpStr
+            
     def addProblem(self, problem: Problem):
 
         dowTable = {
@@ -31,13 +39,16 @@ class ProblemInfoEmbed(discord.Embed):
         }
 
         dows = [dowTable.get(dow, "Unknown") for dow in problem.dows]
-        interval = problem.interval * 15  # convert interval to minutes
+
+        
+        tzHour, tzInterval = timeh.convertFromLocalTimeZone(problem.hour, problem.interval * 15, self.server.settings.timezone)
+
+        interval = tzInterval * 15
 
         probStr = ""
-        amOrPm = "AM" if problem.hour < 12 else "PM"
-        hour = problem.hour % 12 if problem.hour != 0 else 12  # convert to 12-hour format
+        amOrPm = "AM" if tzHour < 12 else "PM"
+        hour = tzHour % 12 if tzHour != 0 else 12  # convert to 12-hour format
         probStr += f"{hour:02d}:{interval:02d} {amOrPm}"
-
 
         self.add_field(
             name=f"Problem {str(problem.problemID).title()} - {probStr}",

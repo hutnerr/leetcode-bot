@@ -15,39 +15,36 @@ class Submitter:
 
         server: Server = self.servers[serverID]
         user: User = self.users[userID]
-        
+                
         submissions = self.queryService.getUserRecentAcceptedSubmissions(user.leetcodeUsername, 15)
         
-        for problem in server.problems:
-            problemID = problem.problemID
-            
-            if not problem:
-                return False    
+        # collect the slugs of the problems the user has submitted alongside the submitted users already
+        # check if the slugs match, if they do, and the user hasnt submitted, then we can add they points
         
-            if not server.isProblemIDActive(problemID):
-                # print(f"ProblemID {problemID} is not active for server {serverID}")
-                return False
-            
-            activeProblem = server.activeProblems[problemID]
-            if not activeProblem:
-                # print(f"Active problem not found for problemID {problemID} on server {serverID}")
-                return False
-            
+        activeProblems = server.activeProblems
+        
+        for pid, activeProblem in enumerate(activeProblems):
             slug, difficulty, submittedUsers = activeProblem
-            if userID in submittedUsers:
-                # user has already submitted this problem
-                # print(f"User {userID} has already submitted problem {problemID} on server {serverID}")
-                # pass onto the next problem
+            
+            # this problem is not active, so we skip it
+            if slug == "" or difficulty == "":
                 continue
 
-            if not self.userCompletedProblem(user, slug, submissions):
-                # print(f"User {userID} has not completed problem {slug} on LeetCode")
-                return False
+            if not self.userCompletedProblem(user=user, slug=slug, submissions=submissions):
+                print("didnt complete")
+                continue
             
-            if not server.addSubmittedUser(user.discordID, problemID):
-                # print(f"Failed to add user {userID} to submitted users for problem {problemID} on server {serverID}")
-                return False
+            if userID in submittedUsers:
+                print("already submitted")
+                continue
+
+            if not server.addSubmittedUser(user.discordID, pid):
+                print("error adding submitted user")
+                continue
             
+            # if we get here, the user has completed a new problem
+            # server.addSubmittedUser() returns a bool
+
             match difficulty:
                 case "easy":
                     points = 1
@@ -56,7 +53,6 @@ class Submitter:
                 case "hard":
                     points = 6
                 case _:
-                    # print(f"Invalid difficulty {difficulty} for problem {problemID} on server {serverID}")
                     return False
             
             user.addPoints(points)
@@ -67,6 +63,7 @@ class Submitter:
     # can pass in submissions to avoid querying the API
     def userCompletedProblem(self, user: User, slug: str, submissions: dict = None) -> bool:
         # uses the api to check a users recent submissions returns true if they have
+        
         leetcodeUsername = user.leetcodeUsername
         if not submissions:
             submissions = self.queryService.getUserRecentSubmissions(leetcodeUsername)

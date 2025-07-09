@@ -105,7 +105,7 @@ class ServerCog(commands.Cog):
     @app_commands.command(name="pinfo", description="Displays a problems info")
     async def pinfo(self, interaction: discord.Interaction):
         server = self.getServer(interaction)
-        await interaction.response.send_message(embed=ProblemInfoEmbed(server.problems))
+        await interaction.response.send_message(embed=ProblemInfoEmbed(server.problems, server))
     
     # pactive - display the problems
     @app_commands.command(name="pactive", description="Displays the current active problems")

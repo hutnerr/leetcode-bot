@@ -213,15 +213,20 @@ class ContestTimeAlertMenu(discord.ui.Select):
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return
 
+        self.app.contestTimeBucket.printBucketClean()  # clean the bucket to remove any old alerts
+
         change = self.values[0] == "True"  # convert to bool
+        print(change)
         result = self.app.synchronizer.changeContestAlertParticpation(self.server.serverID, change)
         if not result:
             embed = ErrorEmbed("CONTSQS", "Failed to Change Upcoming Contest Alerts", "There was an error changing the upcoming contest alert setting.")
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return 
+        
+        self.app.contestTimeBucket.printBucketClean()  # clean the bucket to remove any old alerts
 
         word = "enabled" if change else "disabled"
-        await interaction.response.send_message(embed=PositiveEmbed("Upcoming Contest Alerts Updated", f"**Upcoming contest alerts** are now {word} on your selected intervals"), ephemeral=True)
+        await interaction.response.send_message(embed=PositiveEmbed("Upcoming Contest Alerts Updated", f"Upcoming contest alerts are now **{word}** on your selected intervals"), ephemeral=True)
 
 # =================================
 # DUPLICATES ALLOWED
@@ -252,7 +257,7 @@ class AllowDuplicatesMenu(discord.ui.Select):
         self.server.toJSON()  # save the change
 
         word = "enabled" if change else "disabled"
-        await interaction.response.send_message(embed=PositiveEmbed("Duplicates Updated", f"**Duplicates** are now {word}"), ephemeral=True)
+        await interaction.response.send_message(embed=PositiveEmbed("Duplicates Updated", f"Duplicates are now **{word}**"), ephemeral=True)
 
 # =================================
 # USE ALERT ROLE?
@@ -283,7 +288,7 @@ class UseAlertRoleMenu(discord.ui.Select):
         self.server.toJSON()  # save the change
 
         word = "enabled" if change else "disabled"
-        await interaction.response.send_message(embed=PositiveEmbed("Alert Role Updated", f"**Alert Role** is now {word}"), ephemeral=True)
+        await interaction.response.send_message(embed=PositiveEmbed("Alert Role Updated", f"Alert Role is now **{word}**"), ephemeral=True)
 
 # =================================
 # ROLE SELECTOR 
@@ -374,7 +379,7 @@ class TimezoneSelector(discord.ui.Select):
         
         self.server.settings.timezone = self.values[0]
         self.server.toJSON()
-        embed = PositiveEmbed("Timezone Updated", f"Timezone set to: {self.values[0]}")
+        embed = PositiveEmbed("Timezone Updated", f"Timezone set to: **{self.values[0]}**")
         if interaction.response.is_done():
             await interaction.followup.send(embed=embed, ephemeral=True)
         else:

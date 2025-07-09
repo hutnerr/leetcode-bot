@@ -1,4 +1,23 @@
 import time
+from datetime import datetime
+import pytz
+
+timezones = {
+    "UTC": "UTC",
+    "EST": "America/New_York",
+    "CST": "America/Chicago",
+    "MST": "America/Denver",
+    "PST": "America/Los_Angeles",
+    "GMT": "Europe/London",
+    "CET": "Europe/Berlin",
+    "MSK": "Europe/Moscow",
+    "IST": "Asia/Kolkata",
+    "CST-CHINA": "Asia/Shanghai",
+    "JST": "Asia/Tokyo",
+    "SGT": "Asia/Singapore",
+    "AEST": "Australia/Sydney",
+    "NZST": "Pacific/Auckland",
+}
 
 # converts an integer of minutes to a properly formatting string of hours / mins
 def minutesToHours(minutes: int) -> str:
@@ -85,5 +104,36 @@ def numToDayOfWeek(num: int) -> str:
         return days[num]
     return "INVALID DAY NUMBER"
 
-def timeToEST() -> dict:
-    pass
+def convertTimeZone(hour: int, minute: int, fromtz: str, totz: str, houroffset: int = 0) -> tuple[int, int]:    
+    fromZone = timezones.get(fromtz)
+    toZone = timezones.get(totz)
+
+    if not fromZone or not toZone:
+        raise ValueError(f"Unknown timezone abbreviation: {fromtz} or {totz}")
+
+    sourcetz = pytz.timezone(fromZone)
+    targettz = pytz.timezone(toZone)
+
+    now = datetime.now()
+    dt = datetime(now.year, now.month, now.day, hour, minute)
+    dtSrc = sourcetz.localize(dt)
+    dtTarget = dtSrc.astimezone(targettz)
+    out = (dtTarget.hour + houroffset, dtTarget.minute // 15)  # convert to intervals 
+    return out
+
+def convertFromLocalTimeZone(hour: int, minute: int, totz: str) -> tuple[int, int]:
+    return convertTimeZone(hour, minute, "EST", totz)
+
+def convertToLocalTimeZone(hour: int, minute: int, fromtz: str) -> tuple[int, int]:
+    return convertTimeZone(hour, minute, fromtz, "EST")
+
+# because daylight savings time is a thing, we need to adjust the hour offset based on the current timezone
+# because it changes, this is such a headahce
+def getTimeZoneHourOffset() -> int:
+    match (time.tzname[time.daylight]):
+        case "Eastern Daylight Time":
+            return 1
+        case "Eastern Standard Time":
+            return 0
+        case _:
+            return 0

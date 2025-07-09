@@ -10,10 +10,10 @@ class ServerInfoEmbed(discord.Embed):
         # self.set_thumbnail(url=guild.icon)
         # self.set_image(url=guild.icon.url)
         self.timeTable = {15: "15 mins", 30: "30 mins", 60: "1 hr", 120: "2 hrs", 360: "6 hrs", 720: "12 hrs", 1440: "1 day"}
-
         self.set_footer(text="Channge the config using /sconfig. Delete with /delserver.")
+        
         upcomingContestsString = ""
-        upcomingContestsString += f"Contest Alerts.\n> `{ 'Enabled' if server.settings.weeklyContestAlerts else 'Disabled'}`\n"
+        upcomingContestsString += f"Contest Alerts.\n> `{ 'Enabled' if server.settings.contestTimeAlerts else 'Disabled'}`\n"
         upcomingContestsString += "Intervals.\n"
         for interval in server.settings.contestTimeIntervals:
             upcomingContestsString += f"> `{self.timeTable[interval]}`\n"

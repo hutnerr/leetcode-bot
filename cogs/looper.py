@@ -5,6 +5,7 @@ from discord.ext import commands, tasks
 from utils import problem_helper as probh
 from utils import datetime_helper as timeh
 from models.app import App
+from models.server import Server
 from models.alert import Alert, AlertType
 from models.problem import Problem
 from mediators.alert_builder import AlertBuilder
@@ -24,11 +25,16 @@ BIWEEKLY_CONTEST_INTERVAL = 2  # 30 minutes
 DAILY_PROBLEM_HOUR = 8  # 8 PM
 DAILY_PROBLEM_INTERVAL = 0  # 0 minutes
 
+def buildAlertRoleNotification(server: Server) -> str:
+    if not server.settings.useAlertRole or not server.settings.alertRoleID:
+        return ""
+    return f"<@&{server.settings.alertRoleID}>"
+
 class Looper(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client 
         self.app: App = client.app
-        
+            
         self.mainloop.start()
         self.updateProblemset.start()
     
@@ -69,7 +75,10 @@ class Looper(commands.Cog):
     # update the problemset every 48 hours
     @tasks.loop(hours=48)
     async def updateProblemset(self) -> None:
-        probh.updateProblemSet() # scrape new problems
+        # scrape new problems
+        if not probh.updateProblemSet():
+            return 
+        print("Problem set updated successfully. Reinitializing problem service.")
         self.app.problemService.initProblemSets() # reinitialize the problem service
 
     @updateProblemset.before_loop
@@ -77,49 +86,47 @@ class Looper(commands.Cog):
     async def before_loop(self) -> None:
         await self.client.wait_until_ready()
 
+
     async def handleProblemAlerts(self, dow: int, hour: int, minInterval: int | None):
         
-        async def handleProblem(problem: Problem):
-            if problem.serverID not in self.app.servers:
-                print(f"Server ID {problem.serverID} not found in app servers.")
-                return
+        alertBuilder: AlertBuilder = self.app.alertBuilder 
+        
+        # if we aren't on a proper interval, we don't need to do anything
+        if minInterval is None:
+            return
+        
+        alerts = alertBuilder.buildProblemAlerts(dow, hour, minInterval)
+        
+        if len(alerts) == 0:
+            return
+        
+        for alert in alerts:
+            channelID = alert.channelID
+            serverID = alert.serverID
+            slug = alert.info["slug"]
+            pid = int(alert.info["pid"])
+            difficulty = alert.info["difficulty"]
+            problem = alert.info["problem"]
             
-            server = self.app.servers[problem.serverID]
-            channelID = server.settings.postingChannelID
-            if channelID is None:
-                print(f"Posting channel ID not set for server {server.serverID}.")
-                return
-            
-            problemService: ProblemService = self.app.problemService
-            slug, difficulty = problemService.selectProblem(problem)
-            problemInfo = self.app.queryService.getQuestionInfo(slug)
+            server = self.app.servers.get(serverID)
+
+            if self.app.cacheService.existsInCache(slug):
+                problemInfo = self.app.cacheService.getFromCache(slug)
+                print("Cache hit")
+            else:
+                problemInfo = self.app.queryService.getQuestionInfo(slug)
+                self.app.cacheService.cacheProblem(problemInfo) # cache the problem info
 
             channel = self.client.get_channel(channelID)
-            await channel.send(embed=ProblemEmbed(slug, problemInfo))
-            server.addPreviousProblem(slug)  # add the problem to the server's previous problems
-
-        if minInterval is None:
-            # if we aren't on a proper interval, we don't need to do anything
-            return
-        
-        bucket = self.app.problemBucket.getBucket(dow, hour, minInterval)
-        if bucket is None or len(bucket) == 0:
-            return
-        
-        # FIXME: use the alert builder to build the alerts. not doing it right
-        
-        for problemKey in bucket:
-            # serverid::problemid
-            serverID, problemID = problemKey.split("::")
-            serverID = int(serverID)
-            problemID = int(problemID)
-            
-            if serverID not in self.app.servers:
+            if channel is None:
+                print(f"Channel ID {channelID} not found for server {serverID}.")
                 continue
-            
-            server = self.app.servers[serverID]
-            problem = server.problems[problemID]
-            await handleProblem(problem)
+                        
+            if not server.addActiveProblem(slug, difficulty, pid): # add the problem to the server's active problems. also adds to previous problems
+                print("error adding active problem") 
+                return
+
+            await channel.send(embed=ProblemEmbed(slug, problemInfo), content=buildAlertRoleNotification(server))  # send the problem embed
 
 
     async def handleContestAlerts(self, dow: int, hour: int, minute: int):
@@ -162,8 +169,8 @@ class Looper(commands.Cog):
         # maybe perform an api query to check if its up 
         biweeklyContestMinsAway = getContestMinsAway(BIWEEKLY_CONTEST_DOW, BIWEEKLY_CONTEST_HOUR, BIWEEKLY_CONTEST_INTERVAL)
 
-        print(f"Minutes until weekly contest: {weeklyContestMinsAway}")
-        print(f"Minutes until biweekly contest: {biweeklyContestMinsAway}")
+        # print(f"Minutes until weekly contest: {weeklyContestMinsAway}")
+        # print(f"Minutes until biweekly contest: {biweeklyContestMinsAway}")
 
         # Notification intervals (in minutes)
         intervals = [
@@ -185,7 +192,7 @@ class Looper(commands.Cog):
                     continue
                 
                 channel = self.client.get_channel(alert.channelID)
-                await channel.send(embed=AlertEmbed(alert))
+                await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
         
         if biweeklyContestMinsAway in intervals:
             print("Biweekly contest is within an alert interval.")
@@ -196,7 +203,7 @@ class Looper(commands.Cog):
                     continue
                 
                 channel = self.client.get_channel(alert.channelID)
-                await channel.send(embed=AlertEmbed(alert))
+                await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
 
         # for contest alerts
         # needs interval of contest away length
@@ -216,7 +223,7 @@ class Looper(commands.Cog):
                     continue
                 
                 channel = self.client.get_channel(alert.channelID)
-                await channel.send(embed=AlertEmbed(alert))
+                await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
     
         # alerts happen on either 0min or 30mins which are both intervals
         if minInterval is None:

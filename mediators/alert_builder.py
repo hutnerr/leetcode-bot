@@ -37,7 +37,7 @@ class AlertBuilder:
         
         # the bucket problems are the problems we want to notify the servers about
         bucket = self.problemBucket.getBucket(dow, hour, interval)
-        if bucket is None:
+        if bucket is None or len(bucket) == 0:
             return []
         
         # sid = serverID, pid = problemID
@@ -67,7 +67,8 @@ class AlertBuilder:
                 info = {
                     "slug" : slug,
                     "pid" : pid,
-                    "difficulty" : difficulty
+                    "difficulty" : difficulty,
+                    "problem" : problem
                 }
                 alerts.append(Alert(AlertType.PROBLEM, server.serverID, server.settings.postingChannelID, info))
             

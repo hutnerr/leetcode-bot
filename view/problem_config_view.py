@@ -1,8 +1,11 @@
 import discord
 
+
 from models.server import Server
 from models.app import App
 from models.problem import Problem
+
+from utils import datetime_helper as timeh
 
 from errors.simple_exception import SimpleException
 
@@ -21,11 +24,13 @@ dayTable = {
 # gens a string thats like
 # Problems will be sent at 12:00 AM for every day of the week.
 # Problems will be sent at 1:15 PM on Monday and Wednesday. 
-def getProblemSentString(problem: Problem):
-    hour12 = problem.hour % 12
+def getProblemSentString(problem: Problem, totz: str) -> str:
+    hour, minute = timeh.convertFromLocalTimeZone(problem.hour, problem.interval * 15, totz)
+
+    hour12 = hour % 12
     hour12 = 12 if hour12 == 0 else hour12
-    ampm = "AM" if problem.hour < 12 else "PM"
-    minute = problem.interval * 15
+    ampm = "AM" if hour < 12 else "PM"
+    minute = minute * 15
 
     days = [dayTable[day] for day in problem.dows] if problem.dows else []
     if len(days) == 7:
@@ -82,7 +87,6 @@ class DifficultiesSelect(discord.ui.Select):
             await interaction.response.send_message(embed=embed, ephemeral=True)
         self.app.synchronizer.addProblem(self.problem)
         self.server.toJSON()
-        self.app.problemBucket.printBucketClean()
 
 class DaysOfWeekSelect(discord.ui.Select):
     def __init__(self, server: Server, problem: Problem, app: App):
@@ -111,9 +115,7 @@ class DaysOfWeekSelect(discord.ui.Select):
         if len(self.values) <= 0:
             await interaction.response.send_message("Invalid selection", ephemeral=True)
             return
-        
-        self.app.problemBucket.printBucketClean()
-        
+                
         remove = self.app.synchronizer.removeProblem(self.problem)
         if not remove:
             raise SimpleException("REMOFAIL", "Failed to remove the old problem before setting the new one. This should not happen, please report this issue using `/report`. Also please `/delproblem` and re-add the problem. Sorry for the inconvenience.")
@@ -126,15 +128,13 @@ class DaysOfWeekSelect(discord.ui.Select):
             raise SimpleException("ADDPFAIL", "Failed to add the new problem after setting the days. This should not happen, please report this issue using `/report`. Also please `/delproblem` and re-add the problem. Sorry for the inconvenience.")
 
         selectedDays = [dayTable.get(day, "Unknown") for day in self.problem.dows] if self.problem.dows else []
-        embed = PositiveEmbed("Problem Days Set", getProblemSentString(self.problem))
+        embed = PositiveEmbed("Problem Days Set", getProblemSentString(self.problem, self.server.settings.timezone))
         if interaction.response.is_done():
             await interaction.followup.send(embed=embed, ephemeral=True)
         else:
             await interaction.response.send_message(embed=embed, ephemeral=True)
         self.server.toJSON()
         
-        self.app.problemBucket.printBucketClean()
-
 
 class PremiumSelect(discord.ui.Select):
     def __init__(self, server: Server, problem: Problem, app: App):
@@ -218,8 +218,11 @@ class HourSelect(discord.ui.Select):
             discord.SelectOption(label="11 PM", description="Problems will be sent at 11PM + Interval", value=23),
         ]
         
+        self.timezone = self.app.servers[self.problem.serverID].settings.timezone
+        self.tzHour, self.tzInterval = timeh.convertFromLocalTimeZone(self.problem.hour, self.problem.interval * 15, self.timezone) # convert what we have into our timezone
+        
         super().__init__(
-            placeholder=f"Select Problem Hour ({problem.hour % 12 if problem.hour % 12 != 0 else 12} {'AM' if problem.hour < 12 else 'PM'})",
+            placeholder=f"Select Problem Hour ({self.tzHour % 12 if self.tzHour % 12 != 0 else 12} {'AM' if self.tzHour < 12 else 'PM'})",
             options=options, min_values=1, max_values=1,
         )
 
@@ -228,28 +231,24 @@ class HourSelect(discord.ui.Select):
             await interaction.response.send_message("Invalid selection", ephemeral=True)
             return
         
-        self.app.problemBucket.printBucketClean()
-        
         remove = self.app.synchronizer.removeProblem(self.problem)
         if not remove:
             raise SimpleException("REMOFAIL", "Failed to remove the old problem before setting the new one. This should not happen, please report this issue using `/report`.")
         
         selectedHour = int(self.values[0])
-        self.problem.hour = selectedHour
-        
+
+        self.problem.hour, self.problem.interval = timeh.convertToLocalTimeZone(selectedHour, self.tzInterval * 15, self.timezone) # convert back with the new hour and same interval
+
         add = self.app.synchronizer.addProblem(self.problem)
         if not add:
             raise SimpleException("ADDAFAIL", "Failed to add the new problem after removing the old one. This should not happen, please report this issue using `/report`.")
 
-
-        embed = PositiveEmbed("Problem Hour Set", getProblemSentString(self.problem))
+        embed = PositiveEmbed("Problem Hour Set", getProblemSentString(self.problem, self.timezone))
         if interaction.response.is_done():
             await interaction.followup.send(embed=embed, ephemeral=True)
         else:
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
-        print("------------------------------------")
-        self.app.problemBucket.printBucketClean()
         self.server.toJSON()
 
 class IntervalSelect(discord.ui.Select):
@@ -265,8 +264,11 @@ class IntervalSelect(discord.ui.Select):
             discord.SelectOption(label="45 Min", description="Problems will be sent at hour:45", value=3),
         ]
         
+        self.timezone = self.app.servers[self.problem.serverID].settings.timezone
+        self.tzHour, self.tzInterval = timeh.convertFromLocalTimeZone(self.problem.hour, self.problem.interval * 15, self.timezone)
+        
         super().__init__(
-            placeholder=f"Select Problem Minute Interval ({problem.interval * 15} Min)",
+            placeholder=f"Select Problem Minute Interval ({self.tzInterval * 15} Min)",
             options=options, min_values=1, max_values=1,
         )
 
@@ -275,25 +277,23 @@ class IntervalSelect(discord.ui.Select):
             await interaction.response.send_message("Invalid selection", ephemeral=True)
             return
         
-        self.app.problemBucket.printBucketClean()
-        
         remove = self.app.synchronizer.removeProblem(self.problem)
         if not remove:
             raise SimpleException("REMOFAIL", "Failed to remove the old problem before setting the new one. This should not happen, please report this issue using `/report`.")
         
         selectedInterval = int(self.values[0])
-        self.problem.interval = selectedInterval
-        
+        # self.problem.interval = selectedInterval
+
+        self.problem.hour, self.problem.interval = timeh.convertToLocalTimeZone(self.tzHour, selectedInterval * 15, self.timezone)
+
         add = self.app.synchronizer.addProblem(self.problem)
         if not add:
             raise SimpleException("ADDAFAIL", "Failed to add the new problem after removing the old one. This should not happen, please report this issue using `/report`.")
 
-        embed = PositiveEmbed("Problem Minute Interval Set", getProblemSentString(self.problem))
+        embed = PositiveEmbed("Problem Minute Interval Set", getProblemSentString(self.problem, self.timezone))
         if interaction.response.is_done():
             await interaction.followup.send(embed=embed)
         else:
             await interaction.response.send_message(embed=embed)
 
-        print("------------------------------------")
-        self.app.problemBucket.printBucketClean()
         self.server.toJSON()

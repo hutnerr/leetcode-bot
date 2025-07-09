@@ -145,6 +145,8 @@ class Synchronizer:
 
         currentIntervals = server.settings.contestTimeIntervals
         if not currentIntervals:
+            serverSettings.contestTimeAlerts = participate
+            server.toJSON()
             return True # no intervals to change, so we can just update the setting
             
         # if we now want to participate, add our intervals to the bucket
@@ -165,8 +167,6 @@ class Synchronizer:
                 
         serverSettings.contestTimeAlerts = participate
         server.toJSON() # save after we update the setting
-        self.contestTimeBucket.printBucketClean() # debug print
-
         return True
 
     # ==============================================

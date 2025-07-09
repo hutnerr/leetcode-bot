@@ -58,7 +58,7 @@ class CompetitionCog(commands.Cog):
             tempPoints, member = data
             if member.id == userID:
                 points = tempPoints
-                await interaction.response.send_message(embed=PositiveEmbed("Rank Information", f"**{member.name}** is ranked `{place}`/`{len(boardData)}` with {points} pts", thumbnail=member.display_avatar.url))
+                await interaction.response.send_message(embed=PositiveEmbed("Rank Information", f"**{member.name}** is ranked `{place}`/`{len(boardData)}` with **{points} pts**", thumbnail=member.display_avatar.url))
                 return # exit
             
         raise SimpleException("COMPRANK", "User not found in leaderboard", "Make sure the user has completed problems and has points. If this persists, try `/deluser` to reset.")
@@ -85,7 +85,10 @@ class CompetitionCog(commands.Cog):
         if not submitted:
             raise SimpleException("SUBMITFAIL", "You have not completed any active problems or you have already submitted them.", "Make sure you have completed problems and that they are active on the server. If this persists, try `/deluser` to reset your user data.")
 
-        await interaction.response.send_message(embed=PositiveEmbed("Submission Successful", f"Successfully submitted your problems! You now have {user.points} points. You went up {user.points - prevPoints} points!"), ephemeral=True)
+        if user.points == prevPoints:
+            raise SimpleException("NOPOINTS", "You have not completed any new problems since your last submission.", "Make sure you have completed new problems that are active on the server (check using `/pactive`). If this persists, try `/deluser` to reset your user data.")
+        else:
+            await interaction.response.send_message(embed=PositiveEmbed("Submission Completed", f"Successfully submitted your problems! You now have **{user.points} points**. You went up **{user.points - prevPoints} points**!"), ephemeral=True)
 
     @leaderboard.error
     @rank.error
