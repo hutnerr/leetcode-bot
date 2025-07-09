@@ -11,6 +11,9 @@ This was a personal project and has no official affiliation with LeetCode.
 - [Blog Post]()
 - [Project Reflection]()
 
+## Getting Started
+To get started, I recommend using `/help`. It will briefly explain a majority of the implicit aspects of the bot. After that, you can start configuring your server through `/sconfig`. Then configure your problems with `/pconfig`. There is a limit of 5 reoccurning problems, but each one can be sent on numerous days as well as have variable difficulty. 
+
 ## Commands
 **Main Commands**
 - `problem <dif> <premium*>` - Posts a problem for users to solve.
