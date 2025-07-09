@@ -46,7 +46,7 @@ class ProblemInfoEmbed(discord.Embed):
 
         probStr = ""
         amOrPm = "AM" if tzHour < 12 else "PM"
-        hour = tzHour % 12 if tzHour != 0 or tzHour != 12 else 12  # convert to 12-hour format
+        hour = 12 if tzHour == 0 or tzHour == 12 else tzHour % 12  # convert to 12-hour format
         probStr += f"{hour:02d}:{interval:02d} {amOrPm}"
 
         self.add_field(
