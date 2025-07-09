@@ -17,7 +17,7 @@ class ActiveProblemsEmbed(discord.Embed):
         # if we've looked and found 6 problems that aren't invalid
         # then we have no active problems. this is because we have
         # 5 total problems and we skip index 0
-        print(invalidProblems)
+        # print(invalidProblems)
         if invalidProblems == 6:
             self.add_field(name="No Active Problems", value="There are no active problems for this server. Active problems will be added when a problem is successfully provided to the server.", inline=False)
 

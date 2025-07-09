@@ -187,7 +187,6 @@ class ContestTimeIntervalsMenu(discord.ui.Select):
             return
 
         await interaction.response.send_message(embed=PositiveEmbed("Contest Intervals Updated", f"Contest Intervals have been updated to {', '.join(displayIntervals)}"), ephemeral=True)
-        self.app.contestTimeBucket.printBucketClean()
 
 # =================================
 # CONTEST TIME ALERTS
@@ -212,19 +211,14 @@ class ContestTimeAlertMenu(discord.ui.Select):
             embed = ErrorEmbed("CONTSQS", "Invalid Selection", "Please select either ON or OFF to change the upcoming contest alert setting.")
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return
-
-        self.app.contestTimeBucket.printBucketClean()  # clean the bucket to remove any old alerts
-
+    
         change = self.values[0] == "True"  # convert to bool
-        print(change)
         result = self.app.synchronizer.changeContestAlertParticpation(self.server.serverID, change)
         if not result:
             embed = ErrorEmbed("CONTSQS", "Failed to Change Upcoming Contest Alerts", "There was an error changing the upcoming contest alert setting.")
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return 
         
-        self.app.contestTimeBucket.printBucketClean()  # clean the bucket to remove any old alerts
-
         word = "enabled" if change else "disabled"
         await interaction.response.send_message(embed=PositiveEmbed("Upcoming Contest Alerts Updated", f"Upcoming contest alerts are now **{word}** on your selected intervals"), ephemeral=True)
 

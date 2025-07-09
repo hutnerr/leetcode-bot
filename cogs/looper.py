@@ -112,7 +112,6 @@ class Looper(commands.Cog):
 
             if self.app.cacheService.existsInCache(slug):
                 problemInfo = self.app.cacheService.getFromCache(slug)
-                print("Cache hit")
             else:
                 problemInfo = self.app.queryService.getQuestionInfo(slug)
                 self.app.cacheService.cacheProblem(problemInfo) # cache the problem info

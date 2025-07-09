@@ -1,6 +1,3 @@
-fill out the rest of the help commands
-
-general polish and code cleanup
 @app_commands.describe(pid="The problem ID to delete")
 @app_commands.rename(pid="problemid")
 

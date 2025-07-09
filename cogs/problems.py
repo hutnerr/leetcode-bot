@@ -30,6 +30,7 @@ class Problems(commands.Cog):
         app_commands.Choice(name = "Free", value = 0),
         app_commands.Choice(name = "Paid", value = 1),
         app_commands.Choice(name = "All", value = 2)])
+    @app_commands.describe(difficulty="The difficulty of the problem", paid="Whether the problem is free or paid")
     async def problem(self, interaction: discord.Interaction, difficulty: app_commands.Choice[str], paid: app_commands.Choice[int] = None) -> None:
         if paid is None:
             premium = 0 # default to free problems

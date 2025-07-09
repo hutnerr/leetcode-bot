@@ -18,6 +18,7 @@ from view.error_embed import ErrorEmbed
 from view.active_problems_embed import ActiveProblemsEmbed
 from view.problem_info_embed import ProblemInfoEmbed
 from view.problem_config_view import ProblemConfigView
+from view.positive_embed import PositiveEmbed
 
 class ServerCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -25,12 +26,13 @@ class ServerCog(commands.Cog):
         self.app: App = client.app
     
     # sconfig - change the settings
-    @app_commands.command(name="sconfig", description="Configure the servers settings. Admin only")
+    @app_commands.command(name="sconfig", description="Configure the servers settings")
     @app_commands.choices(setting = [
         app_commands.Choice(name="Upcoming Contest Alerts", value="upcomingcontests"),
         app_commands.Choice(name="Static Time Alerts", value="staticalerts"),
         app_commands.Choice(name="Other Settings", value="other"),])
     @app_commands.checks.has_permissions(administrator=True) # only admins can change the server settings
+    @app_commands.describe(setting="The setting group to configure")
     async def sconfig(self, interaction: discord.Interaction, setting: app_commands.Choice[str]):
         server = self.getServer(interaction)
         try:
@@ -56,6 +58,8 @@ class ServerCog(commands.Cog):
             app_commands.Choice(name=4, value=4),
             app_commands.Choice(name=5, value=5),
         ])
+    @app_commands.describe(pids="The ID of the problem to configure")
+    @app_commands.rename(pids="problemid")
     async def pconfig(self, interaction: discord.Interaction, pids: discord.app_commands.Choice[int]):
         server = self.getServer(interaction)
         
@@ -102,7 +106,7 @@ class ServerCog(commands.Cog):
             await interaction.response.send_message(view=view, ephemeral=True)
 
     # pinfo - display the problem info
-    @app_commands.command(name="pinfo", description="Displays a problems info")
+    @app_commands.command(name="pinfo", description="Displays all configured problem's info")
     async def pinfo(self, interaction: discord.Interaction):
         server = self.getServer(interaction)
         await interaction.response.send_message(embed=ProblemInfoEmbed(server.problems, server))
@@ -123,6 +127,7 @@ class ServerCog(commands.Cog):
             app_commands.Choice(name=5, value=5),
         ])
     @app_commands.describe(pids="The problem ID to delete")
+    @app_commands.rename(pids="problemid")
     async def delproblem(self, interaction: discord.Interaction, pids: discord.app_commands.Choice[int]):
         server: Server = self.getServer(interaction)
 
@@ -134,8 +139,9 @@ class ServerCog(commands.Cog):
             raise SimpleException("PROBDEL", "Failed to delete problem", "The problem could not be deleted. It may not exist or there was an error in the backend.")
 
         server.toJSON()  # save the server
-        await interaction.response.send_message(f"Problem with ID `{pids.value}` has been deleted successfully.", ephemeral=True)
-    
+        embed = PositiveEmbed("Problem Deleted", f"Problem with ID `{pids.value}` has been deleted successfully.")
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
     # setchannel - set the channel for the bot to post in
     # @app_commands.command(name="setchannel", description="Sets the bot's output feed channel")
     # @app_commands.checks.has_permissions(administrator=True) # only admins can change the server settings
@@ -165,13 +171,15 @@ class ServerCog(commands.Cog):
             server: Server = self.getServer(interaction)
             server.previousProblems = [] # reset the previous problems
             server.toJSON() # save the server
-            await interaction.followup.send("Stored duplicate problems have been reset successfully.", ephemeral=True)
+            embed = PositiveEmbed("Duplicate Problems Reset", "The stored duplicate problems have been reset successfully.")
+            await interaction.followup.send(embed=embed, ephemeral=True)
         else: # user clicked no
-            await interaction.followup.send("Duplicate problem deletion cancelled.", ephemeral=True)
+            embed = PositiveEmbed("Reset Cancelled", "The duplicate problem reset has been cancelled.")
+            await interaction.followup.send(embed=embed, ephemeral=True)
 
     # deleteserver - delete the server config. admin only 
-    @app_commands.command(name="delserver", description="Deletes the server configuration")
-    @app_commands.checks.has_permissions(administrator=True) # only admins can change the server settings
+    @app_commands.command(name="delserver", description="Deletes the server configuration entirely")
+    @app_commands.checks.has_permissions(administrator=True)  # only admins can change the server settings
     async def delserver(self, interaction: discord.Interaction):
         confirmationMSG = "Are you sure you want to delete the server configuration? This action cannot be undone."
         embed: discord.Embed = ConfirmationEmbed(confirmationMSG)
@@ -183,7 +191,8 @@ class ServerCog(commands.Cog):
             return
     
         if not view.result:  # user clicked no
-            await interaction.followup.send("Server configuration deletion cancelled.", ephemeral=True)
+            embed = PositiveEmbed("Deletion Cancelled", "The server configuration deletion has been cancelled.")
+            await interaction.followup.send(embed=embed, ephemeral=True)
             return
 
         server: Server = self.getServer(interaction)
@@ -195,7 +204,8 @@ class ServerCog(commands.Cog):
         path = os.path.join("data", "servers", f"{server.serverID}.json")
         if fileh.fileExists(path):
             if fileh.deleteFile(path):
-                await interaction.followup.send("Server configuration has been deleted successfully.", ephemeral=True)
+                embed = PositiveEmbed("Server Configuration Deleted", "The server configuration has been deleted successfully.")
+                await interaction.followup.send(embed=embed, ephemeral=True)
             else:
                 raise SimpleException("SRVDEL", "Failed to delete server configuration file")
             

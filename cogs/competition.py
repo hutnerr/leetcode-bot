@@ -41,6 +41,7 @@ class CompetitionCog(commands.Cog):
 
     # rank. gets your rank on the leaderboard
     @app_commands.command(name="rank", description="Displays the point ranking of a specific user")
+    @app_commands.describe(user="The user to get the rank of. Defaults to the user who called the command.")
     async def rank(self, interaction: discord.Interaction, user: discord.User = None):
         # displays a very simple embed of the current rank position of a user
         if user is None:

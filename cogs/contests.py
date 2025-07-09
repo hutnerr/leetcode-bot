@@ -13,7 +13,7 @@ class Contests(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
         self.app: App = client.app
-        
+    
     @app_commands.command(name = "contests", description = "Gets information about the current LeetCode contests")
     async def contests(self, interaction: discord.Interaction):
         queryService: QueryService = self.app.queryService

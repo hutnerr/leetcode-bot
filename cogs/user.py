@@ -22,6 +22,7 @@ class UserCog(commands.Cog):
         self.app: App = client.app
 
     @app_commands.command(name = "uinfo", description = "Displays information about a user")
+    @app_commands.describe(user="The user to get the info of. Defaults to the user who called the command.")
     async def uinfo(self, interaction: discord.Interaction, user: discord.User = None):
         if user is None: # get self
             user = interaction.user
@@ -75,10 +76,7 @@ class UserCog(commands.Cog):
         await interaction.response.send_message(embed=PositiveEmbed("Username Set", f"Your LeetCode username has been set to `{leetcodeusername}`. You can now use `/uinfo` to view your profile."), ephemeral=True)  
     
     @app_commands.command(name = "deluser", description = "Deletes your user profile")
-    async def deleteuser(self, interaction: discord.Interaction):
-        # remove from the dict
-        # delete the file
-        # send an are you sure embed, say that user profiles are NOT server specific
+    async def deluser(self, interaction: discord.Interaction):
         confirmationMSG = "User profiles are **NOT** server specific. If you delete it, your points and progress will be lost **entirely**."
         embed: discord.Embed = ConfirmationEmbed(confirmationMSG)
         view: discord.View = ConfirmationView()
@@ -124,7 +122,7 @@ class UserCog(commands.Cog):
     
     @uinfo.error
     @setusername.error
-    @deleteuser.error
+    @deluser.error
     async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):
         exception: SimpleException = error.original
         code: SimpleException = exception.code if isinstance(error.original, SimpleException) else "BACKEND FAILURE"
