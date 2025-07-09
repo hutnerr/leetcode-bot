@@ -40,14 +40,13 @@ class ProblemInfoEmbed(discord.Embed):
 
         dows = [dowTable.get(dow, "Unknown") for dow in problem.dows]
 
-        
         tzHour, tzInterval = timeh.convertFromLocalTimeZone(problem.hour, problem.interval * 15, self.server.settings.timezone)
 
         interval = tzInterval * 15
 
         probStr = ""
         amOrPm = "AM" if tzHour < 12 else "PM"
-        hour = tzHour % 12 if tzHour != 0 else 12  # convert to 12-hour format
+        hour = tzHour % 12 if tzHour != 0 or tzHour != 12 else 12  # convert to 12-hour format
         probStr += f"{hour:02d}:{interval:02d} {amOrPm}"
 
         self.add_field(
