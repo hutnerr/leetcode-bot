@@ -6,7 +6,7 @@ There is also other functionality that will notify the server about upcoming con
 This was a personal project and has no official affiliation with LeetCode. 
 
 **Links**
-- [Invite Link]()
+- [Invite Link](https://discord.com/oauth2/authorize?client_id=1392738606120173719&permissions=2147616768&integration_type=0&scope=bot)
 - [Top.gg Link]()
 - [Blog Post]()
 - [Project Reflection]()
