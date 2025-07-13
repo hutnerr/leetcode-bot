@@ -125,7 +125,7 @@ class DaysOfWeekSelect(discord.ui.Select):
 
         add = self.app.synchronizer.addProblem(self.problem)
         if not add:
-            raise SimpleException("ADDPFAIL", "Failed to add the new problem after setting the days. This should not happen, please report this issue using `/report`. Also please `/delproblem` and re-add the problem. Sorry for the inconvenience.")
+            raise SimpleException("ADDPFAIL", "Failed to add the new problem after setting the days. This should not happen, please report this issue using `/report`. Also please `/deleteproblem` and re-add the problem. Sorry for the inconvenience.")
 
         selectedDays = [dayTable.get(day, "Unknown") for day in self.problem.dows] if self.problem.dows else []
         embed = PositiveEmbed("Problem Days Set", getProblemSentString(self.problem, self.server.settings.timezone))

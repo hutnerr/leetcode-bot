@@ -20,7 +20,7 @@ class Problems(commands.Cog):
         self.client: commands.Bot = client
         self.app: App = client.app
 
-    @app_commands.command(name = "problem", description = "Gets a LeeetCode problem. Default is free problems")
+    @app_commands.command(name = "lcproblem", description = "Gets a LeeetCode problem. Default is free problems")
     @app_commands.choices(difficulty = [
         app_commands.Choice(name = "Easy", value = "easy"),
         app_commands.Choice(name = "Medium", value = "medium"),
@@ -53,7 +53,7 @@ class Problems(commands.Cog):
         embed = ProblemEmbed(slug, problemInfo)
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name = "dailyproblem", description = "Gets the LeeetCode daily problem")
+    @app_commands.command(name = "dailylcproblem", description = "Gets the LeeetCode daily problem")
     async def dailyproblem(self, interaction: discord.Interaction):
         queryService: QueryService = self.app.queryService
         if not queryService:

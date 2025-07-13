@@ -328,7 +328,7 @@ class ChannelSelector(discord.ui.ChannelSelect):
         if channel.type != discord.ChannelType.text:
             code = "CHNSELVW"
             msg = "The selected channel is not a text channel."
-            help = "If your channel is not listed, try doing `/setchannel #channel_name` to set it as the output channel directly."
+            help = "If your channel is not listed, try typing to find it and set it as the output channel directly."
             embed = ErrorEmbed(code, msg, help)
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return

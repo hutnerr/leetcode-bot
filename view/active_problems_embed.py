@@ -5,7 +5,7 @@ from utils import problem_helper as probh
 
 class ActiveProblemsEmbed(discord.Embed):
     def __init__(self, server: Server):
-        super().__init__(title="Active Problems", description="These are the current active problems in the server. If you've completed them, use `/submit` to score some points!\n\n")
+        super().__init__(title="Active Problems", description="These are the current active problems in the server. If you've completed them, use `/submitproblems` to score some points!\n\n")
 
         invalidProblems = 0
         for problem in server.activeProblems:

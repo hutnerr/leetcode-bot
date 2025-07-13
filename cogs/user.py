@@ -21,9 +21,9 @@ class UserCog(commands.Cog):
         self.client: commands.Bot = client
         self.app: App = client.app
 
-    @app_commands.command(name = "uinfo", description = "Displays information about a user")
+    @app_commands.command(name = "userinfo", description = "Displays information about a user")
     @app_commands.describe(user="The user to get the info of. Defaults to the user who called the command.")
-    async def uinfo(self, interaction: discord.Interaction, user: discord.User = None):
+    async def userinfo(self, interaction: discord.Interaction, user: discord.User = None):
         if user is None: # get self
             user = interaction.user
 
@@ -73,9 +73,9 @@ class UserCog(commands.Cog):
 
         user.setLeetCodeUsername(leetcodeusername)
         # await interaction.response.send_message("Your username has been successfuly set!", ephemeral=True)
-        await interaction.response.send_message(embed=PositiveEmbed("Username Set", f"Your LeetCode username has been set to `{leetcodeusername}`. You can now use `/uinfo` to view your profile."), ephemeral=True)  
-    
-    @app_commands.command(name = "deluser", description = "Deletes your user profile")
+        await interaction.response.send_message(embed=PositiveEmbed("Username Set", f"Your LeetCode username has been set to `{leetcodeusername}`. You can now use `/userinfo` to view your profile."), ephemeral=True)
+
+    @app_commands.command(name = "deleteuser", description = "Deletes your user profile")
     async def deluser(self, interaction: discord.Interaction):
         confirmationMSG = "User profiles are **NOT** server specific. If you delete it, your points and progress will be lost **entirely**."
         embed: discord.Embed = ConfirmationEmbed(confirmationMSG)
@@ -120,7 +120,7 @@ class UserCog(commands.Cog):
         return user
     
     
-    @uinfo.error
+    @userinfo.error
     @setusername.error
     @deluser.error
     async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):

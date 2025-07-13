@@ -7,14 +7,14 @@ class ProblemInfoEmbed(discord.Embed):
     def __init__(self, problems: list[Problem], server: Server):
         super().__init__(title="Problem Config Info")
         self.color = discord.Color.blurple()
-        self.set_footer(text="Change the config with /pconfig. Delete with /delproblem.")
+        self.set_footer(text="Change the config with /problemconfig. Delete with /deleteproblem.")
         self.server = server
-        
-        helpStr = "There are no problems configured for this server. Use `/pconfig` to add a problem."
-        
+
+        helpStr = "There are no problems configured for this server. Use `/problemconfig` to add a problem."
+
         # set the description to a default message if there is no timezone set then return
         if server.settings.timezone is None:
-            self.description = helpStr + " The server's timezone is not set. Please set it using `/sconfig <Other Settings>` before configuring problems. This ensures time accuracy."
+            self.description = helpStr + " The server's timezone is not set. Please set it using `/serverconfig <Other Settings>` before configuring problems. This ensures time accuracy."
             return
 
         problemAdded = False

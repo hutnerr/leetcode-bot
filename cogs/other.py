@@ -18,21 +18,21 @@ helpDictionary = {
         "description": "Gets information about the current LeetCode contests. It will show the upcoming contests this week, how far away they are, and provide a link to register.",
         "usage": "/contests",
     },
-    "dailyproblem": {
+    "dailylcproblem": {
         "description": "Gets the official LeetCode daily problem.",
-        "usage": "/dailyproblem",
+        "usage": "/dailylcproblem",
     },
-    "delproblem": {
+    "deleteproblem": {
         "description": "Deletes a problem configuration from the problems list.\n\nThis will remove the problem configuration from the server's reoccurring problems and it will no longer be sent.",
-        "usage": "/delproblem <problemID>",
+        "usage": "/deleteproblem <problemID>",
     },
-    "delserver": {
+    "deleteserver": {
         "description": "Deletes the server configuration.\n\nThis will remove the server's reoccurring problems and any other server specific data. It will delete the server's data entirely.",
-        "usage": "/delserver",
+        "usage": "/deleteserver",
     },
-    "deluser": {
+    "deleteuser": {
         "description": "Deletes your user data from the bot.\n\nThis will remove your LeetCode username and any other data associated with your user. It is NOT server specific, it will delete your data entirely.\n\nThis is useful if you want to reset your data or if you no longer want to use the bot.",
-        "usage": "/deluser",
+        "usage": "/deleteuser",
     },
     "help": {
         "description": "Displays help information about the bot. Supports general help information as well as specific commands within the bot.",
@@ -42,21 +42,21 @@ helpDictionary = {
         "description": "Displays the leaderboard for a specific server.\n\nThis will show the top users in the server based on their points.",
         "usage": "/leaderboard",
     },
-    "pactive" : {
+    "problemactive" : {
         "description": "Gets the active problems in the server.\n\nThis will show the problems that can be submitted for points through `/submit`. For a problem to count, it might be one of your recent 15 submissions.",
-        "usage": "/pactive",
+        "usage": "/problemactive",
     },
-    "pconfig": {
+    "problemconfig": {
         "description": "Configures the server's reoccurring problems.\n\nThis will allow you to add and configure the server's reoccurring problems. It is used to set up the problems that will be sent to the server on a schedule.",
-        "usage": "/pconfig <problemID>",
+        "usage": "/problemconfig <problemID>",
     },
-    "pinfo": {
+    "probleminfo": {
         "description": "Displays information about the configured problems in the server.\n\nThis will show the problems that are configured in the server and their details.",
-        "usage": "/pinfo",
+        "usage": "/probleminfo",
     },
-    "problem": {
+    "lcproblem": {
         "description": "Gets a LeetCode problem using certain parameters.\n\nThe parameters are difficulty and premium.\nPremium is optional. It is free by default.\n\nDifficulty can be easy, medium, hard, or random.\nPremium can be free, paid, or all.\n",
-        "usage": "/problem <difficulty> <premium>",
+        "usage": "/lcproblem <difficulty> <premium>",
     },
     "rank": {
         "description": "Gets a users rank in the server based on your points.\n\nThis will show your rank and how many points you have.\n\nBy default it will use the user who called the command, but you can specify another user.",
@@ -70,25 +70,25 @@ helpDictionary = {
         "description": "Resets the duplicate problems in the server.\n\nThis will remove any duplicate problems in the server's reoccurring problems.",
         "usage": "/resetdupes",
     },
-    "sconfig": {
+    "serverconfig": {
         "description": "Configures the server's settings.\n\nTo learn more about the server settings use just `/help`.",
-        "usage": "/sconfig <setting group",
+        "usage": "/serverconfig <setting group>",
     },
     "setusername": {
         "description": "Sets your LeetCode username for the bot to use.",
         "usage": "/setusername <username>",
     },
-    "sinfo": {
+    "serverinfo": {
         "description": "Displays the  server's configuration.",
-        "usage": "/sinfo",
+        "usage": "/serverinfo",
     },
-    "submit": {
-        "description": "Submits your recent LeetCode submissions to the server for points.\n\nThis will check your recent 15 submissions and give you points for any active problems (`/pactive`) that you have completed.",
-        "usage": "/submit",
+    "submitproblems": {
+        "description": "Submits your recent LeetCode submissions to the server for points.\n\nThis will check your recent 15 submissions and give you points for any active problems (`/problemactive`) that you have completed.",
+        "usage": "/submitproblems",
     },
-    "uinfo": {
+    "userinfo": {
         "description": "Gets information about a user, such as their LeetCode username and problem completion stats.\n\nIf no user is specified, it will use whoever called the command.",
-        "usage": "/uinfo <user>",
+        "usage": "/userinfo <user>",
     },
 }
 
