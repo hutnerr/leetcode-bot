@@ -55,9 +55,10 @@ class Looper(commands.Cog):
         # hour = WEEKLY_CONTEST_HOUR
         # minInterval = WEEKLY_CONTEST_INTERVAL
         
-        # dow = BIWEEKLY_CONTEST_DOW
-        # hour = BIWEEKLY_CONTEST_HOUR
-        # minInterval = BIWEEKLY_CONTEST_INTERVAL
+        dow = BIWEEKLY_CONTEST_DOW
+        hour = BIWEEKLY_CONTEST_HOUR - 1 
+        minute = 30
+        minInterval = BIWEEKLY_CONTEST_INTERVAL
         
         # hour = DAILY_PROBLEM_HOUR
         # minInterval = DAILY_PROBLEM_INTERVAL
@@ -159,12 +160,28 @@ class Looper(commands.Cog):
 
         weeklyContestMinsAway = getContestMinsAway(WEEKLY_CONTEST_DOW, WEEKLY_CONTEST_HOUR, WEEKLY_CONTEST_INTERVAL)
         
-        # FIXME: biweekly contest is every 2 weeks, so we need to adjust the calculation
-        # maybe perform an api query to check if its up 
+        contestInfo = self.app.queryService.getUpcomingContests()["data"]["upcomingContests"]
+        biweeklyExists = False
+        biweeklyInfo = []
+        for contest in contestInfo:
+            if "Biweekly Contest" in contest["title"]:
+                biweeklyExists = True
+                biweeklyInfo = contest
+                break
+        
+        # if the time difference is greater than 2 days, then we don't need to send an alert
+        # this is to avoid sending alerts for contests that are too far away
+        if biweeklyExists:
+            biweeklyStartTime = biweeklyInfo["startTime"] # get the UTC time stamp
+            currentUTC = int(time.time() * 1000)  # current time in milliseconds
+            timeDiff = biweeklyStartTime - currentUTC  # difference in milliseconds
+            if timeDiff > 2 * 24 * 60 * 60 * 1000:  # greater than 2 days in ms
+                biweeklyExists = False
+        
         biweeklyContestMinsAway = getContestMinsAway(BIWEEKLY_CONTEST_DOW, BIWEEKLY_CONTEST_HOUR, BIWEEKLY_CONTEST_INTERVAL)
 
-        # print(f"Minutes until weekly contest: {weeklyContestMinsAway}")
-        # print(f"Minutes until biweekly contest: {biweeklyContestMinsAway}")
+        print(f"Minutes until weekly contest: {weeklyContestMinsAway}")
+        print(f"Minutes until biweekly contest: {biweeklyContestMinsAway}")
 
         # Notification intervals (in minutes)
         intervals = [
@@ -188,7 +205,7 @@ class Looper(commands.Cog):
                 channel = self.client.get_channel(alert.channelID)
                 await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
         
-        if biweeklyContestMinsAway in intervals:
+        if biweeklyExists and biweeklyContestMinsAway in intervals:
             print("Biweekly contest is within an alert interval.")
             alerts = alertBuilder.buildContestAlerts(biweeklyContestMinsAway, AlertType.CONTEST_TIME_AWAY, AlertType.BIWEEKLY_CONTEST)
             for alert in alerts:
