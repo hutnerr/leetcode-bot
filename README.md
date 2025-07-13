@@ -16,27 +16,27 @@ To get started, I recommend using `/help`. It will briefly explain a majority of
 
 ## Commands
 **Main Commands**
-- `problem <dif> <premium*>` - Posts a problem for users to solve.
-- `dailyproblem` - Posts the LeetCode daily problem.
+- `lcproblem <dif> <premium*>` - Posts a problem for users to solve.
+- `dailylcproblem` - Posts the LeetCode daily problem.
 - `contests` - Displays upcoming contest times
 
 **Competition Commands**
-- `submit` - Submits recently completed problems. Get's points if they were active. 
+- `submitproblems` - Submits recently completed problems. Get's points if they were active. 
 - `leaderboard` - Displays the current point leaderboard.
 - `rank <user*>` - Displays the current leaderboard position of a user. 
 
 **Config & Status Commands**
-- `uinfo <user*>` - Displays user information.
+- `userinfo <user*>` - Displays user information.
 - `setusername <username>` - Sets the LeetCode username of the user.
-- `deluser` - Deletes a user's config.
-- `pconfig <problemID>` - Allows configuration of problems.
-- `pinfo` - Displays information about all configured problems. 
-- `pactive` - Displays the problems that can be submitted for points.
-- `delproblem <problemID>` - Deletes a problem's config.
-- `sconfig <setting group>` - Allows configuration of server settings.
-- `sinfo` - Displays information about a server's config. 
+- `deleteuser` - Deletes a user's config.
+- `problemconfig <problemID>` - Allows configuration of problems.
+- `probleminfo` - Displays information about all configured problems. 
+- `problemactive` - Displays the problems that can be submitted for points.
+- `deleteproblem <problemID>` - Deletes a problem's config.
+- `serverconfig <setting group>` - Allows configuration of server settings.
+- `serverinfo` - Displays information about a server's config. 
 - `resetdupes` - Clears a server's duplicate problems. 
-- `delserver` - Deletes a server's config. 
+- `deleteserver` - Deletes a server's config. 
 
 **Misc. Commands**
 - `about` - Displays some information about the bot.
