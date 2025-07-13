@@ -55,10 +55,10 @@ class Looper(commands.Cog):
         # hour = WEEKLY_CONTEST_HOUR
         # minInterval = WEEKLY_CONTEST_INTERVAL
         
-        dow = BIWEEKLY_CONTEST_DOW
-        hour = BIWEEKLY_CONTEST_HOUR - 1 
-        minute = 30
-        minInterval = BIWEEKLY_CONTEST_INTERVAL
+        # dow = BIWEEKLY_CONTEST_DOW
+        # hour = BIWEEKLY_CONTEST_HOUR 
+        # minute = 30
+        # minInterval = BIWEEKLY_CONTEST_INTERVAL
         
         # hour = DAILY_PROBLEM_HOUR
         # minInterval = DAILY_PROBLEM_INTERVAL

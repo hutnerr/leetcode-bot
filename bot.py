@@ -48,6 +48,6 @@ client = Client()
 client.remove_command("help") # remove default help so I can add custom one. 
 
 with open("data/key.json", "r") as file:
-    key = json.load(file)['testkey']
+    key = json.load(file)['key']
 
 client.run(key)
