@@ -114,12 +114,12 @@ class Looper(commands.Cog):
 
             channel = self.client.get_channel(channelID)
             if channel is None:
-                print(f"Channel ID {channelID} not found for server {serverID}.")
                 continue
                         
             if not server.addActiveProblem(slug, difficulty, pid): # add the problem to the server's active problems. also adds to previous problems
                 print("error adding active problem") 
                 return
+
 
             await channel.send(embed=ProblemEmbed(slug, problemInfo), content=buildAlertRoleNotification(server))  # send the problem embed
 
@@ -180,8 +180,8 @@ class Looper(commands.Cog):
         
         biweeklyContestMinsAway = getContestMinsAway(BIWEEKLY_CONTEST_DOW, BIWEEKLY_CONTEST_HOUR, BIWEEKLY_CONTEST_INTERVAL)
 
-        print(f"Minutes until weekly contest: {weeklyContestMinsAway}")
-        print(f"Minutes until biweekly contest: {biweeklyContestMinsAway}")
+        # print(f"Minutes until weekly contest: {weeklyContestMinsAway}")
+        # print(f"Minutes until biweekly contest: {biweeklyContestMinsAway}")
 
         # Notification intervals (in minutes)
         intervals = [
@@ -203,6 +203,9 @@ class Looper(commands.Cog):
                     continue
                 
                 channel = self.client.get_channel(alert.channelID)
+                if channel is None:
+                    continue
+                
                 await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
         
         if biweeklyExists and biweeklyContestMinsAway in intervals:
@@ -214,16 +217,11 @@ class Looper(commands.Cog):
                     continue
                 
                 channel = self.client.get_channel(alert.channelID)
+                if channel is None:
+                    continue
+                
                 await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
 
-        # for contest alerts
-        # needs interval of contest away length
-        # we can assume that the contests are technically static times
-        # thus these technically won't change
-        # set the specific contest times, calculate the current time away
-        # check if its a proper interval,
-        # if it is, then gather the alerts
-        pass
 
     async def handleStaticAlerts(self, dow: int, hour: int, minInterval: int):
         
@@ -234,6 +232,9 @@ class Looper(commands.Cog):
                     continue
                 
                 channel = self.client.get_channel(alert.channelID)
+                if channel is None:
+                    continue
+                
                 await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
     
         # alerts happen on either 0min or 30mins which are both intervals
