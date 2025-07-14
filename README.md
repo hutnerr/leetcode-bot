@@ -7,9 +7,9 @@ This was a personal project and has no official affiliation with LeetCode.
 
 **Links**
 - [Invite Link](https://discord.com/oauth2/authorize?client_id=1392738606120173719&permissions=2147616768&integration_type=0&scope=bot)
-- [Top.gg Link]()
-- [Blog Post]()
-- [Project Reflection]()
+- [Top.gg Link](https://top.gg/bot/1392738606120173719)
+- [Blog Post](https://www.hunter-baker.com/blog/blog-07-14-2025.html)
+- [Project Reflection](https://www.hunter-baker.com/)
 
 ## Getting Started
 To get started, I recommend using `/help`. It will briefly explain a majority of the implicit aspects of the bot. After that, you can start configuring your server through `/sconfig`. Then configure your problems with `/pconfig`. There is a limit of 5 reoccurning problems, but each one can be sent on numerous days as well as have variable difficulty. 
