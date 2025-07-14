@@ -1,5 +1,5 @@
 ## Overview
-The goal of this bot is to encourage and enable LeetCoding within a Discord server. It achieves through the use of distributing personalized reoccurinng server problems. 
+The goal of this bot is to encourage and enable LeetCoding within a Discord server. It achieves through the use of distributing personalized reoccurring server problems. 
 
 There is also other functionality that will notify the server about upcoming contests. The timing of these notifications can be set and modified. 
 
