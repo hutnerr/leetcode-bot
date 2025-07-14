@@ -1,7 +1,9 @@
 ## Overview
-The goal of this bot is to encourage and enable LeetCoding within a Discord server. It achieves through the use of distributing personalized reoccurring server problems. 
+The goal of this bot is to encourage and enable LeetCoding within a Discord server. It achieves through the use of distributing personalized reoccurring server problems.
 
-There is also other functionality that will notify the server about upcoming contests. The timing of these notifications can be set and modified. 
+These problems can be configured to be sent out on specific days of the week at specific times. The difficulty as well as if selection of premium problems can also be configured.
+
+Besides the configurable problems, the bot also provides a more baseline set of features. Such as the ability to receive a notification based on how far away a contest is, notifications for the official daily problem, as well as notifications for when the contests become active.
 
 This was a personal project and has no official affiliation with LeetCode. 
 
@@ -12,7 +14,7 @@ This was a personal project and has no official affiliation with LeetCode.
 - [Project Reflection](https://www.hunter-baker.com/projectpages/leetcode-bot.html)
 
 ## Getting Started
-To get started, I recommend using `/help`. It will briefly explain a majority of the implicit aspects of the bot. After that, you can start configuring your server through `/sconfig`. Then configure your problems with `/pconfig`. There is a limit of 5 reoccurning problems, but each one can be sent on numerous days as well as have variable difficulty. 
+To get started, I recommend using `/help`. It will briefly explain a majority of the implicit aspects of the bot. After that, you can start configuring your server through `/serverconfig`. Then configure your problems with `/problemconfig`. There is a limit of 5 reoccurning problems, but each one can be sent on numerous days as well as have variable difficulty. 
 
 ## Commands
 **Main Commands**
