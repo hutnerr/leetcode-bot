@@ -1,18 +1,22 @@
 ## Overview
-The goal of this bot is to encourage and enable LeetCoding within a Discord server. It achieves through the use of distributing personalized reoccurinng server problems. 
+The goal of this bot is to encourage and enable LeetCoding within a Discord server. It achieves through the use of distributing personalized reoccurring server problems.
 
-There is also other functionality that will notify the server about upcoming contests. The timing of these notifications can be set and modified. 
+These problems can be configured to be sent out on specific days of the week at specific times. The difficulty as well as if selection of premium problems can also be configured.
+
+Besides the configurable problems, the bot also provides a more baseline set of features. Such as the ability to receive a notification based on how far away a contest is, notifications for the official daily problem, as well as notifications for when the contests become active.
 
 This was a personal project and has no official affiliation with LeetCode. 
 
 **Links**
 - [Invite Link](https://discord.com/oauth2/authorize?client_id=1392738606120173719&permissions=2147616768&integration_type=0&scope=bot)
-- [Top.gg Link]()
-- [Blog Post]()
-- [Project Reflection]()
+- [Top.gg Link](https://top.gg/bot/1392738606120173719)
+- [Blog Post](https://www.hunter-baker.com/blog/blog-07-14-2025.html)
+- [Project Reflection](https://www.hunter-baker.com/projectpages/leetcode-bot.html)
+- [Help & Tutorial Page](https://www.hunter-baker.com/beastcode-help.html)
+- [Showcase & Tutorial Video]()
 
 ## Getting Started
-To get started, I recommend using `/help`. It will briefly explain a majority of the implicit aspects of the bot. After that, you can start configuring your server through `/sconfig`. Then configure your problems with `/pconfig`. There is a limit of 5 reoccurning problems, but each one can be sent on numerous days as well as have variable difficulty. 
+To get started, I recommend using `/help`. It will briefly explain a majority of the implicit aspects of the bot. After that, you can start configuring your server through `/serverconfig`. Then configure your problems with `/problemconfig`. There is a limit of 5 reoccurning problems, but each one can be sent on numerous days as well as have variable difficulty. 
 
 ## Commands
 **Main Commands**
@@ -41,4 +45,4 @@ To get started, I recommend using `/help`. It will briefly explain a majority of
 **Misc. Commands**
 - `about` - Displays some information about the bot.
 - `report` - Provides the GitHub link so users can report bugs. 
-- `help <command*>` - Explains and give details about an individual command.
+- `help <command*>` - Explains background info and give details about an individual command.
