@@ -200,9 +200,21 @@ class ServerCog(commands.Cog):
             raise SimpleException("SRVDEL", "Server configuration not found", "The server configuration does not exist. It may have already been deleted.")
 
         # alerts should only be in the bucket if this setting is enabled
+        # otherwise this clears the alert intervals
         if server.settings.contestTimeAlerts:
             if not self.app.synchronizer.changeAlertIntervals(server.serverID, []):  # reset the alert intervals
                 raise SimpleException("SRVDEL", "Failed to reset alert intervals", "The alert intervals could not be reset.")
+
+        # remove all problems from server
+        for problem in server.problems:
+            if problem is not None:
+                if not self.app.synchronizer.removeProblem(problem):
+                    raise SimpleException("SRVDEL", "Failed to delete problem during server deletion", "The problem could not be deleted. It may not exist or there was an error in the backend.")
+
+        for bucket in self.app.staticTimeBucket.buckets:
+            if server.serverID in self.app.staticTimeBucket.buckets[bucket]:
+                if not self.app.staticTimeBucket.removeFromBucket(bucket, server.serverID):
+                    raise SimpleException("SRVDEL", "Failed to remove server from static time bucket", "The server could not be removed from the static time bucket. It may not exist or there was an error in the backend.")
 
         del self.app.servers[server.serverID]  # delete the server from the dict
         server.toJSON()  # save the server
