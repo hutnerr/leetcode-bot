@@ -45,3 +45,5 @@ To get started, I recommend using `/help`. It will briefly explain a majority of
 - `about` - Displays some information about the bot.
 - `report` - Provides the GitHub link so users can report bugs. 
 - `help <command*>` - Explains background info and give details about an individual command.
+- `vote` - Provides a link to Top.gg to show support
+- `tutorial` - Provides a link to the [Help & Tutorial Page](https://www.hunter-baker.com/beastcode-help.html).
