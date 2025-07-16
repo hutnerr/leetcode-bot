@@ -6,7 +6,7 @@ class CommandHelpEmbed(discord.Embed):
             title=f"Help for `{command}`", description=info['description'])
         self.add_field(name="Usage", value=f"`{info['usage']}`", inline=False)
         self.color = discord.Color.blue()
-        self.set_footer(text="Use /help to see general help.")
+        self.set_footer(text="Use /help to see general help. Use /tutorial for a setup guide.")
 
 class HelpEmbed(discord.Embed):
     def __init__(self):
@@ -29,4 +29,4 @@ class HelpEmbed(discord.Embed):
 
         self.color = discord.Color.blue()
         self.set_footer(
-            text="Use /help <command> to see command specific help.")
+            text="Use /help <command> to see command specific help. Use /tutorial for a setup guide.")
