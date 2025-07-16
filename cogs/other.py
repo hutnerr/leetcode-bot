@@ -90,6 +90,14 @@ helpDictionary = {
         "description": "Gets information about a user, such as their LeetCode username and problem completion stats.\n\nIf no user is specified, it will use whoever called the command.",
         "usage": "/userinfo <user>",
     },
+    "vote": {
+        "description": "Show support for the bot by voting for it on Top.gg",
+        "usage": "/vote",
+    },
+    "tutorial": {
+        "description": "Provides a link to the bot's setup tutorial.",
+        "usage": "/tutorial",
+    }
 }
 
 
@@ -139,6 +147,25 @@ class OtherCog(commands.Cog):
         )
         embed.add_field(name="Developer", value="> [My GitHub](https://github.com/hutnerr)\n> [My Website](https://hunter-baker.com)", inline=False)
         embed.add_field(name="GitHub", value="> [LeetCode Bot](https://github.com/hutnerr/leetcode-bot)", inline=False)
+        await interaction.response.send_message(embed=embed)
+
+
+    @app_commands.command(name="tutorial", description="Provides a link to the bot's setup tutorial")
+    async def tutorial(self, interaction: discord.Interaction):
+        url = "https://www.hunter-baker.com/beastcode-help.html"
+        embed = PositiveEmbed(
+            title="Tutorial",
+            description=f"To learn how to set up the bot, please visit the [setup tutorial]({url}). At the top of the page is some additional information. Near the bottom is a walkthrough of the setup process.",
+        )
+        await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="vote", description="Show support for the bot by voting for it on Top.gg")
+    async def vote(self, interaction: discord.Interaction):
+        url = "https://top.gg/bot/1392738606120173719"
+        embed = PositiveEmbed(
+            title="Vote",
+            description=f"To vote for the bot, please visit the [vote page]({url}). Any feedback is much appreciated! I am a new developer and I am always looking to improve the bot. Thank you very much.",
+        )
         await interaction.response.send_message(embed=embed)
 
     @help.error
