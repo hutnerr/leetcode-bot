@@ -152,7 +152,7 @@ class OtherCog(commands.Cog):
 
     @app_commands.command(name="tutorial", description="Provides a link to the bot's setup tutorial")
     async def tutorial(self, interaction: discord.Interaction):
-        url = "https://www.hunter-baker.com/beastcode-help.html"
+        url = "https://www.hunter-baker.com/pages/core/beastcode-help.html"
         embed = PositiveEmbed(
             title="Tutorial",
             description=f"To learn how to set up the bot, please visit the [setup tutorial]({url}). At the top of the page is some additional information. Near the bottom is a walkthrough of the setup process.",
