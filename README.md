@@ -10,9 +10,9 @@ This was a personal project and has no official affiliation with LeetCode.
 **Links**
 - [Invite Link](https://discord.com/oauth2/authorize?client_id=1392738606120173719&permissions=2147616768&integration_type=0&scope=bot)
 - [Top.gg Link](https://top.gg/bot/1392738606120173719)
-- [Blog Post](https://www.hunter-baker.com/blog/blog-07-14-2025.html)
-- [Project Reflection](https://www.hunter-baker.com/projectpages/leetcode-bot.html)
-- [Help & Tutorial Page](https://www.hunter-baker.com/beastcode-help.html)
+- [Blog Post](https://www.hunter-baker.com/pages/blog/blog-07-14-2025.html)
+- [Project Reflection](https://www.hunter-baker.com/pages/projects/leetcode-bot.html)
+- [Help & Tutorial Page](https://www.hunter-baker.com/pages/core/beastcode-help.html)
 
 ## Getting Started
 To get started, I recommend using `/help`. It will briefly explain a majority of the implicit aspects of the bot. After that, you can start configuring your server through `/serverconfig`. Then configure your problems with `/problemconfig`. There is a limit of 5 reoccurning problems, but each one can be sent on numerous days as well as have variable difficulty. 
@@ -46,4 +46,4 @@ To get started, I recommend using `/help`. It will briefly explain a majority of
 - `report` - Provides the GitHub link so users can report bugs. 
 - `help <command*>` - Explains background info and give details about an individual command.
 - `vote` - Provides a link to Top.gg to show support
-- `tutorial` - Provides a link to the [Help & Tutorial Page](https://www.hunter-baker.com/beastcode-help.html).
+- `tutorial` - Provides a link to the [Help & Tutorial Page](https://www.hunter-baker.com/pages/core/beastcode-help.html).
