@@ -4,7 +4,7 @@ from models.alert import Alert, AlertType
 class AlertEmbed(discord.Embed):
     def __init__(self, alert: Alert):
         super().__init__(url=alert.info.get("url", None))
-        
+
         bellIconURL = "https://images.icon-icons.com/3653/PNG/512/bell_notification_icon_228288.png"
         leetCodeIconURL = "https://leetcode.com/static/images/LeetCode_logo_rvs.png"
         clockIconURL = "https://assets.streamlinehq.com/image/private/w_512,h_512,ar_1/f_auto/v1/icons/1/alarm-clock-8x1uhzi8lnqnxzawr60ih.png/alarm-clock-jck7ltg29a4dg77hlu0ks.png?_a=DATAdtAAZAA0"

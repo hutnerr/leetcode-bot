@@ -1,16 +1,14 @@
 import os
 
-from testing.generator import GeneratedServers
-
-from utils.initializer import Initializer
-from utils import problem_helper as probh
-
 from models.app import App
 from models.problem import Problem
-
 from services.cache_service import CacheService
 from services.problem_service import ProblemService
 from services.query_service import QueryService
+from testing.generator import GeneratedServers
+from utils import problem_helper as probh
+from utils.initializer import Initializer
+
 
 # services integration testing
 def makeApp() -> App:
@@ -89,41 +87,41 @@ def testQueryService() -> bool:
     assert queryService, "App's queryService was None"
 
     # daily problem query test
-    dailyProblemInfo = queryService.getDailyProblem()
+    dailyProblemInfo = await queryService.getDailyProblem()
     assert "data" in dailyProblemInfo, "Daily Problem Info Query Failed"
 
     # get user recent accepted submissions test
     # test w a limit and with no limit
-    recentUserAcceptedInfo = queryService.getUserRecentAcceptedSubmissions(USERNAME)
+    recentUserAcceptedInfo = await queryService.getUserRecentAcceptedSubmissions(USERNAME)
     assert len(recentUserAcceptedInfo["data"]["recentAcSubmissionList"]) == 10, "Recent Accepted Submissions not 10 on no limit defined"
 
-    recentUserAcceptedInfo = queryService.getUserRecentAcceptedSubmissions(USERNAME, 1)
+    recentUserAcceptedInfo = await queryService.getUserRecentAcceptedSubmissions(USERNAME, 1)
     assert len(recentUserAcceptedInfo["data"]["recentAcSubmissionList"]) == 1, "Recent Accepted Submissions not 1 on a limit of 1"
 
-    recentUserAcceptedInfo = queryService.getUserRecentAcceptedSubmissions(BADUSERNAME)
+    recentUserAcceptedInfo = await queryService.getUserRecentAcceptedSubmissions(BADUSERNAME)
     assert not recentUserAcceptedInfo["data"]["recentAcSubmissionList"], "Recent Accepted Submissions is not None on an invalid account"
 
-    # recentUserAcceptedInfo = queryService.getUserRecentAcceptedSubmissions(USERNAME, -1) # this just returns max limit
-    # recentUserAcceptedInfo = queryService.getUserRecentAcceptedSubmissions(USERNAME, 0) # this also returns max limit
+    # recentUserAcceptedInfo = await queryService.getUserRecentAcceptedSubmissions(USERNAME, -1) # this just returns max limit
+    # recentUserAcceptedInfo = await queryService.getUserRecentAcceptedSubmissions(USERNAME, 0) # this also returns max limit
     
     # get user profile test
-    userProfileInfo = queryService.getUserProfile(USERNAME)
+    userProfileInfo = await queryService.getUserProfile(USERNAME)
     assert "errors" not in userProfileInfo, "Query failed. No match"
 
     assert userProfileInfo["data"]["matchedUser"]["username"] == USERNAME, "Wrong Username"
     
-    userProfileInfo = queryService.getUserProfile(BADUSERNAME)
+    userProfileInfo = await queryService.getUserProfile(BADUSERNAME)
     assert "errors" in userProfileInfo, "Found a user for the Bad User Name"
 
     # get question info
-    questionInfo = queryService.getQuestionInfo(PROBLEM_SLUG)
+    questionInfo = await queryService.getQuestionInfo(PROBLEM_SLUG)
     assert questionInfo["data"]["question"], "Good question slug got a bad result"
 
-    questionInfo = queryService.getQuestionInfo("DONT EXIST")
+    questionInfo = await queryService.getQuestionInfo("DONT EXIST")
     assert not questionInfo["data"]["question"], "Bad question slug got a valid result"
 
     # get upcoming contests
-    upcomingContestInfo = queryService.getUpcomingContests()
+    upcomingContestInfo = await queryService.getUpcomingContests()
     assert "errors" not in upcomingContestInfo, "Failed getting Upcoming Contest Info"
 
     return True
@@ -143,7 +141,7 @@ def lifecycleTest() -> bool:
     else:
         path = os.path.join("data", "problem_cache", f"{problemSlug}.json")
         assert not os.path.exists(path), "Path exists BEFORE caching it"
-        problemInfo = queryService.getQuestionInfo(problemSlug)
+        problemInfo = await queryService.getQuestionInfo(problemSlug)
         cacheService.cacheProblem(problemInfo)
         assert os.path.exists(path), "Problem file does not exist after caching"
 

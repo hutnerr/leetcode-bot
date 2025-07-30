@@ -76,7 +76,7 @@ class AlertBuilder:
 
 
     # collects the server & channel IDs and builds the alert message for the contest alerts
-    def buildContestAlerts(self, interval: int, alertType: AlertType, contestAlertType: AlertType) -> list[Alert]:
+    async def buildContestAlerts(self, interval: int, alertType: AlertType, contestAlertType: AlertType) -> list[Alert]:
         alerts = []
 
         if contestAlertType == AlertType.WEEKLY_CONTEST:
@@ -86,7 +86,7 @@ class AlertBuilder:
         else:
             return []
 
-        info = self.queryService.getUpcomingContests()
+        info = await self.queryService.getUpcomingContests()
         contests = info["data"]["upcomingContests"]
         title = None
         titleSlug = None
@@ -132,14 +132,14 @@ class AlertBuilder:
         
         
     # these alerts all happen at a static time, so we can just get the channel IDs, build the alert message, and return them
-    def buildStaticAlerts(self, alert: StaticTimeAlert) -> list[Alert]:
+    async def buildStaticAlerts(self, alert: StaticTimeAlert) -> list[Alert]:
 
-        def buildStaticAlertInfo() -> dict | None:
+        async def buildStaticAlertInfo() -> dict | None:
             # we have a contest
             if (alert == StaticTimeAlert.WEEKLY_CONTEST) or (alert == StaticTimeAlert.BIWEEKLY_CONTEST):
                 contestType = alert.value.capitalize() # FIXME: uses the enum value, might be ugly
     
-                info = self.queryService.getUpcomingContests()
+                info = await self.queryService.getUpcomingContests()
                 contests = info["data"]["upcomingContests"]
                 title = None
                 titleSlug = None
@@ -159,7 +159,8 @@ class AlertBuilder:
 
             # FIXME: also might need a delay on this 
             elif alert == StaticTimeAlert.DAILY_PROBLEM:
-                titleSlug = self.queryService.getDailyProblem()["data"]["challenge"]["question"]["titleSlug"]
+                titleSlug = await self.queryService.getDailyProblem()
+                titleSlug = titleSlug["data"]["challenge"]["question"]["titleSlug"]
                 url = probh.slugToURL(titleSlug)
                 alertString = f"Today's daily problem is now available! It is **[{probh.slugToTitle(titleSlug)}]({url})**."
             else:
@@ -177,7 +178,7 @@ class AlertBuilder:
         if not serversToNotify:
             return []
 
-        alertInfo = buildStaticAlertInfo()
+        alertInfo = await buildStaticAlertInfo()
         if alertInfo is None:
             return []
 

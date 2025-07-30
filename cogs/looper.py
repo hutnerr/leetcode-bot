@@ -46,7 +46,7 @@ class Looper(commands.Cog):
             minInterval = minute // 15
 
         # FOR TESTING INDIVIDUAL PROBLEMS
-        # minute = 15
+        # minute = 0
         # dow = 6
         # hour = 0
         # minInterval = 0
@@ -66,7 +66,6 @@ class Looper(commands.Cog):
         await self.handleProblemAlerts(dow, hour, minInterval)
         await self.handleContestAlerts(dow, hour, minute)
         await self.handleStaticAlerts(dow, hour, minInterval)
-        
         
     # update the problemset every 48 hours
     @tasks.loop(hours=48)
@@ -109,7 +108,7 @@ class Looper(commands.Cog):
             if self.app.cacheService.existsInCache(slug):
                 problemInfo = self.app.cacheService.getFromCache(slug)
             else:
-                problemInfo = self.app.queryService.getQuestionInfo(slug)
+                problemInfo = await self.app.queryService.getQuestionInfo(slug)
                 self.app.cacheService.cacheProblem(problemInfo) # cache the problem info
 
             channel = self.client.get_channel(channelID)
@@ -119,7 +118,6 @@ class Looper(commands.Cog):
             if not server.addActiveProblem(slug, difficulty, pid): # add the problem to the server's active problems. also adds to previous problems
                 print("error adding active problem") 
                 return
-
 
             await channel.send(embed=ProblemEmbed(slug, problemInfo), content=buildAlertRoleNotification(server))  # send the problem embed
 
@@ -160,7 +158,8 @@ class Looper(commands.Cog):
 
         weeklyContestMinsAway = getContestMinsAway(WEEKLY_CONTEST_DOW, WEEKLY_CONTEST_HOUR, WEEKLY_CONTEST_INTERVAL)
         
-        contestInfo = self.app.queryService.getUpcomingContests()["data"]["upcomingContests"]
+        contestInfo = await self.app.queryService.getUpcomingContests()
+        contestInfo = contestInfo["data"]["upcomingContests"] if "data" in contestInfo else []
         biweeklyExists = False
         biweeklyInfo = []
         for contest in contestInfo:
@@ -196,7 +195,7 @@ class Looper(commands.Cog):
         
         if weeklyContestMinsAway in intervals:
             print("Weekly contest is within an alert interval.")
-            alerts = alertBuilder.buildContestAlerts(weeklyContestMinsAway, AlertType.CONTEST_TIME_AWAY, AlertType.WEEKLY_CONTEST)
+            alerts = await alertBuilder.buildContestAlerts(weeklyContestMinsAway, AlertType.CONTEST_TIME_AWAY, AlertType.WEEKLY_CONTEST)
             for alert in alerts:
                 if alert.channelID is None:
                     print(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.")
@@ -210,7 +209,7 @@ class Looper(commands.Cog):
         
         if biweeklyExists and biweeklyContestMinsAway in intervals:
             print("Biweekly contest is within an alert interval.")
-            alerts = alertBuilder.buildContestAlerts(biweeklyContestMinsAway, AlertType.CONTEST_TIME_AWAY, AlertType.BIWEEKLY_CONTEST)
+            alerts = await alertBuilder.buildContestAlerts(biweeklyContestMinsAway, AlertType.CONTEST_TIME_AWAY, AlertType.BIWEEKLY_CONTEST)
             for alert in alerts:
                 if alert.channelID is None:
                     print(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.")
@@ -245,17 +244,17 @@ class Looper(commands.Cog):
         
         # leetcode weekly: saturday 10 30 pm
         if dow == WEEKLY_CONTEST_DOW and hour == WEEKLY_CONTEST_HOUR and minInterval == WEEKLY_CONTEST_INTERVAL:
-            weeklyAlerts = alertBuilder.buildStaticAlerts(StaticTimeAlert.WEEKLY_CONTEST)
+            weeklyAlerts = await alertBuilder.buildStaticAlerts(StaticTimeAlert.WEEKLY_CONTEST)
             await sendStaticAlerts(weeklyAlerts)
 
         # leetcode biweekly: sunday 10 30 am
         if dow == BIWEEKLY_CONTEST_DOW and hour == BIWEEKLY_CONTEST_HOUR and minInterval == BIWEEKLY_CONTEST_INTERVAL:
-            biweeklyAlerts = alertBuilder.buildStaticAlerts(StaticTimeAlert.BIWEEKLY_CONTEST)
+            biweeklyAlerts = await alertBuilder.buildStaticAlerts(StaticTimeAlert.BIWEEKLY_CONTEST)
             await sendStaticAlerts(biweeklyAlerts)
 
         # leetcode daily resets at 8pm
         if hour == DAILY_PROBLEM_HOUR and minInterval == DAILY_PROBLEM_INTERVAL:
-            dailyAlerts = alertBuilder.buildStaticAlerts(StaticTimeAlert.DAILY_PROBLEM)
+            dailyAlerts = await alertBuilder.buildStaticAlerts(StaticTimeAlert.DAILY_PROBLEM)
             await sendStaticAlerts(dailyAlerts)
 
 

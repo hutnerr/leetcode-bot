@@ -9,19 +9,23 @@ class Submitter:
         self.queryService = queryService
     
     # checks if a user has completed problems in the servers active problems
-    def submit(self, serverID: int, userID: int) -> bool:
+    async def submit(self, serverID: int, userID: int) -> bool:
         if (serverID not in self.servers) or (userID not in self.users):
             return False
 
+        print("we here")
+
         server: Server = self.servers[serverID]
         user: User = self.users[userID]
-                
-        submissions = self.queryService.getUserRecentAcceptedSubmissions(user.leetcodeUsername, 15)
+        
+        submissions = await self.queryService.getUserRecentAcceptedSubmissions(user.leetcodeUsername, 15)
         
         # collect the slugs of the problems the user has submitted alongside the submitted users already
         # check if the slugs match, if they do, and the user hasnt submitted, then we can add they points
         
         activeProblems = server.activeProblems
+        
+        print("we here now")
         
         for pid, activeProblem in enumerate(activeProblems):
             slug, difficulty, submittedUsers = activeProblem
@@ -61,12 +65,12 @@ class Submitter:
 
     # checks if a user has submitted a problem
     # can pass in submissions to avoid querying the API
-    def userCompletedProblem(self, user: User, slug: str, submissions: dict = None) -> bool:
+    async def userCompletedProblem(self, user: User, slug: str, submissions: dict = None) -> bool:
         # uses the api to check a users recent submissions returns true if they have
         
         leetcodeUsername = user.leetcodeUsername
         if not submissions:
-            submissions = self.queryService.getUserRecentSubmissions(leetcodeUsername)
+            submissions = await self.queryService.getUserRecentSubmissions(leetcodeUsername)
         if not submissions or "data" not in submissions:
             return False
 

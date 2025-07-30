@@ -1,52 +1,69 @@
 import requests
+import aiohttp
 from enum import Enum
 
 # performs queries
 class QueryService:
     API_URL: str = "https://leetcode.com/graphql"
     
-    # gets the official daily leetcode problem
-    def getDailyProblem(self) -> dict:
-        args = {} 
-        return self._performQuery(QueryStrings.DAILY_PROBLEM, args)
-    
-    # can define an amount to get only that many
-    def getUserRecentAcceptedSubmissions(self, username: str, amount: int = 10) -> dict:
-        args = {
-            "username" : username,
-            "limit" : amount
-        }
-        return self._performQuery(QueryStrings.RECENT_SUBMISSIONS, args)
-    
-    def getUserProfile(self, username: str) -> dict:
-        args = {
-            "username" : username
-            }
-        return self._performQuery(QueryStrings.USER_PROFILE, args)
-    
-    def getUserProblemsSolved(self, username: str) -> dict:
-        args = {
-            "username" : username
-        }
-        return self._performQuery(QueryStrings.USER_PROBLEMS_SOLVED, args)
-    
-    def getQuestionInfo(self, slug: str) -> dict:
-        args = {
-            "titleSlug" : slug
-        }
-        return self._performQuery(QueryStrings.QUESTION_INFO, args)
-    
-    def getUpcomingContests(self) -> dict:
-        args = {}
-        return self._performQuery(QueryStrings.UPCOMING_CONTESTS, args)
-
     # internal query actions
-    def _performQuery(self, query: str, variables: dict) -> dict:
+    def _performRequestsQuery(self, query: str, variables: dict) -> dict:
         json = {
             'query': query.value,
             'variables': variables
         }
         return requests.post(self.API_URL, json=json).json()
+    
+    async def _performQuery(self, query: str, variables: dict) -> dict:
+        json_data = {
+            'query': query.value,
+            'variables': variables
+        }
+        async with aiohttp.ClientSession() as session:
+            async with session.post(self.API_URL, json=json_data) as resp:
+                return await resp.json()
+
+    # gets the official daily leetcode problem
+    async def getDailyProblem(self) -> dict:
+        args = {} 
+        return await self._performQuery(QueryStrings.DAILY_PROBLEM, args)
+    
+    # can define an amount to get only that many
+    async def getUserRecentAcceptedSubmissions(self, username: str, amount: int = 10) -> dict:
+        args = {
+            "username" : username,
+            "limit" : amount
+        }
+        return await self._performQuery(QueryStrings.RECENT_SUBMISSIONS, args)
+
+    async def getUserProfile(self, username: str) -> dict:
+        args = {
+            "username" : username
+        }
+        return await self._performQuery(QueryStrings.USER_PROFILE, args)
+
+    def getUserProfileRequests(self, username: str) -> dict:
+        args = {
+            "username" : username
+        }
+        return self._performRequestsQuery(QueryStrings.USER_PROFILE, args)
+
+    async def getUserProblemsSolved(self, username: str) -> dict:
+        args = {
+            "username" : username
+        }
+        return await self._performQuery(QueryStrings.USER_PROBLEMS_SOLVED, args)
+
+    async def getQuestionInfo(self, slug: str) -> dict:
+        args = {
+            "titleSlug" : slug
+        }
+        return await self._performQuery(QueryStrings.QUESTION_INFO, args)
+
+    async def getUpcomingContests(self) -> dict:
+        args = {}
+        return await self._performQuery(QueryStrings.UPCOMING_CONTESTS, args)
+
 
 # enum class that holds the query strings 
 # can also be used to see what you need to pass
@@ -96,7 +113,6 @@ class QueryStrings(Enum):
     }
     """
     
-    # TODO: Write tests for this query
     USER_PROBLEMS_SOLVED = """
     query userProblemsSolved($username: String!) {
         matchedUser(username: $username) {

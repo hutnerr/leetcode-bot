@@ -1,20 +1,19 @@
 import os
+
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from errors.simple_exception import SimpleException
-from utils import file_helper as fileh
-
-from services.query_service import QueryService
-
 from models.app import App
 from models.user import User
-
-from view.user_info_embed import UserInfoEmbed
-from view.confirmation_view import ConfirmationView, ConfirmationEmbed
+from services.query_service import QueryService
+from utils import file_helper as fileh
+from view.confirmation_view import ConfirmationEmbed, ConfirmationView
 from view.error_embed import ErrorEmbed
 from view.positive_embed import PositiveEmbed
+from view.user_info_embed import UserInfoEmbed
+
 
 class UserCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -41,10 +40,11 @@ class UserCog(commands.Cog):
             if not queryService:
                 raise SimpleException("UINFOQS", "Backend failure")
             
-            profileInfo = queryService.getUserProblemsSolved(userObj.leetcodeUsername)
+            # profileInfo = await queryService.getUserProblemsSolved(userObj.leetcodeUsername)
+            profileInfo = None
             
-            if "errors" in profileInfo:
-                raise SimpleException("UINFOPROFILE", "LeetCode account not found", "Please set your username using `/setusername <username>`")
+            # if not profileInfo or "errors" in profileInfo:
+            #     raise SimpleException("UINFOPROFILE", "LeetCode account not found", "Please set your username using `/setusername <username>`")
 
         embed = UserInfoEmbed(user, userObj, profileInfo)
         await interaction.response.send_message(embed=embed)
@@ -55,6 +55,8 @@ class UserCog(commands.Cog):
         if leetcodeusername is None or len(leetcodeusername) <= 0:
             raise SimpleException("EMPTY USERNAME")
         
+        channel = self.app.servers[interaction.guild.id].settings.postingChannelID
+        
         discUser = interaction.user
         userID = discUser.id
         users = self.app.users
@@ -63,17 +65,23 @@ class UserCog(commands.Cog):
             user = users[userID]
         else:
             user = self.newUser(userID)
+
+        await interaction.response.defer(ephemeral=True) # defer the response to give us time to process
             
-        # perform query
         queryService: QueryService = self.app.queryService
-        profileInfo = queryService.getUserProfile(leetcodeusername)
+        profileInfo = await queryService.getUserProfile(leetcodeusername)
         
         if "errors" in profileInfo:
             raise SimpleException("USRSETUP", "LeetCode account not found", "Make sure you have a valid LeetCode account and that the username is typed correctly.")
 
+        channel = self.client.get_channel(channel)
+        if channel is None:
+            raise SimpleException("POSTING_CHANNEL", "Posting channel not found", "Please set the posting channel using `/setpostingchannel <channel>` before setting your username.")
+        
+        await interaction.followup.send(embed=PositiveEmbed("Username Set", f"Your LeetCode username has been set to `{leetcodeusername}`. You can now use `/userinfo` to view your profile."))
+
         user.setLeetCodeUsername(leetcodeusername)
         # await interaction.response.send_message("Your username has been successfuly set!", ephemeral=True)
-        await interaction.response.send_message(embed=PositiveEmbed("Username Set", f"Your LeetCode username has been set to `{leetcodeusername}`. You can now use `/userinfo` to view your profile."), ephemeral=True)
 
     @app_commands.command(name = "deleteuser", description = "Deletes your user profile")
     async def deluser(self, interaction: discord.Interaction):

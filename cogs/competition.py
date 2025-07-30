@@ -2,13 +2,13 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from errors.simple_exception import SimpleException
 from models.app import App
 from models.user import User
-from errors.simple_exception import SimpleException
-
 from view.competition_embed import LeaderboardEmbed
 from view.error_embed import ErrorEmbed
 from view.positive_embed import PositiveEmbed
+
 
 class CompetitionCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -71,8 +71,8 @@ class CompetitionCog(commands.Cog):
         userID = interaction.user.id
         if userID not in self.app.users:
             # new  user
-            user = User(id=userID)
-            self.app.users[user.id] = user
+            user = User(discordID=userID)
+            self.app.users[user.discordID] = user
             user.toJSON() # save the new user
         else:
             user = self.app.users[userID]
@@ -82,14 +82,15 @@ class CompetitionCog(commands.Cog):
         if user.leetcodeUsername is None:
             raise SimpleException("LEETCODEUSER", "You have not set your LeetCode username. Use `/setleetcode` to set it.", "Make sure you have a LeetCode account and that you have completed problems.")
 
-        submitted = self.app.submitter.submit(interaction.guild.id, userID)
+        await interaction.response.defer(thinking=True)  # defer the response to avoid timeout
+        submitted = await self.app.submitter.submit(interaction.guild.id, userID)
         if not submitted:
             raise SimpleException("SUBMITFAIL", "You have not completed any active problems or you have already submitted them.", "Make sure you have completed problems and that they are active on the server. If this persists, try `/deluser` to reset your user data.")
 
         if user.points == prevPoints:
             raise SimpleException("NOPOINTS", "You have not completed any new problems since your last submission.", "Make sure you have completed new problems that are active on the server (check using `/pactive`). If this persists, try `/deluser` to reset your user data.")
         else:
-            await interaction.response.send_message(embed=PositiveEmbed("Submission Completed", f"Successfully submitted your problems! You now have **{user.points} points**. You went up **{user.points - prevPoints} points**!"), ephemeral=True)
+            await interaction.followup.send(embed=PositiveEmbed("Submission Completed", f"Successfully submitted your problems! You now have **{user.points} points**. You went up **{user.points - prevPoints} points**!"), ephemeral=True)
 
     @leaderboard.error
     @rank.error
@@ -99,7 +100,10 @@ class CompetitionCog(commands.Cog):
         code: SimpleException = exception.code if isinstance(error.original, SimpleException) else "BACKEND FAILURE"
         msg = error.original.message if isinstance(error.original, SimpleException) else str(error.original)
         help = error.original.help if isinstance(error.original, SimpleException) else None
-        await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
+        if interaction.response.is_done():
+            await interaction.followup.send(embed=ErrorEmbed(code, msg, help), ephemeral=True)
+        else:
+            await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
 
 async def setup(client: commands.Bot) -> None: 
     await client.add_cog(CompetitionCog(client))

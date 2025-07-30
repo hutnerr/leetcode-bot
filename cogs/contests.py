@@ -9,6 +9,7 @@ from utils import datetime_helper as timeh
 from view.contest_embed import ContestEmbed
 from view.error_embed import ErrorEmbed
 
+
 class Contests(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
@@ -20,7 +21,7 @@ class Contests(commands.Cog):
         if not queryService:
             raise SimpleException("CONTSQS", "Backend failure")
         
-        contestsInfo = queryService.getUpcomingContests()
+        contestsInfo = await queryService.getUpcomingContests()
         if contestsInfo and "data" in contestsInfo:
             upcoming = contestsInfo["data"]["upcomingContests"]
             contests = {}
