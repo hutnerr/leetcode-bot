@@ -53,9 +53,9 @@ class Looper(commands.Cog):
         # hour = 0
         # minInterval = 0
         
-        dow = WEEKLY_CONTEST_DOW
-        hour = WEEKLY_CONTEST_HOUR
-        minInterval = WEEKLY_CONTEST_INTERVAL
+        # dow = WEEKLY_CONTEST_DOW
+        # hour = WEEKLY_CONTEST_HOUR
+        # minInterval = WEEKLY_CONTEST_INTERVAL
         
         # dow = BIWEEKLY_CONTEST_DOW
         # hour = BIWEEKLY_CONTEST_HOUR 
@@ -95,7 +95,7 @@ class Looper(commands.Cog):
             alerts = alertBuilder.buildProblemAlerts(dow, hour, minInterval)
             
             if len(alerts) == 0:
-                raise Exception("No alerts to send for problems")
+                return
             
             for alert in alerts:
                 channelID = alert.channelID
