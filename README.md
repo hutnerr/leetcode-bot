@@ -1,3 +1,5 @@
+![Top.gg](https://top.gg/api/widget/servers/1392738606120173719.svg)
+
 ## Overview
 The goal of this bot is to encourage and enable LeetCoding within a Discord server. It achieves through the use of distributing personalized reoccurring server problems.
 
