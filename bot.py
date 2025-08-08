@@ -44,6 +44,15 @@ class Client(commands.Bot):
         print(prfx + " Slash CMDs Sycned " + Fore.YELLOW + str(len(synced)))
         await client.change_presence(activity = discord.Activity(type = discord.ActivityType.playing, name = "/help for commands"))
 
+    async def sendErrAlert(self, message: str):
+        print("Sending error alert to user...")
+        with open("data/key.json", "r") as file:
+            userid = json.load(file)["id"]        
+            user = await self.fetch_user(int(userid))
+        if not user:
+            return
+        await user.send(message)
+
 client = Client()
 client.remove_command("help") # remove default help so I can add custom one. 
 

@@ -176,6 +176,7 @@ class OtherCog(commands.Cog):
         code: SimpleException = exception.code if isinstance(error.original, SimpleException) else "BACKEND FAILURE"
         msg = error.original.message if isinstance(error.original, SimpleException) else str(error.original)
         help = error.original.help if isinstance(error.original, SimpleException) else None
+        await self.client.sendErrAlert(f"Error in {interaction.command.name} command: {msg}")
         await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
 
 

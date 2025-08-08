@@ -60,6 +60,12 @@ class QueryService:
         }
         return await self._performQuery(QueryStrings.QUESTION_INFO, args)
 
+    def getQuestionInfoRequests(self, slug: str) -> dict:
+        args = {
+            "titleSlug" : slug
+        }
+        return self._performRequestsQuery(QueryStrings.QUESTION_INFO, args)
+
     async def getUpcomingContests(self) -> dict:
         args = {}
         return await self._performQuery(QueryStrings.UPCOMING_CONTESTS, args)

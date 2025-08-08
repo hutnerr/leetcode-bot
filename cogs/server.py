@@ -1,24 +1,24 @@
 import os
+
 import discord
 from discord import app_commands
 from discord.ext import commands
 
-from models.app import App
-from models.server import Server
-from models.problem import Problem
-from models.server_settings import ServerSettings
-
 from errors.simple_exception import SimpleException
+from models.app import App
+from models.problem import Problem
+from models.server import Server
+from models.server_settings import ServerSettings
 from utils import file_helper as fileh
-
-from view.confirmation_view import ConfirmationView, ConfirmationEmbed
+from view.active_problems_embed import ActiveProblemsEmbed
+from view.confirmation_view import ConfirmationEmbed, ConfirmationView
+from view.error_embed import ErrorEmbed
+from view.positive_embed import PositiveEmbed
+from view.problem_config_view import ProblemConfigView
+from view.problem_info_embed import ProblemInfoEmbed
 from view.server_config_view import ServerConfigView
 from view.server_info_embed import ServerInfoEmbed
-from view.error_embed import ErrorEmbed
-from view.active_problems_embed import ActiveProblemsEmbed
-from view.problem_info_embed import ProblemInfoEmbed
-from view.problem_config_view import ProblemConfigView
-from view.positive_embed import PositiveEmbed
+
 
 class ServerCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -270,8 +270,10 @@ class ServerCog(commands.Cog):
         msg = error.original.message if isinstance(error.original, SimpleException) else str(error.original)
         help = error.original.help if isinstance(error.original, SimpleException) else None
         if interaction.response.is_done():
+            await self.client.sendErrAlert(f"Error in {interaction.command.name} command: {msg}")
             await interaction.followup.send(embed=ErrorEmbed(code, msg, help), ephemeral=True)
         else:
+            await self.client.sendErrAlert(f"Error in {interaction.command.name} command: {msg}")
             await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
 
 async def setup(client: commands.Bot) -> None: 

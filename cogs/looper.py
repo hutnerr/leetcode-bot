@@ -1,13 +1,15 @@
 import time
+
 from discord.ext import commands, tasks
-from utils import problem_helper as probh
+
+from buckets.static_time_bucket import StaticTimeAlert
+from mediators.alert_builder import AlertBuilder
+from models.alert import Alert, AlertType
 from models.app import App
 from models.server import Server
-from models.alert import Alert, AlertType
-from mediators.alert_builder import AlertBuilder
-from view.problem_embed import ProblemEmbed
+from utils import problem_helper as probh
 from view.alert_embed import AlertEmbed
-from buckets.static_time_bucket import StaticTimeAlert
+from view.problem_embed import ProblemEmbed
 
 WEEKLY_CONTEST_DOW = 6  # Saturday
 WEEKLY_CONTEST_HOUR = 22  # 10 PM
@@ -51,9 +53,9 @@ class Looper(commands.Cog):
         # hour = 0
         # minInterval = 0
         
-        # dow = WEEKLY_CONTEST_DOW
-        # hour = WEEKLY_CONTEST_HOUR
-        # minInterval = WEEKLY_CONTEST_INTERVAL
+        dow = WEEKLY_CONTEST_DOW
+        hour = WEEKLY_CONTEST_HOUR
+        minInterval = WEEKLY_CONTEST_INTERVAL
         
         # dow = BIWEEKLY_CONTEST_DOW
         # hour = BIWEEKLY_CONTEST_HOUR 
@@ -83,43 +85,45 @@ class Looper(commands.Cog):
 
 
     async def handleProblemAlerts(self, dow: int, hour: int, minInterval: int | None):
-        
-        alertBuilder: AlertBuilder = self.app.alertBuilder 
-        
-        # if we aren't on a proper interval, we don't need to do anything
-        if minInterval is None:
-            return
-        
-        alerts = alertBuilder.buildProblemAlerts(dow, hour, minInterval)
-        
-        if len(alerts) == 0:
-            return
-        
-        for alert in alerts:
-            channelID = alert.channelID
-            serverID = alert.serverID
-            slug = alert.info["slug"]
-            pid = int(alert.info["pid"])
-            difficulty = alert.info["difficulty"]
-            # problem = alert.info["problem"]
+        try:
+            alertBuilder: AlertBuilder = self.app.alertBuilder 
             
-            server = self.app.servers.get(serverID)
-
-            if self.app.cacheService.existsInCache(slug):
-                problemInfo = self.app.cacheService.getFromCache(slug)
-            else:
-                problemInfo = await self.app.queryService.getQuestionInfo(slug)
-                self.app.cacheService.cacheProblem(problemInfo) # cache the problem info
-
-            channel = self.client.get_channel(channelID)
-            if channel is None:
-                continue
-                        
-            if not server.addActiveProblem(slug, difficulty, pid): # add the problem to the server's active problems. also adds to previous problems
-                print("error adding active problem") 
+            # if we aren't on a proper interval, we don't need to do anything
+            if minInterval is None:
                 return
+            
+            alerts = alertBuilder.buildProblemAlerts(dow, hour, minInterval)
+            
+            if len(alerts) == 0:
+                raise Exception("No alerts to send for problems")
+            
+            for alert in alerts:
+                channelID = alert.channelID
+                serverID = alert.serverID
+                slug = alert.info["slug"]
+                pid = int(alert.info["pid"])
+                difficulty = alert.info["difficulty"]
+                # problem = alert.info["problem"]
+                
+                server = self.app.servers.get(serverID)
 
-            await channel.send(embed=ProblemEmbed(slug, problemInfo), content=buildAlertRoleNotification(server))  # send the problem embed
+                if self.app.cacheService.existsInCache(slug):
+                    problemInfo = self.app.cacheService.getFromCache(slug)
+                else:
+                    problemInfo = await self.app.queryService.getQuestionInfo(slug)
+                    self.app.cacheService.cacheProblem(problemInfo) # cache the problem info
+
+                channel = self.client.get_channel(channelID)
+                if channel is None:
+                    continue
+                            
+                if not server.addActiveProblem(slug, difficulty, pid): # add the problem to the server's active problems. also adds to previous problems
+                    print("error adding active problem") 
+                    raise Exception("Error adding active problem to server's active problems")
+
+                await channel.send(embed=ProblemEmbed(slug, problemInfo), content=buildAlertRoleNotification(server))  # send the problem embed
+        except Exception as e:
+            await self.client.sendErrAlert(f"Error in Looper - problem sending: {str(e)}")
 
 
     async def handleContestAlerts(self, dow: int, hour: int, minute: int):
@@ -156,71 +160,73 @@ class Looper(commands.Cog):
                     hoursAway * MINS_PER_HOUR + 
                     minsAway)
 
-        weeklyContestMinsAway = getContestMinsAway(WEEKLY_CONTEST_DOW, WEEKLY_CONTEST_HOUR, WEEKLY_CONTEST_INTERVAL)
-        
-        contestInfo = await self.app.queryService.getUpcomingContests()
-        contestInfo = contestInfo["data"]["upcomingContests"] if "data" in contestInfo else []
-        biweeklyExists = False
-        biweeklyInfo = []
-        for contest in contestInfo:
-            if "Biweekly Contest" in contest["title"]:
-                biweeklyExists = True
-                biweeklyInfo = contest
-                break
-        
-        # if the time difference is greater than 2 days, then we don't need to send an alert
-        # this is to avoid sending alerts for contests that are too far away
-        if biweeklyExists:
-            biweeklyStartTime = biweeklyInfo["startTime"] # get the UTC time stamp
-            currentUTC = int(time.time() * 1000)  # current time in milliseconds
-            timeDiff = biweeklyStartTime - currentUTC  # difference in milliseconds
-            if timeDiff > 2 * 24 * 60 * 60 * 1000:  # greater than 2 days in ms
-                biweeklyExists = False
-        
-        biweeklyContestMinsAway = getContestMinsAway(BIWEEKLY_CONTEST_DOW, BIWEEKLY_CONTEST_HOUR, BIWEEKLY_CONTEST_INTERVAL)
+        try:
+            weeklyContestMinsAway = getContestMinsAway(WEEKLY_CONTEST_DOW, WEEKLY_CONTEST_HOUR, WEEKLY_CONTEST_INTERVAL)
+            
+            contestInfo = await self.app.queryService.getUpcomingContests()
+            contestInfo = contestInfo["data"]["upcomingContests"] if "data" in contestInfo else []
+            biweeklyExists = False
+            biweeklyInfo = []
+            for contest in contestInfo:
+                if "Biweekly Contest" in contest["title"]:
+                    biweeklyExists = True
+                    biweeklyInfo = contest
+                    break
+            
+            # if the time difference is greater than 2 days, then we don't need to send an alert
+            # this is to avoid sending alerts for contests that are too far away
+            if biweeklyExists:
+                biweeklyStartTime = biweeklyInfo["startTime"] # get the UTC time stamp
+                currentUTC = int(time.time() * 1000)  # current time in milliseconds
+                timeDiff = biweeklyStartTime - currentUTC  # difference in milliseconds
+                if timeDiff > 2 * 24 * 60 * 60 * 1000:  # greater than 2 days in ms
+                    biweeklyExists = False
+            
+            biweeklyContestMinsAway = getContestMinsAway(BIWEEKLY_CONTEST_DOW, BIWEEKLY_CONTEST_HOUR, BIWEEKLY_CONTEST_INTERVAL)
 
-        # print(f"Minutes until weekly contest: {weeklyContestMinsAway}")
-        # print(f"Minutes until biweekly contest: {biweeklyContestMinsAway}")
+            # print(f"Minutes until weekly contest: {weeklyContestMinsAway}")
+            # print(f"Minutes until biweekly contest: {biweeklyContestMinsAway}")
 
-        # Notification intervals (in minutes)
-        intervals = [
-            15,      # 15 mins
-            30,      # 30 mins  
-            60,      # 1 hr
-            120,     # 2 hrs
-            360,     # 6 hrs
-            720,     # 12 hrs
-            1440,    # 1 day
-        ]
-        
-        if weeklyContestMinsAway in intervals:
-            print("Weekly contest is within an alert interval.")
-            alerts = await alertBuilder.buildContestAlerts(weeklyContestMinsAway, AlertType.CONTEST_TIME_AWAY, AlertType.WEEKLY_CONTEST)
-            for alert in alerts:
-                if alert.channelID is None:
-                    print(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.")
-                    continue
-                
-                channel = self.client.get_channel(alert.channelID)
-                if channel is None:
-                    continue
-                
-                await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
-        
-        if biweeklyExists and biweeklyContestMinsAway in intervals:
-            print("Biweekly contest is within an alert interval.")
-            alerts = await alertBuilder.buildContestAlerts(biweeklyContestMinsAway, AlertType.CONTEST_TIME_AWAY, AlertType.BIWEEKLY_CONTEST)
-            for alert in alerts:
-                if alert.channelID is None:
-                    print(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.")
-                    continue
-                
-                channel = self.client.get_channel(alert.channelID)
-                if channel is None:
-                    continue
-                
-                await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
-
+            # Notification intervals (in minutes)
+            intervals = [
+                15,      # 15 mins
+                30,      # 30 mins  
+                60,      # 1 hr
+                120,     # 2 hrs
+                360,     # 6 hrs
+                720,     # 12 hrs
+                1440,    # 1 day
+            ]
+            
+            if weeklyContestMinsAway in intervals:
+                print("Weekly contest is within an alert interval.")
+                alerts = await alertBuilder.buildContestAlerts(weeklyContestMinsAway, AlertType.CONTEST_TIME_AWAY, AlertType.WEEKLY_CONTEST)
+                for alert in alerts:
+                    if alert.channelID is None:
+                        print(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.")
+                        continue
+                    
+                    channel = self.client.get_channel(alert.channelID)
+                    if channel is None:
+                        continue
+                    
+                    await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
+            
+            if biweeklyExists and biweeklyContestMinsAway in intervals:
+                print("Biweekly contest is within an alert interval.")
+                alerts = await alertBuilder.buildContestAlerts(biweeklyContestMinsAway, AlertType.CONTEST_TIME_AWAY, AlertType.BIWEEKLY_CONTEST)
+                for alert in alerts:
+                    if alert.channelID is None:
+                        print(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.")
+                        continue
+                    
+                    channel = self.client.get_channel(alert.channelID)
+                    if channel is None:
+                        continue
+                    
+                    await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
+        except Exception as e:
+            await self.client.sendErrAlert(f"Error in Looper - contest sending: {str(e)}")
 
     async def handleStaticAlerts(self, dow: int, hour: int, minInterval: int):
         
@@ -236,27 +242,30 @@ class Looper(commands.Cog):
                 
                 await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
     
-        # alerts happen on either 0min or 30mins which are both intervals
-        if minInterval is None:
-            return
-        
-        alertBuilder = self.app.alertBuilder
-        
-        # leetcode weekly: saturday 10 30 pm
-        if dow == WEEKLY_CONTEST_DOW and hour == WEEKLY_CONTEST_HOUR and minInterval == WEEKLY_CONTEST_INTERVAL:
-            weeklyAlerts = await alertBuilder.buildStaticAlerts(StaticTimeAlert.WEEKLY_CONTEST)
-            await sendStaticAlerts(weeklyAlerts)
+        try:
+            # alerts happen on either 0min or 30mins which are both intervals
+            if minInterval is None:
+                return
+            
+            alertBuilder = self.app.alertBuilder
+            
+            # leetcode weekly: saturday 10 30 pm
+            if dow == WEEKLY_CONTEST_DOW and hour == WEEKLY_CONTEST_HOUR and minInterval == WEEKLY_CONTEST_INTERVAL:
+                weeklyAlerts = await alertBuilder.buildStaticAlerts(StaticTimeAlert.WEEKLY_CONTEST)
+                await sendStaticAlerts(weeklyAlerts)
 
-        # leetcode biweekly: sunday 10 30 am
-        if dow == BIWEEKLY_CONTEST_DOW and hour == BIWEEKLY_CONTEST_HOUR and minInterval == BIWEEKLY_CONTEST_INTERVAL:
-            biweeklyAlerts = await alertBuilder.buildStaticAlerts(StaticTimeAlert.BIWEEKLY_CONTEST)
-            await sendStaticAlerts(biweeklyAlerts)
+            # leetcode biweekly: sunday 10 30 am
+            if dow == BIWEEKLY_CONTEST_DOW and hour == BIWEEKLY_CONTEST_HOUR and minInterval == BIWEEKLY_CONTEST_INTERVAL:
+                biweeklyAlerts = await alertBuilder.buildStaticAlerts(StaticTimeAlert.BIWEEKLY_CONTEST)
+                await sendStaticAlerts(biweeklyAlerts)
 
-        # leetcode daily resets at 8pm
-        if hour == DAILY_PROBLEM_HOUR and minInterval == DAILY_PROBLEM_INTERVAL:
-            dailyAlerts = await alertBuilder.buildStaticAlerts(StaticTimeAlert.DAILY_PROBLEM)
-            await sendStaticAlerts(dailyAlerts)
-
+            # leetcode daily resets at 8pm
+            if hour == DAILY_PROBLEM_HOUR and minInterval == DAILY_PROBLEM_INTERVAL:
+                dailyAlerts = await alertBuilder.buildStaticAlerts(StaticTimeAlert.DAILY_PROBLEM)
+                await sendStaticAlerts(dailyAlerts)
+            
+        except Exception as e:
+            await self.client.sendErrAlert(f"Error in Looper - static alert sending: {str(e)}")
 
 async def setup(client: commands.Bot) -> None: 
     await client.add_cog(Looper(client))
