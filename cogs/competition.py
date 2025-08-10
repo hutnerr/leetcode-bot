@@ -80,7 +80,7 @@ class CompetitionCog(commands.Cog):
         prevPoints = user.points
             
         if user.leetcodeUsername is None:
-            raise SimpleException("LEETCODEUSER", "You have not set your LeetCode username. Use `/setleetcode` to set it.", "Make sure you have a LeetCode account and that you have completed problems.")
+            raise SimpleException("LEETCODEUSER", "You have not set your LeetCode username. Use `/setusername` to set it.", "Make sure you have a LeetCode account and that you have completed problems.")
 
         await interaction.response.defer(thinking=True)  # defer the response to avoid timeout
         submitted = await self.app.submitter.submit(interaction.guild.id, userID)
