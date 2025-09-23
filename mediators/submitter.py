@@ -34,7 +34,7 @@ class Submitter:
             if slug == "" or difficulty == "":
                 continue
 
-            if not self.userCompletedProblem(user=user, slug=slug, submissions=submissions):
+            if not await self.userCompletedProblem(user=user, slug=slug, submissions=submissions):
                 print("didnt complete")
                 continue
             
