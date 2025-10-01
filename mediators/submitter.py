@@ -70,7 +70,8 @@ class Submitter:
         
         leetcodeUsername = user.leetcodeUsername
         if not submissions:
-            submissions = await self.queryService.getUserRecentSubmissions(leetcodeUsername)
+            submissions = await self.queryService.getUserRecentAcceptedSubmissions(leetcodeUsername)
+            
         if not submissions or "data" not in submissions:
             return False
 
