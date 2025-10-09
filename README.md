@@ -17,7 +17,7 @@ This was a personal project and has no official affiliation with LeetCode.
 - [Help & Tutorial Page](https://www.hunter-baker.com/pages/other/beastcode-help.html)
 
 ## Getting Started
-To get started, I recommend using `/help`. It will briefly explain a majority of the implicit aspects of the bot. After that, you can start configuring your server through `/serverconfig`. Then configure your problems with `/problemconfig`. There is a limit of 5 reoccurning problems, but each one can be sent on numerous days as well as have variable difficulty. 
+To get started, I recommend using `/help`. It will briefly explain a majority of the implicit aspects of the bot. After that, you can start configuring your server through `/serverconfig`. Then configure your problems with `/problemconfig`. There is a limit of 5 reoccurning problems, but each one can be sent on numerous days as well as have variable difficulty. For a full walkthrough, simply visit the tutorial page [here](https://www.hunter-baker.com/pages/other/beastcode-help.html).
 
 ## Commands
 **Main Commands**
