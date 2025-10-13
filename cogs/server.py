@@ -265,16 +265,23 @@ class ServerCog(commands.Cog):
     @delserver.error
     @delproblem.error
     async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):
-        exception: SimpleException = error.original
-        code: SimpleException = exception.code if isinstance(error.original, SimpleException) else "BACKEND FAILURE"
-        msg = error.original.message if isinstance(error.original, SimpleException) else str(error.original)
-        help = error.original.help if isinstance(error.original, SimpleException) else None
-        if interaction.response.is_done():
-            await self.client.sendErrAlert(f"Error in {interaction.command.name} command: {msg}")
-            await interaction.followup.send(embed=ErrorEmbed(code, msg, help), ephemeral=True)
+        if isinstance(error.original, SimpleException):
+            exception: SimpleException = error.original
+            code: SimpleException = exception.code if isinstance(error.original, SimpleException) else "BACKEND FAILURE"
+            msg = error.original.message if isinstance(error.original, SimpleException) else str(error.original)
+            help = error.original.help if isinstance(error.original, SimpleException) else None
+            if interaction.response.is_done():
+                await self.client.sendErrAlert(f"Error in {interaction.command.name} command: {msg}")
+                await interaction.followup.send(embed=ErrorEmbed(code, msg, help), ephemeral=True)
+            else:
+                await self.client.sendErrAlert(f"Error in {interaction.command.name} command: {msg}")
+                await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
         else:
-            await self.client.sendErrAlert(f"Error in {interaction.command.name} command: {msg}")
-            await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
+            await self.client.sendErrAlert(f"Error in {interaction.command.name} command: {str(error)}")
+            if interaction.response.is_done():
+                await interaction.followup.send(embed=ErrorEmbed("BACKEND FAILURE", str(error)), ephemeral=True)
+            else:
+                await interaction.response.send_message(embed=ErrorEmbed("BACKEND FAILURE", str(error)), ephemeral=True)
 
 async def setup(client: commands.Bot) -> None: 
     await client.add_cog(ServerCog(client))
