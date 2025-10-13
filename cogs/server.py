@@ -266,7 +266,7 @@ class ServerCog(commands.Cog):
     @delproblem.error
     async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):
         if isinstance(error, discord.app_commands.MissingPermissions):
-            await interaction.response.send_message(embed=ErrorEmbed("PERMISSION DENIED", "You do not have permission to use this command. Administrator permission is required."), ephemeral=True)
+            await interaction.response.send_message(embed=ErrorEmbed("PERMISSION DENIED", "You do not have permission to use this command. Administrator permission is required.", "---"), ephemeral=True)
             return
         if isinstance(error.original, SimpleException):
             exception: SimpleException = error.original
