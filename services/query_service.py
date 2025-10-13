@@ -1,10 +1,14 @@
 import requests
 import aiohttp
+import asyncio
 from enum import Enum
+
+from errors.simple_exception import SimpleException
 
 # performs queries
 class QueryService:
     API_URL: str = "https://leetcode.com/graphql"
+    MAX_RETRIES: int = 3
     
     # internal query actions
     def _performRequestsQuery(self, query: str, variables: dict) -> dict:
@@ -16,12 +20,54 @@ class QueryService:
     
     async def _performQuery(self, query: str, variables: dict) -> dict:
         json_data = {
-            'query': query.value,
-            'variables': variables
+            "query": query.value,
+            "variables": variables
         }
-        async with aiohttp.ClientSession() as session:
-            async with session.post(self.API_URL, json=json_data) as resp:
-                return await resp.json()
+        headers = {
+            "Content-Type": "application/json",
+            "Referer": "https://leetcode.com/",
+            "User-Agent": "Mozilla/5.0 (compatible; LeetCodeBot/1.0; +https://github.com/hutnerr/leetcode-bot)"
+        }
+
+        for attempt in range(self.MAX_RETRIES):
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.post(self.API_URL, json=json_data, headers=headers) as resp:
+                        # Check HTTP status
+                        if resp.status != 200:
+                            text = await resp.text()
+                            raise Exception(f"HTTP {resp.status}: {text[:200]}")
+
+                        # Check Content-Type
+                        content_type = resp.headers.get("Content-Type", "")
+                        if "application/json" not in content_type:
+                            text = await resp.text()
+                            raise Exception(
+                                f"Unexpected content type '{content_type}', "
+                                f"response (truncated): {text[:200]}"
+                            )
+
+                        data = await resp.json()
+
+                        # Ensure valid GraphQL response
+                        if data and "data" in data and data["data"]:
+                            return data
+
+                        if "errors" in data:
+                            print(f"LeetCode GraphQL error: {data['errors']}")
+
+                        raise Exception("Invalid or empty 'data' field in response.")
+
+            except Exception as e:
+                print(f"[QueryService] Attempt {attempt+1}/{self.MAX_RETRIES} failed: {e}")
+                if attempt < self.MAX_RETRIES - 1:
+                    await asyncio.sleep(2 ** attempt)  # exponential backoff
+                else:
+                    raise SimpleException(
+                        code="QUERY_FAILED",
+                        message=f"Query failed after {self.MAX_RETRIES} attempts: {e}",
+                        help="LeetCode may be down or rate-limiting the bot."
+                    )
 
     # gets the official daily leetcode problem
     async def getDailyProblem(self) -> dict:

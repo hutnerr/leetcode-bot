@@ -83,7 +83,6 @@ class Looper(commands.Cog):
     async def before_loop(self) -> None:
         await self.client.wait_until_ready()
 
-
     async def handleProblemAlerts(self, dow: int, hour: int, minInterval: int | None):
         try:
             alertBuilder: AlertBuilder = self.app.alertBuilder 
@@ -98,6 +97,9 @@ class Looper(commands.Cog):
                 return
             
             for alert in alerts:
+                if not alert.info:
+                    raise ValueError(f"Alert has no info: {alert}")
+                
                 channelID = alert.channelID
                 serverID = alert.serverID
                 slug = alert.info["slug"]
@@ -111,12 +113,19 @@ class Looper(commands.Cog):
                     problemInfo = self.app.cacheService.getFromCache(slug)
                 else:
                     problemInfo = await self.app.queryService.getQuestionInfo(slug)
+                    if not problemInfo or "data" not in problemInfo or not problemInfo["data"]:
+                        raise Exception(f"Failed to fetch problem info for slug: {slug}")
+
                     self.app.cacheService.cacheProblem(problemInfo) # cache the problem info
 
                 channel = self.client.get_channel(channelID)
                 if channel is None:
                     continue
                             
+                # FIXME: 
+                # this might fail if the problem is already active or if the server doesn't exist
+                # in that case, we just don't add an active problem, which is not good
+                # the chance of this is very low though.
                 if not server.addActiveProblem(slug, difficulty, pid): # add the problem to the server's active problems. also adds to previous problems
                     print("error adding active problem") 
                     raise Exception("Error adding active problem to server's active problems")

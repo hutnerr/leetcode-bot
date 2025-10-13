@@ -5,11 +5,9 @@ from utils import initializer
 
 app: App = initializer.Initializer.initApp()
 
-print(app.submitter.userCompletedProblem("hutnerr", "two-sum"))
+pinfo = asyncio.run(app.queryService.getQuestionInfo("two-sum"))
+app.cacheService.cacheProblem(pinfo)
 
-user = User(0, "hutnerr", 0)
+userinfo = asyncio.run(app.queryService.getUserProblemsSolved("hutnerr"))
+print(userinfo)
 
-async def test():
-    print(await app.submitter.userCompletedProblem(user, "two-sum"))
-    
-asyncio.run(test())

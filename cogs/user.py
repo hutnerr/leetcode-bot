@@ -55,7 +55,7 @@ class UserCog(commands.Cog):
         if leetcodeusername is None or len(leetcodeusername) <= 0:
             raise SimpleException("EMPTY USERNAME")
         
-        channel = self.app.servers[interaction.guild.id].settings.postingChannelID
+        channelID = self.app.servers[interaction.guild.id].settings.postingChannelID
         
         discUser = interaction.user
         userID = discUser.id
@@ -74,9 +74,9 @@ class UserCog(commands.Cog):
         if "errors" in profileInfo:
             raise SimpleException("USRSETUP", "LeetCode account not found", "Make sure you have a valid LeetCode account and that the username is typed correctly.")
 
-        channel = self.client.get_channel(channel)
+        channel = self.client.get_channel(channelID) if channelID else None
         if channel is None:
-            raise SimpleException("POSTING_CHANNEL", "Posting channel not found", "Please set the posting channel using `/setpostingchannel <channel>` before setting your username.")
+            raise SimpleException("OUTPUT_CHANNEL", "Output channel not found", "Please set the output channel using `/serverconfig other` before setting your username.")
         
         await interaction.followup.send(embed=PositiveEmbed("Username Set", f"Your LeetCode username has been set to `{leetcodeusername}`. You can now use `/userinfo` to view your profile."))
 

@@ -66,13 +66,16 @@ class Server:
     # and right before being added
     def addActiveProblem(self, slug: str, difficulty: str, problemID: int) -> bool:
         if not self.addPreviousProblem(slug): # to prevent duplicates
+            print("Problem is a duplicate, not adding to previous problems")
             return False
 
         for problem in self.activeProblems:
             if problem[0] == slug: # get the slug portion of the tuple
+                print("Problem is already active, not adding to active problems")
                 return False
     
         if problemID < 0 or problemID > self.MAXPROBLEMS:
+            print("Problem ID is out of valid range, not adding to active problems")
             return False
 
         # initialize the active problem with an empty set of users
