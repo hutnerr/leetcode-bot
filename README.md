@@ -12,6 +12,8 @@ In addition to scheduled problems, the bot provides baseline utility features su
 This is a personal project and has no official affiliation with LeetCode.  
 The project is licensed under the MIT License.
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S71TM9XT)
+
 ## Links
 - [Invite Link](https://discord.com/oauth2/authorize?client_id=1392738606120173719&permissions=2147616768&integration_type=0&scope=bot)
 - [Top.gg Link](https://top.gg/bot/1392738606120173719)
