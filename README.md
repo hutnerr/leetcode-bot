@@ -5,7 +5,7 @@ These problems can be configured to be sent out on specific days of the week at 
 
 Besides the configurable problems, the bot also provides a more baseline set of features. Such as the ability to receive a notification based on how far away a contest is, notifications for the official daily problem, as well as notifications for when the contests become active.
 
-This was a personal project and has no official affiliation with LeetCode. 
+This was a personal project and has no official affiliation with LeetCode. It is licensed under the MIT License.
 
 **Links**
 - [Invite Link](https://discord.com/oauth2/authorize?client_id=1392738606120173719&permissions=2147616768&integration_type=0&scope=bot)
