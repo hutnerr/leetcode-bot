@@ -1,13 +1,18 @@
 ## Overview
-The goal of this bot is to encourage and enable LeetCoding within a Discord server. It achieves through the use of distributing personalized reoccurring server problems.
+This Discord bot is designed to encourage and facilitate LeetCode practice within a server by automatically distributing personalized, recurring coding problems.
+This bot is intended for Discord servers that want structured, recurring LeetCode practice with light competition elements.
 
-These problems can be configured to be sent out on specific days of the week at specific times. The difficulty as well as if selection of premium problems can also be configured.
+Server administrators can configure problems to be posted on specific days and times, select difficulty levels, and optionally include premium problems.
 
-Besides the configurable problems, the bot also provides a more baseline set of features. Such as the ability to receive a notification based on how far away a contest is, notifications for the official daily problem, as well as notifications for when the contests become active.
+In addition to scheduled problems, the bot provides baseline utility features such as:
+- Notifications for upcoming contests
+- Alerts when contests go live
+- Notifications for the official daily LeetCode problem
 
-This was a personal project and has no official affiliation with LeetCode. It is licensed under the MIT License.
+This is a personal project and has no official affiliation with LeetCode.  
+The project is licensed under the MIT License.
 
-**Links**
+## Links
 - [Invite Link](https://discord.com/oauth2/authorize?client_id=1392738606120173719&permissions=2147616768&integration_type=0&scope=bot)
 - [Top.gg Link](https://top.gg/bot/1392738606120173719)
 - [Blog Post](https://www.hunter-baker.com/pages/blog/blog-07-14-2025.html)
@@ -15,9 +20,11 @@ This was a personal project and has no official affiliation with LeetCode. It is
 - [Help & Tutorial Page](https://www.hunter-baker.com/pages/other/beastcode-help.html)
 
 ## Getting Started
-To get started, I recommend using `/help`. It will briefly explain a majority of the implicit aspects of the bot. After that, you can start configuring your server through `/serverconfig`. Then configure your problems with `/problemconfig`. There is a limit of 5 reoccurning problems, but each one can be sent on numerous days as well as have variable difficulty. For a full walkthrough, simply visit the tutorial page [here](https://www.hunter-baker.com/pages/other/beastcode-help.html).
+To get started, I recommend using `/help`. It will briefly explain a majority of the implicit aspects of the bot. After that, you can start configuring your server through `/serverconfig`. Then configure your problems with `/problemconfig`. There is a limit of 5 recurring problems, but each one can be sent on numerous days as well as have variable difficulty. For a full walkthrough, simply visit the tutorial page [here](https://www.hunter-baker.com/pages/other/beastcode-help.html).
 
 ## Commands
+> Arguments marked with `*` are optional.
+
 **Main Commands**
 - `lcproblem <dif> <premium*>` - Posts a problem for users to solve.
 - `dailylcproblem` - Posts the LeetCode daily problem.
