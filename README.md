@@ -1,5 +1,3 @@
-![Top.gg](https://top.gg/api/widget/servers/1392738606120173719.svg)
-
 ## Overview
 The goal of this bot is to encourage and enable LeetCoding within a Discord server. It achieves through the use of distributing personalized reoccurring server problems.
 
@@ -49,3 +47,20 @@ To get started, I recommend using `/help`. It will briefly explain a majority of
 - `help <command*>` - Explains background info and give details about an individual command.
 - `vote` - Provides a link to Top.gg to show support
 - `tutorial` - Provides a link to the [Help & Tutorial Page](https://www.hunter-baker.com/pages/other/beastcode-help.html).
+
+## Setup
+To set this up locally, you would need to provide your own Discord key. You would have to have a `key.json` file within the data folder. You also would need to `pip install -r requirements.txt` which is located in the root.
+
+```json
+{
+  "key": "string — production API key",
+  "testkey": "string — local testing API key",
+  "id": int — Discord user ID for error logging
+}
+```
+
+## Showcase
+<img src="https://www.hunter-baker.com/resources/images/projects/leetcode-bot.png">
+<img src="https://www.hunter-baker.com/resources/images/beastcode-walkthrough/bc-example.png">
+<img src="https://www.hunter-baker.com/resources/images/beastcode-walkthrough/bc-example2.png">
+
