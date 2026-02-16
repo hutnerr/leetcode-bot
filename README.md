@@ -13,10 +13,9 @@ This is a personal project and has no official affiliation with LeetCode.
 The project is licensed under the MIT License.
 
 ## Links
-- [Invite Link](https://discord.com/oauth2/authorize?client_id=1392738606120173719&permissions=2147616768&integration_type=0&scope=bot)
+- [Discord Invite Link](https://discord.com/oauth2/authorize?client_id=1392738606120173719&permissions=2147616768&integration_type=0&scope=bot)
 - [Top.gg Link](https://top.gg/bot/1392738606120173719)
-- [Blog Post](https://www.hunter-baker.com/pages/blog/blog-07-14-2025.html)
-- [Project Reflection](https://www.hunter-baker.com/pages/projects/leetcode-bot.html)
+- [Project Showcase](https://www.hunter-baker.com/pages/projects/leetcode-bot.html)
 - [Help & Tutorial Page](https://www.hunter-baker.com/pages/other/beastcode-help.html)
 
 ## Getting Started
