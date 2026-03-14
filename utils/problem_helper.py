@@ -1,6 +1,7 @@
 import json
 import requests
 import os
+from pyutils import Clogger
 
 from utils import csv_helper as csvh
 
@@ -21,6 +22,7 @@ def slugToURL(slug: str) -> str:
 # updates the problem set by fetching the latest problems from LeetCode
 # and saving them to a CSV file
 def updateProblemSet() -> bool:
+    Clogger.warn("Updating problem set is currently disabled. Please run the update script manually to fetch the latest problems.")
     return False
     # problemList = json.loads(requests.get("https://leetcode.com/api/problems/all/").content)
     # problems = []

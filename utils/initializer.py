@@ -2,6 +2,7 @@ import os
 
 from testing import generator as gen
 
+from pyutils import Clogger
 from utils import json_helper as jsonh
 from utils import file_helper as fileh
 
@@ -49,12 +50,14 @@ class Initializer:
         mediators = setupMediators(servers, users, problemBucket, staticTimeBucket, contestTimeBucket, problemService, queryService)
         alertBuilder, synchronizer, submitter = mediators
 
+        Clogger.info("Initialization complete")
         return App(servers, users, buckets, services, mediators)
         
     
 def readServersFromFiles():
     # problems are saved within the servers json file so they're read in
     # when the server is built from JSON
+    Clogger.info("Reading servers from files...")
     spath = os.path.join("data", "servers")
     servers: dict[int, Server] = dict()
     serverFiles = fileh.getFilesInDirectory(spath)
@@ -65,6 +68,7 @@ def readServersFromFiles():
     return servers
     
 def readUsersFromFiles():
+    Clogger.info("Reading users from files...")
     upath = os.path.join("data", "users")
     users: dict[int, User] = dict()
     userFiles = fileh.getFilesInDirectory(upath)
@@ -79,6 +83,7 @@ def readUsersFromFiles():
 # ========================================================
 
 def setupBuckets(servers):
+    Clogger.info("Setting up buckets...")
     problemBucket = ProblemBucket()
     staticTimeBucket = StaticTimeBucket()
     contestTimeBucket = ContestTimeBucket()
@@ -88,21 +93,21 @@ def setupBuckets(servers):
         for problem in server.problems:
             if problem is not None:
                 if not problemBucket.addToBucket(problem):
-                    print("Failed to add problem to bucket:", problem)
+                    Clogger.error(f"Failed to add problem to bucket: {problem}")
 
     def addServerToStaticTimeBucket(server: Server):
         settings = server.settings
         if settings.weeklyContestAlerts:
             if not staticTimeBucket.addToBucket(StaticTimeAlert.WEEKLY_CONTEST, server.serverID):
-                print("ADDING WEEKLY FAILED")
+                Clogger.error("Failed to add weekly contest alert to bucket")
             
         if settings.biweeklyContestAlerts:
             if not staticTimeBucket.addToBucket(StaticTimeAlert.BIWEEKLY_CONTEST, server.serverID):
-                print("ADDING BIWEEKLY FAILED")
+                Clogger.error("Failed to add biweekly contest alert to bucket")
             
         if settings.officialDailyAlerts:
             if not staticTimeBucket.addToBucket(StaticTimeAlert.DAILY_PROBLEM, server.serverID):
-                print("ADDING DAILY FAILED")
+                Clogger.error("Failed to add daily problem alert to bucket")
 
     def addServerToContestTimeBucket(server: Server):
         settings = server.settings
@@ -122,6 +127,7 @@ def setupBuckets(servers):
 # ========================================================
 
 def setupServices():
+    Clogger.info("Setting up services...")
     cacheService = CacheService()
     queryService = QueryService()
     problemService = ProblemService()
@@ -132,6 +138,7 @@ def setupServices():
 # ========================================================
 
 def setupMediators(servers, users, problemBucket, staticTimeBucket, contestTimeBucket, problemService, queryService):
+    Clogger.info("Setting up mediators...")
     alertBuilder = AlertBuilder(servers, problemBucket, staticTimeBucket, contestTimeBucket, problemService, queryService)
     synchronizer = Synchronizer(servers, problemBucket, staticTimeBucket, contestTimeBucket)
     submitter = Submitter(servers, users, queryService)

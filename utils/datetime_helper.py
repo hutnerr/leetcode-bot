@@ -1,6 +1,7 @@
 import time
 from datetime import datetime
 import pytz
+from pyutils import Clogger
 
 timezones = {
     "UTC": "UTC",
@@ -93,6 +94,7 @@ def formatTimeDelta(seconds: int) -> str:
 
 def formatDateTime(timeStruct: time.struct_time) -> str:
     if not isinstance(timeStruct, time.struct_time):
+        Clogger.error("formatDateTime: Invalid input, expected time.struct_time")
         return "INVALID INPUT"
     
     return time.strftime("%A, %B %d at %I:%M %p", timeStruct).replace(" 0", " ").lstrip("0")
@@ -102,6 +104,8 @@ def numToDayOfWeek(num: int) -> str:
     days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
     if 0 <= num < len(days):
         return days[num]
+    
+    Clogger.error(f"numToDayOfWeek: Invalid input {num}, expected 0-6")
     return "INVALID DAY NUMBER"
 
 def convertTimeZone(hour: int, minute: int, fromtz: str, totz: str) -> tuple[int, int]:    

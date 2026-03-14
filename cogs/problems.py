@@ -10,13 +10,14 @@ from services.problem_service import ProblemService
 from services.query_service import QueryService
 from view.error_embed import ErrorEmbed
 from view.problem_embed import ProblemEmbed
-
+from pyutils import Clogger
 
 # related to simply getting and producing problems
 class Problems(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
         self.app: App = client.app
+        Clogger.info("ProblemsCog initialized")
 
     @app_commands.command(name = "lcproblem", description = "Gets a LeeetCode problem. Default is free problems")
     @app_commands.choices(difficulty = [
@@ -45,7 +46,7 @@ class Problems(commands.Cog):
             difs=difficulty.value,
             premium=premium
         )
-        
+        Clogger.action(f"Problem command requested by user: {interaction.user} in server: {interaction.guild}")
         await interaction.response.defer(thinking=True)  # defer the response to avoid timeout
         slug, dif = problemService.selectProblem(problem)
         problemInfo = await self.getProblemInfo(slug)
@@ -58,6 +59,7 @@ class Problems(commands.Cog):
         if not queryService:
             raise SimpleException("PPROBDP", "Backend failure")
 
+        Clogger.action(f"Daily problem command requested by user: {interaction.user} in server: {interaction.guild}")
         dailyProblem = await queryService.getDailyProblem()
         if dailyProblem and "data" in dailyProblem:
             dailyProblemSlug = dailyProblem["data"]["challenge"]["question"]["titleSlug"]
@@ -97,6 +99,7 @@ class Problems(commands.Cog):
         code: SimpleException = exception.code if isinstance(error.original, SimpleException) else "BACKEND FAILURE"
         msg = error.original.message if isinstance(error.original, SimpleException) else str(error.original)
         help = error.original.help if isinstance(error.original, SimpleException) else None
+        Clogger.error(f"Error in {interaction.command.name} command: {msg}. server: {interaction.guild.name}, channel: {interaction.channel.name}")
         await self.client.sendErrAlert(f"Error in {interaction.command.name} command: {msg}")
         await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
 

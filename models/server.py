@@ -1,5 +1,7 @@
 import os
 
+from pyutils import Clogger
+
 from models.problem import Problem
 from models.server_settings import ServerSettings
 
@@ -44,6 +46,7 @@ class Server:
     def addProblem(self, problem: Problem) -> bool:
         id:int = problem.problemID
         if id < 0 or id > self.MAXPROBLEMS:
+            Clogger.warn(f"Problem ID {id} is out of valid range, not adding to problems")
             return False
         self.problems[id] = problem
         self.toJSON()
@@ -54,6 +57,7 @@ class Server:
     def removeProblem(self, problem: Problem) -> bool:
         id:int = problem.problemID
         if id < 0 or id > self.MAXPROBLEMS:
+            Clogger.warn(f"Problem ID {id} is out of valid range, not removing from problems")
             return False
         self.problems[id] = None
         self.activeProblems[id] = ("", "", set()) # reset the active problem slug as well
@@ -66,16 +70,16 @@ class Server:
     # and right before being added
     def addActiveProblem(self, slug: str, difficulty: str, problemID: int) -> bool:
         if not self.addPreviousProblem(slug): # to prevent duplicates
-            print("Problem is a duplicate, not adding to previous problems")
+            Clogger.warn("Problem is a duplicate, not adding to previous problems")
             return False
 
         for problem in self.activeProblems:
             if problem[0] == slug: # get the slug portion of the tuple
-                print("Problem is already active, not adding to active problems")
+                Clogger.warn("Problem is already active, not adding to active problems")
                 return False
     
         if problemID < 0 or problemID > self.MAXPROBLEMS:
-            print("Problem ID is out of valid range, not adding to active problems")
+            Clogger.warn("Problem ID is out of valid range, not adding to active problems")
             return False
 
         # initialize the active problem with an empty set of users
@@ -90,26 +94,25 @@ class Server:
             self.previousProblems.append(slug)
             self.toJSON()
             return True
+        Clogger.warn("Problem is a duplicate, not adding to previous problems")
         return False
 
     def addSubmittedUser(self, userID: int, problemID) -> bool:
-        
-        print(problemID)
+        Clogger.info(f"Adding submitted user {userID} for problem {problemID}")
         
         if not self.isProblemIDActive(problemID):
-            print("Problem ID is not active")
+            Clogger.warn("Problem ID is not active")
             return False
-        
         
         activeProblem = self.activeProblems[problemID]
         if not activeProblem:
-            print("Active problem is empty")
-            print(activeProblem)
+            Clogger.warn(f"Active problem is empty: {activeProblem}")
             return False
         
         submittedUsers: set = activeProblem[2]
         submittedUsers.add(userID)
         self.toJSON() # save
+        Clogger.info(f"Successfully added submitted user {userID} for problem {problemID}")
         return True
 
     def isProblemDuplicate(self, slug: str) -> bool:
@@ -117,11 +120,13 @@ class Server:
     
     def isProblemIDActive(self, problemID: int) -> bool:
         if problemID < 0 or problemID > self.MAXPROBLEMS:
+            Clogger.warn(f"Problem ID {problemID} is out of valid range")
             return False
         return self.activeProblems[problemID][0] != ""
     
     def resetActiveProblem(self, problemID: int) -> bool:
         if problemID < 0 or problemID > self.MAXPROBLEMS:
+            Clogger.warn(f"Problem ID {problemID} is out of valid range")
             return False
         
         # reset the active problem to an empty tuple

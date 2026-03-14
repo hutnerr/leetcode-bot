@@ -2,6 +2,7 @@ import time
 
 from discord.ext import commands, tasks
 
+from pyutils import Clogger
 from buckets.static_time_bucket import StaticTimeAlert
 from mediators.alert_builder import AlertBuilder
 from models.alert import Alert, AlertType
@@ -19,7 +20,7 @@ BIWEEKLY_CONTEST_DOW = 0  # Sunday
 BIWEEKLY_CONTEST_HOUR = 10  # 10 AM
 BIWEEKLY_CONTEST_INTERVAL = 2  # 30 minutes
 
-DAILY_PROBLEM_HOUR = 8  # 8 PM
+DAILY_PROBLEM_HOUR = 20  # 8 PM
 DAILY_PROBLEM_INTERVAL = 0  # 0 minutes
 
 def buildAlertRoleNotification(server: Server) -> str:
@@ -34,6 +35,7 @@ class Looper(commands.Cog):
             
         self.mainloop.start()
         self.updateProblemset.start()
+        Clogger.info("Looper cog initialized and loops started.")
     
     @tasks.loop(minutes=1)
     async def mainloop(self) -> None:
@@ -75,7 +77,7 @@ class Looper(commands.Cog):
         # scrape new problems
         if not probh.updateProblemSet():
             return 
-        print("Problem set updated successfully. Reinitializing problem service.")
+        Clogger.info("Problem set updated successfully. Reinitializing problem service.")
         self.app.problemService.initProblemSets() # reinitialize the problem service
 
     @updateProblemset.before_loop
@@ -95,6 +97,8 @@ class Looper(commands.Cog):
             
             if len(alerts) == 0:
                 return
+            
+            Clogger.info("Sending problem alerts", {"count": len(alerts), "dow": dow, "hour": hour, "minInterval": minInterval})
             
             for alert in alerts:
                 if not alert.info:
@@ -120,6 +124,7 @@ class Looper(commands.Cog):
 
                 channel = self.client.get_channel(channelID)
                 if channel is None:
+                    Clogger.warn(f"Channel not found for ID: {channelID}", {"server": server.id})
                     continue
                             
                 # FIXME: 
@@ -127,11 +132,11 @@ class Looper(commands.Cog):
                 # in that case, we just don't add an active problem, which is not good
                 # the chance of this is very low though.
                 if not server.addActiveProblem(slug, difficulty, pid): # add the problem to the server's active problems. also adds to previous problems
-                    print("error adding active problem") 
                     raise Exception("Error adding active problem to server's active problems")
 
                 await channel.send(embed=ProblemEmbed(slug, problemInfo), content=buildAlertRoleNotification(server))  # send the problem embed
         except Exception as e:
+            Clogger.error(f"Error in Looper - problem sending: {str(e)} {server.id}")
             await self.client.sendErrAlert(f"Error in Looper - problem sending: {str(e)}")
 
 
@@ -208,29 +213,31 @@ class Looper(commands.Cog):
             ]
             
             if weeklyContestMinsAway in intervals:
-                print("Weekly contest is within an alert interval.")
+                Clogger.info("Weekly contest is within an alert interval.")
                 alerts = await alertBuilder.buildContestAlerts(weeklyContestMinsAway, AlertType.CONTEST_TIME_AWAY, AlertType.WEEKLY_CONTEST)
                 for alert in alerts:
                     if alert.channelID is None:
-                        print(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.")
+                        Clogger.warn(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.", {"server": alert.serverID})
                         continue
                     
                     channel = self.client.get_channel(alert.channelID)
                     if channel is None:
+                        Clogger.warn(f"Channel not found for ID: {alert.channelID}", {"server": alert.serverID})
                         continue
                     
                     await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
             
             if biweeklyExists and biweeklyContestMinsAway in intervals:
-                print("Biweekly contest is within an alert interval.")
+                Clogger.info("Biweekly contest is within an alert interval.")
                 alerts = await alertBuilder.buildContestAlerts(biweeklyContestMinsAway, AlertType.CONTEST_TIME_AWAY, AlertType.BIWEEKLY_CONTEST)
                 for alert in alerts:
                     if alert.channelID is None:
-                        print(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.")
+                        Clogger.warn(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.", {"server": alert.serverID})
                         continue
                     
                     channel = self.client.get_channel(alert.channelID)
                     if channel is None:
+                        Clogger.warn(f"Channel not found for ID: {alert.channelID}", {"server": alert.serverID})
                         continue
                     
                     await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
@@ -242,11 +249,12 @@ class Looper(commands.Cog):
         async def sendStaticAlerts(alerts: list[Alert]):
             for alert in alerts:
                 if alert.channelID is None:
-                    print(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.")
+                    Clogger.warn(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.", {"server": alert.serverID})
                     continue
                 
                 channel = self.client.get_channel(alert.channelID)
                 if channel is None:
+                    Clogger.warn(f"Channel not found for ID: {alert.channelID}", {"server": alert.serverID})
                     continue
                 
                 await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
@@ -274,6 +282,7 @@ class Looper(commands.Cog):
                 await sendStaticAlerts(dailyAlerts)
             
         except Exception as e:
+            Clogger.error(f"Error in Looper - static alert sending: {str(e)}")
             await self.client.sendErrAlert(f"Error in Looper - static alert sending: {str(e)}")
 
 async def setup(client: commands.Bot) -> None: 

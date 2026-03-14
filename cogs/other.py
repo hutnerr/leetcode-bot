@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from pyutils import Clogger
 from models.app import App
 from errors.simple_exception import SimpleException
 
@@ -105,12 +106,14 @@ class OtherCog(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
         self.app: App = client.app
+        Clogger.info("OtherCog initialized")
 
     # help command to display help information for the bot
     # uses a dictionary to store the help information for each command
     @app_commands.command(name='help', description='Displays help information for the bot')
     @app_commands.choices(command=[app_commands.Choice(name=cmd, value=cmd) for cmd in helpDictionary.keys()])
     async def help(self, interaction: discord.Interaction, command: app_commands.Choice[str] = None):
+        Clogger.action(f"Help command requested by user: {interaction.user} in server: {interaction.guild}")
         if command is None:
             # if no command is specified, send a general help message
             await interaction.response.send_message(embed=HelpEmbed())
@@ -127,6 +130,7 @@ class OtherCog(commands.Cog):
     # this is a simple command that just sends a message with a link to the GitHub
     @app_commands.command(name='report', description='Report an issue to the GitHub')
     async def report(self, interaction: discord.Interaction):
+        Clogger.action(f"Report command requested by user: {interaction.user} in server: {interaction.guild}")
         embed = PositiveEmbed(
             title="Report an Issue",
             description="If you encounter any issues with the bot, please report them on the [GitHub repository](https://github.com/hutnerr/leetcode-bot/issues).",
@@ -138,6 +142,7 @@ class OtherCog(commands.Cog):
     # about command to display information about the bot
     @app_commands.command(name='about', description='Displays information about the bot & it\'s purpose')
     async def about(self, interaction: discord.Interaction):
+        Clogger.action(f"About command requested by user: {interaction.user} in server: {interaction.guild}")
         embed = discord.Embed(
             title="About",
             description="This bot was created to help facilitate the use of [LeetCode](https://leetcode.com/) on Discord.\n\n"
@@ -152,6 +157,7 @@ class OtherCog(commands.Cog):
 
     @app_commands.command(name="tutorial", description="Provides a link to the bot's setup tutorial")
     async def tutorial(self, interaction: discord.Interaction):
+        Clogger.action(f"Tutorial command requested by user: {interaction.user} in server: {interaction.guild}")
         url = "https://www.hunter-baker.com/pages/other/beastcode-help.html"
         embed = PositiveEmbed(
             title="Tutorial",
@@ -161,6 +167,7 @@ class OtherCog(commands.Cog):
 
     @app_commands.command(name="vote", description="Show support for the bot by voting for it on Top.gg")
     async def vote(self, interaction: discord.Interaction):
+        Clogger.action(f"Vote command requested by user: {interaction.user} in server: {interaction.guild}")
         url = "https://top.gg/bot/1392738606120173719"
         embed = PositiveEmbed(
             title="Vote",
@@ -176,6 +183,7 @@ class OtherCog(commands.Cog):
         code: SimpleException = exception.code if isinstance(error.original, SimpleException) else "BACKEND FAILURE"
         msg = error.original.message if isinstance(error.original, SimpleException) else str(error.original)
         help = error.original.help if isinstance(error.original, SimpleException) else None
+        Clogger.error(f"Error in {interaction.command.name} command: {msg}. server: {interaction.guild.name}, channel: {interaction.channel.name}")
         await self.client.sendErrAlert(f"Error in {interaction.command.name} command: {msg}")
         await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
 

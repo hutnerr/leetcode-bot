@@ -5,6 +5,9 @@ from enum import Enum
 
 from errors.simple_exception import SimpleException
 
+from pyutils import Clogger
+from pyutils import check_response
+
 # performs queries
 class QueryService:
     API_URL: str = "https://leetcode.com/graphql"
@@ -16,7 +19,11 @@ class QueryService:
             'query': query.value,
             'variables': variables
         }
-        return requests.post(self.API_URL, json=json).json()
+        response = requests.post(self.API_URL, json=json)
+        if not check_response(response):
+            return {}
+        
+        return response.json()
     
     async def _performQuery(self, query: str, variables: dict) -> dict:
         json_data = {
@@ -54,12 +61,12 @@ class QueryService:
                             return data
 
                         if "errors" in data:
-                            print(f"LeetCode GraphQL error: {data['errors']}")
+                            Clogger.warn(f"LeetCode GraphQL error: {data['errors']}")
 
                         raise Exception("Invalid or empty 'data' field in response.")
 
             except Exception as e:
-                print(f"[QueryService] Attempt {attempt+1}/{self.MAX_RETRIES} failed: {e}")
+                Clogger.warn(f"[QueryService] Attempt {attempt+1}/{self.MAX_RETRIES} failed: {e}")
                 if attempt < self.MAX_RETRIES - 1:
                     await asyncio.sleep(2 ** attempt)  # exponential backoff
                 else:

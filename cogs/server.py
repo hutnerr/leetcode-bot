@@ -18,12 +18,13 @@ from view.problem_config_view import ProblemConfigView
 from view.problem_info_embed import ProblemInfoEmbed
 from view.server_config_view import ServerConfigView
 from view.server_info_embed import ServerInfoEmbed
-
+from pyutils import Clogger
 
 class ServerCog(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
         self.app: App = client.app
+        Clogger.info("ServerCog initialized")
 
     # serverconfig - change the settings
     @app_commands.command(name="serverconfig", description="Configure the servers settings")
@@ -35,6 +36,7 @@ class ServerCog(commands.Cog):
     @app_commands.describe(setting="The setting group to configure")
     async def sconfig(self, interaction: discord.Interaction, setting: app_commands.Choice[str]):
         server = self.getServer(interaction)
+        Clogger.action(f"User {interaction.user} is configuring server settings for server {interaction.guild.name} ({server.serverID}) - setting group: {setting.value}")
         try:
             await interaction.response.send_message(view=ServerConfigView(server, self.app, setting.value), ephemeral=True)
         except Exception as e:
@@ -44,6 +46,7 @@ class ServerCog(commands.Cog):
     @app_commands.command(name="serverinfo", description="Displays the servers config")
     async def sinfo(self, interaction: discord.Interaction):
         server = self.getServer(interaction)
+        Clogger.action(f"User {interaction.user} is viewing server info for server {interaction.guild.name} ({server.serverID})")
         await interaction.response.send_message(embed=ServerInfoEmbed(server, interaction.guild))
     
     # pconfig <pid> - change a problem config  
@@ -62,6 +65,7 @@ class ServerCog(commands.Cog):
     @app_commands.rename(pids="problemid")
     async def pconfig(self, interaction: discord.Interaction, pids: discord.app_commands.Choice[int]):
         server = self.getServer(interaction)
+        Clogger.action(f"User {interaction.user} is configuring problem settings for server {interaction.guild.name} ({server.serverID}) - problem ID: {pids.value}")
         
         # if the timezone is not set, then we need to ask the user to set it
         if server.settings.timezone is None:
@@ -109,12 +113,14 @@ class ServerCog(commands.Cog):
     @app_commands.command(name="probleminfo", description="Displays all configured problem's info")
     async def pinfo(self, interaction: discord.Interaction):
         server = self.getServer(interaction)
+        Clogger.action(f"User {interaction.user} is viewing problem info for server {interaction.guild.name} ({server.serverID})")
         await interaction.response.send_message(embed=ProblemInfoEmbed(server.problems, server))
 
     # problemactive - display the problems
     @app_commands.command(name="problemactive", description="Displays the current active problems")
     async def pactive(self, interaction: discord.Interaction):
         server = self.getServer(interaction)
+        Clogger.action(f"User {interaction.user} is viewing active problems for server {interaction.guild.name} ({server.serverID})")
         await interaction.response.send_message(embed=ActiveProblemsEmbed(server))
 
     @app_commands.command(name="deleteproblem", description="Deletes a problem from the server's config")
@@ -140,6 +146,7 @@ class ServerCog(commands.Cog):
 
         server.toJSON()  # save the server
         embed = PositiveEmbed("Problem Deleted", f"Problem with ID `{pids.value}` has been deleted successfully.")
+        Clogger.action(f"User {interaction.user} deleted problem ID {pids.value} from server {interaction.guild.name} ({server.serverID})")
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
     # setchannel - set the channel for the bot to post in
@@ -158,11 +165,13 @@ class ServerCog(commands.Cog):
     @app_commands.command(name="resetdupes", description="Reset the stored duplicate problems")
     @app_commands.checks.has_permissions(administrator=True) # only admins can change the server settings
     async def resetdupes(self, interaction: discord.Interaction):
+        Clogger.action(f"User {interaction.user} is attempting to reset duplicate problems for server {interaction.guild.name} ({interaction.guild_id})")
         confirmationMSG = "Are you sure you want to reset the stored duplicate problems? This action cannot be undone."
         embed: discord.Embed = ConfirmationEmbed(confirmationMSG)
         view: discord.ui.View = ConfirmationView()
         await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
         await view.wait()
+        
         if view.is_finished() and view.result is None:
             await interaction.followup.send("Timed out. Please try again.", ephemeral=True)
             return
@@ -181,6 +190,7 @@ class ServerCog(commands.Cog):
     @app_commands.command(name="deleteserver", description="Deletes the server configuration entirely")
     @app_commands.checks.has_permissions(administrator=True)  # only admins can change the server settings
     async def delserver(self, interaction: discord.Interaction):
+        Clogger.action(f"User {interaction.user} is attempting to delete server configuration for server {interaction.guild.name} ({interaction.guild_id})")
         confirmationMSG = "Are you sure you want to delete the server configuration? This action cannot be undone."
         embed: discord.Embed = ConfirmationEmbed(confirmationMSG)
         view: discord.ui.View = ConfirmationView()
@@ -254,6 +264,7 @@ class ServerCog(commands.Cog):
         )
         self.app.servers[serverID] = server # add to the dict
         server.toJSON() # save the server
+        Clogger.info(f"New server created with ID: {serverID} and channel ID: {channelID}")
         return server
 
     @sconfig.error
@@ -265,6 +276,7 @@ class ServerCog(commands.Cog):
     @delserver.error
     @delproblem.error
     async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):
+        Clogger.error(f"Error in {interaction.command.name} command: {str(error)}")
         if isinstance(error, discord.app_commands.MissingPermissions):
             await interaction.response.send_message(embed=ErrorEmbed("PERMISSION DENIED", "You do not have permission to use this command. Administrator permission is required.", "---"), ephemeral=True)
             return

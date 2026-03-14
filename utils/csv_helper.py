@@ -1,9 +1,12 @@
 import csv
 from utils import file_helper as fh
 
+from pyutils import Clogger
+
 # reads a CSV file and returns its content as a list of lists
 def readFromCSV(filePath: str) -> list[list[str]] | None:
     if not fh.fileExists(filePath):
+        Clogger.error(f"CSV file {filePath} does not exist.")
         return None
     
     with open(filePath, 'r', encoding='utf-8') as file:
@@ -19,7 +22,7 @@ def writeLineToCSV(filePath: str, line: list[str], overwrite: bool = False) -> b
             writer.writerow(line)
         return True
     except Exception as e:
-        print(f"Error writing to CSV {filePath}: {e}")
+        Clogger.error(f"Error writing to CSV {filePath}: {e}")
         return False
 
 # appends multiple lines to a CSV file
@@ -31,5 +34,5 @@ def writeLinesToCSV(filePath: str, lines: list[list[str]], overwrite: bool = Fal
             writer.writerows(lines)
         return True
     except Exception as e:
-        print(f"Error writing multiple lines to CSV {filePath}: {e}")
+        Clogger.error(f"Error writing multiple lines to CSV {filePath}: {e}")
         return False

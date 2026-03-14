@@ -1,5 +1,6 @@
 import os
 
+from pyutils import Clogger
 from utils import json_helper as jsonh
 from utils import file_helper as fh
 from utils import problem_helper as probHelper
@@ -11,6 +12,7 @@ class CacheService:
     def __init__(self):
         self.cachedProblems = dict()
         self.initCache()
+        Clogger.info(f"CacheService initialized with {len(self.cachedProblems)} cached problems.")
 
     # initializes the cache by reading all json files in the cache directory
     # and storing them in the cachedProblems dict
@@ -29,6 +31,7 @@ class CacheService:
         path = os.path.join(self.CACHELOCATION, f"{slug}.json")
         jsonh.writeJSON(path, json)
         self.cachedProblems[slug] = json
+        Clogger.info(f"Cached problem {slug} at {path}.")
 
     def existsInCache(self, slug: str) -> bool:
         return slug in self.cachedProblems

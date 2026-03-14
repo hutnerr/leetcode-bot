@@ -1,5 +1,6 @@
 from utils import datetime_helper as timeh
 from utils import problem_helper as probh
+from pyutils import Clogger
 
 from models.server import Server
 from models.problem import Problem
@@ -29,6 +30,7 @@ class AlertBuilder:
         self.contestTimeBucket = contestTimeBucket
         self.problemService = problemService
         self.queryService = queryService
+        Clogger.info("AlertBuilder initialized")
 
     # collects all the server & channel ids and the slug of the problem that has beens selected based 
     # on the server settings and the problem bucket for the day of week, hour, and interval
@@ -38,6 +40,7 @@ class AlertBuilder:
         # the bucket problems are the problems we want to notify the servers about
         bucket = self.problemBucket.getBucket(dow, hour, interval)
         if bucket is None or len(bucket) == 0:
+            Clogger.info("No problems found for the given time interval: dow={}, hour={}, interval={}".format(dow, hour, interval))
             return []
         
         # sid = serverID, pid = problemID
@@ -45,12 +48,14 @@ class AlertBuilder:
             sid, pid = map(int, problem.split("::")) # cast to ints
             
             if sid not in self.servers: # couldn't find the serverID
+                Clogger.warn(f"Could not find server with ID {sid}")
                 continue
             
             # determine our server and problem 
             server = self.servers[sid]
             problem = server.problems[pid]
             if problem is None: # couldn't find the problemID
+                Clogger.warn(f"Could not find problem with ID {pid} for server {sid}")
                 continue
             
             slug, difficulty = self.problemService.selectProblem(problem)
@@ -72,6 +77,7 @@ class AlertBuilder:
                 }
                 alerts.append(Alert(AlertType.PROBLEM, server.serverID, server.settings.postingChannelID, info))
             
+        Clogger.info(f"Built {len(alerts)} problem alerts for dow={dow}, hour={hour}, interval={interval}")
         return alerts
 
 
@@ -84,6 +90,7 @@ class AlertBuilder:
         elif contestAlertType == AlertType.BIWEEKLY_CONTEST:
             contestType = "Biweekly"
         else:
+            Clogger.warn(f"Invalid contest alert type: {contestAlertType}")
             return []
 
         info = await self.queryService.getUpcomingContests()
@@ -100,18 +107,19 @@ class AlertBuilder:
         
         if not title or not titleSlug:
             # if we don't have a contest, we can't build an alert
-            print("Contest Query Failed")
+            Clogger.warn("Contest Query Failed")
             return []
         
         # FIXME: Might have to -1 this. it deteremines how fast this updates
         if not title or not titleSlug:
-            print("Contest Query Failed")
+            Clogger.warn("Contest Query Failed")
             return None
 
         alertString = f"[{title}]({url}) is upcoming in **{timeh.minutesToHours(interval)}**! Remember to register and prepare!"
 
         serversToNotify = self.contestTimeBucket.getBucket(interval)
         if not serversToNotify: # no servers to notify
+            Clogger.info(f"No servers to notify for contest alert with interval {interval}")
             return []
         
         for serverID in serversToNotify:
@@ -120,6 +128,7 @@ class AlertBuilder:
             # we may be in the bucket, but have the setting turned off
             # in this case, just ignore
             if not server.settings.contestTimeAlerts:
+                Clogger.info(f"Server {serverID} has contest time alerts disabled.")
                 continue
             
             info = {
@@ -128,6 +137,7 @@ class AlertBuilder:
             }
             alerts.append(Alert(alertType, server.serverID, server.settings.postingChannelID, info))
         
+        Clogger.info(f"Built {len(alerts)} contest alerts for interval={interval} minutes, contest type={contestAlertType}")
         return alerts
         
         
@@ -151,7 +161,7 @@ class AlertBuilder:
 
                 # FIXME: Might have to -1 this. it deteremines how fast this updates
                 if not title or not titleSlug:
-                    print("Contest Query Failed")
+                    Clogger.warn("Contest Query Failed")
                     return None
 
                 url = f"https://leetcode.com/contest/{titleSlug}/"
@@ -164,6 +174,7 @@ class AlertBuilder:
                 url = probh.slugToURL(titleSlug)
                 alertString = f"Today's daily problem is now available! It is **[{probh.slugToTitle(titleSlug)}]({url})**."
             else:
+                Clogger.warn(f"Invalid static time alert type: {alert}")
                 return None # invalid alert
             
             info = {
@@ -197,4 +208,5 @@ class AlertBuilder:
             info = alertInfo
             alerts.append(Alert(alertType, server.serverID, server.settings.postingChannelID, info))
 
+        Clogger.info(f"Built {len(alerts)} static alerts for alert type {alert}")
         return alerts

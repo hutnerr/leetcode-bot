@@ -1,3 +1,4 @@
+from pyutils import Clogger
 import json
 from utils import file_helper as fh
 
@@ -5,6 +6,7 @@ from utils import file_helper as fh
 # returns None if the file does not exist
 def readJSON(filePath: str) -> dict | None:
     if not fh.fileExists(filePath):
+        Clogger.warn(f"JSON file not found: {filePath}")
         return None
     
     with open(filePath, 'r', encoding='utf-8') as file:
@@ -17,7 +19,7 @@ def writeJSON(filePath: str, data: dict) -> bool:
             json.dump(data, file, indent=4)
         return True
     except Exception as e:
-        print(f"Error writing JSON to {filePath}: {e}")
+        Clogger.error(f"Error writing JSON to {filePath}: {e}")
         return False
 
 # updates a JSON file with new data, merging it w/ old data

@@ -1,5 +1,6 @@
 from models.problem import Problem
 from models.server import Server
+from pyutils import Clogger
 
 # this bucket handles the times each individual problem is located at
 # the bucket itself is a dict with dow as keys with values being a list of sets
@@ -15,6 +16,7 @@ class ProblemBucket:
         # use _calculateBucketIndex with the hour and interval for the right index
         # sunday is 0, monday is 1, etc. saturday is 6
         self.buckets = {i: [set() for _ in range(self.NUMBUCKETS)] for i in range(0, 7)}
+        Clogger.info("Initialized ProblemBucket.")
 
     def __str__(self) -> str:
         non_empty = [bucket for bucket in self.buckets if bucket]
@@ -25,32 +27,40 @@ class ProblemBucket:
     # TO ENSURE THAT THE BUCKET AND MODEL CONTAIN THE SAME DATA
     def addToBucket(self, prob: Problem) -> bool:
         if (prob.problemID < 0) or (prob.problemID > Server.MAXPROBLEMS) or (not prob.dows):
+            Clogger.warn(f"Could not add to bucket. Invalid problem data: {prob}")
             return False
         
         index = self._calculateBucketIndex(prob.hour, prob.interval)
         if index == -1:
+            Clogger.warn(f"Could not add to bucket. Invalid hour or interval: hour={prob.hour}, interval={prob.interval}")
             return False
         
         for dow in prob.dows:
             key = prob.getKey() # the key is the serverID::problemID, used later to trace back
             self.buckets[dow][index].add(key)
+            
+        Clogger.info(f"Successfully added problem {prob.problemID} to bucket.")
         return True
     
     # ADDING AND REMOVING SHOULD BE CALLED BY A SYNCRONIZER
     # TO ENSURE THAT THE BUCKET AND MODEL CONTAIN THE SAME DATA
     def removeFromBucket(self, prob: Problem) -> bool:
         if not prob.dows:
+            Clogger.warn(f"Could not remove from bucket. Invalid problem data: {prob}")
             return False
         
         index = self._calculateBucketIndex(prob.hour, prob.interval)
         if index == -1:
+            Clogger.warn(f"Could not remove from bucket. Invalid hour or interval: hour={prob.hour}, interval={prob.interval}")
             return False
 
         for dow in prob.dows:
             key = prob.getKey() # the key is the serverID::problemID, used later to trace back
             if key in self.buckets[dow][index]:
                 self.buckets[dow][index].remove(key)
+                Clogger.info(f"Successfully removed problem {prob.problemID} from bucket.")
             else:
+                Clogger.warn(f"Could not remove problem {prob.problemID} from bucket. Not found.")
                 return False
         return True
 
@@ -72,16 +82,3 @@ class ProblemBucket:
         if (hour < 0 or hour > 24) or (interval < 0 or interval > self.NUMINTERVALS):
             return -1
         return (hour * self.NUMINTERVALS) + interval
-    
-    # FIXME: For testing, delete when product complete
-    def printBucketClean(self) -> None:
-        for day in self.buckets:
-            print(f"===== DAY {day}=====")
-            for i, bucket in enumerate(self.buckets[day]):
-                if bucket:
-                    hour = i // self.NUMINTERVALS
-                    interval = i % self.NUMINTERVALS
-                    print(f"[{hour:02d}:{interval * 15:02d}] -> {sorted(bucket)}")
-
-
-# TODO: Make enums for intervals, hours, days of week?

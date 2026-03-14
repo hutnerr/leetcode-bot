@@ -2,6 +2,7 @@ import os
 import random
 
 from utils import csv_helper as csvh
+from pyutils import Clogger
 from models.problem import Problem
 
 # performs to service of determining a concrete problem based on problem settings
@@ -11,6 +12,7 @@ class ProblemService:
     def __init__(self):
         self.problemSets = {}
         self.initProblemSets()
+        Clogger.info(f"ProblemService initialized")
         
     # can be used to reset the problemsets
     # should be used if the csv is updated
@@ -38,6 +40,11 @@ class ProblemService:
         # read in the problemsets into memory for faster access
         PROBLEMSETPATH = os.path.join("data", "problems.csv")
         lines = csvh.readFromCSV(PROBLEMSETPATH) # returns each line as a list already split
+        
+        if not lines:
+            Clogger.warn(f"No problem sets found in {PROBLEMSETPATH}. Please check the file and try again.")
+            return
+        
         for line in lines:
             slug, dif, paid = map(str.lower, line) # lowercase each element
             
@@ -59,9 +66,11 @@ class ProblemService:
             case 2: # all
                 ps = self.problemSets["all"]
             case _: 
+                Clogger.warn(f"Invalid premium value for problem {problem}. Returning None.")
                 return None
         
         if not problem.difficulties:
+            Clogger.warn(f"No difficulties specified for problem {problem}. Returning None.")
             return None
         
         difficulty = random.choice(problem.difficulties)        

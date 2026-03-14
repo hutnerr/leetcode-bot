@@ -1,3 +1,5 @@
+from pyutils import Clogger
+
 from models.server import Server
 from models.user import User
 from services.query_service import QueryService
@@ -7,13 +9,14 @@ class Submitter:
         self.servers = servers
         self.users = users
         self.queryService = queryService
+        Clogger.info("Submitter initialized")
     
     # checks if a user has completed problems in the servers active problems
     async def submit(self, serverID: int, userID: int) -> bool:
         if (serverID not in self.servers) or (userID not in self.users):
             return False
 
-        print("we here")
+        Clogger.info("Processing submission")
 
         server: Server = self.servers[serverID]
         user: User = self.users[userID]
@@ -25,8 +28,6 @@ class Submitter:
         
         activeProblems = server.activeProblems
         
-        print("we here now")
-        
         for pid, activeProblem in enumerate(activeProblems):
             slug, difficulty, submittedUsers = activeProblem
             
@@ -35,15 +36,15 @@ class Submitter:
                 continue
 
             if not await self.userCompletedProblem(user=user, slug=slug, submissions=submissions):
-                print("didnt complete")
+                Clogger.warn("User has not completed the problem")
                 continue
             
             if userID in submittedUsers:
-                print("already submitted")
+                Clogger.warn("User has already submitted this problem")
                 continue
 
             if not server.addSubmittedUser(user.discordID, pid):
-                print("error adding submitted user")
+                Clogger.warn("Error adding submitted user")
                 continue
             
             # if we get here, the user has completed a new problem
@@ -67,7 +68,7 @@ class Submitter:
     # can pass in submissions to avoid querying the API
     async def userCompletedProblem(self, user: User, slug: str, submissions: dict = None) -> bool:
         # uses the api to check a users recent submissions returns true if they have
-        
+        Clogger.info(f"Checking if user {user.discordID} has completed problem {slug}")
         leetcodeUsername = user.leetcodeUsername
         if not submissions:
             submissions = await self.queryService.getUserRecentAcceptedSubmissions(leetcodeUsername)

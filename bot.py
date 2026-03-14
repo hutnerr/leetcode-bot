@@ -4,6 +4,7 @@ This is where the bot will be run from.
 """
 import time
 import json
+import os
 
 import discord
 from colorama import Back, Fore, Style
@@ -11,6 +12,9 @@ from discord.ext import commands
 
 from utils.initializer import Initializer
 from models.app import App
+
+from pyutils import get_env
+from pyutils import Clogger, CloggerColor, LogLevel, CloggerConfig, Clogobj, ClogobjFactory
 
 class Client(commands.Bot):
     def __init__(self):
@@ -34,32 +38,52 @@ class Client(commands.Bot):
         self.app = Initializer.initApp()
         
         for ext in self.cogslist:
-            await self.load_extension(ext) # loads our cogs    
+            await self.load_extension(ext) # loads our cogs   
+             
+        Clogger.info(f"App initialized with {len(self.app.servers)} servers, {len(self.app.users)} users.")
+        
 
     # prints info to console, gives us custom status, and syncs slash commands
-    async def on_ready(self):
+    async def on_ready(self):        
         prfx = (Back.BLACK + Fore.GREEN + time.strftime("%H:%M:%S EST", time.localtime()) + Back.RESET + Fore.WHITE + Style.BRIGHT)
-        print(prfx + " Logged in as " + Fore.YELLOW + client.user.name)
+        Clogger.info("Logged in as " + Fore.YELLOW + client.user.name)
         synced = await client.tree.sync()
-        print(prfx + " Slash CMDs Sycned " + Fore.YELLOW + str(len(synced)))
+        Clogger.info("Slash CMDs Sycned " + Fore.YELLOW + str(len(synced)))
         await client.change_presence(activity = discord.Activity(type = discord.ActivityType.playing, name = "/help for commands"))
+        Clogger.info("Bot is ready!")
 
     async def sendErrAlert(self, message: str):
-        print("Sending error alert to user...")
-        with open("data/key.json", "r") as file:
-            userid = json.load(file)["id"]        
-            user = await self.fetch_user(int(userid))
-        if not user:
+        Clogger.info("Sending error alert to user...")
+        userID = get_env("ALERT_DISCORD_ID")
+        if not userID:
+            Clogger.warn("ALERT_DISCORD_ID not set in environment variables. Cannot send error alert.")
             return
+        
+        user = await self.fetch_user(int(userID))
+        if not user:
+            Clogger.warn(f"User with ID {userID} not found. Cannot send error alert.")
+            return
+        
         await user.send(message)
 
-client = Client()
-client.remove_command("help") # remove default help so I can add custom one. 
+if __name__ == "__main__":
+    client = Client()
+    client.remove_command("help") # remove default help so I can add custom one. 
 
-# key = "testkey"
-key = "key"
+    # base config
+    Clogger.config = CloggerConfig(
+        write_to_file=True,
+        log_file_path=os.path.join("logs", "bot.log")
+    )
 
-with open("data/key.json", "r") as file:
-    key = json.load(file)[key]
+    ENV_NAME = "BEASTCODE_BOT_TOKEN"
+    # ENV_NAME = "TESTING_BOT_TOKEN"
+    key = get_env(ENV_NAME)
+    if not key:
+        Clogger.error(
+            f"Bot token not found in environment variable '{ENV_NAME}'. Please set it and try again.", 
+            exc=Exception
+        )
 
-client.run(key)
+    Clogger.info("Starting bot...")
+    client.run(key)

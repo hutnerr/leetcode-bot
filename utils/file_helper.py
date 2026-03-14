@@ -1,4 +1,5 @@
 import os
+from pyutils import Clogger
 
 # if create is false, just check if the directory exists.
 def directoryExists(filePath: str, create: bool = False) -> bool:
@@ -12,7 +13,7 @@ def directoryExists(filePath: str, create: bool = False) -> bool:
                 return False
         return True
     except Exception as e:
-        print(f"Error creating directory: {e}")
+        Clogger.error(f"Error creating directory: {e}")
         return False
 
 
@@ -24,6 +25,7 @@ def fileExists(filePath: str) -> bool:
 # does not include other directories or subdirectories
 def getFilesInDirectory(directory: str, showExtensions: bool = True) -> list[str]:
     if not os.path.isdir(directory):
+        Clogger.error(f"This is not a valid directory: {directory}")
         return []
 
     # if show_extensions is true, return the full file names with extensions
@@ -42,5 +44,5 @@ def deleteFile(filePath: str) -> bool:
             return True
         return False
     except Exception as e:
-        print(f"Error deleting file: {e}")
+        Clogger.error(f"Error deleting file: {e}")
         return False

@@ -4,6 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from pyutils import Clogger
 from errors.simple_exception import SimpleException
 from models.app import App
 from models.user import User
@@ -19,10 +20,13 @@ class UserCog(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
         self.app: App = client.app
+        Clogger.info("UserCog initialized")
 
     @app_commands.command(name = "userinfo", description = "Displays information about a user")
     @app_commands.describe(user="The user to get the info of. Defaults to the user who called the command.")
     async def userinfo(self, interaction: discord.Interaction, user: discord.User = None):
+        Clogger.action(f"User {interaction.user} is requesting user info for {user if user else 'themselves'}")
+        
         if user is None: # get self
             user = interaction.user
 
@@ -52,6 +56,7 @@ class UserCog(commands.Cog):
     
     @app_commands.command(name = "setusername", description = "Set your LeetCode Username")
     async def setusername(self, interaction: discord.Interaction, leetcodeusername: str):
+        Clogger.action(f"User {interaction.user} is setting their LeetCode username to {leetcodeusername}")
         if leetcodeusername is None or len(leetcodeusername) <= 0:
             raise SimpleException("EMPTY USERNAME")
         
@@ -85,6 +90,7 @@ class UserCog(commands.Cog):
 
     @app_commands.command(name = "deleteuser", description = "Deletes your user profile")
     async def deluser(self, interaction: discord.Interaction):
+        Clogger.action(f"User {interaction.user} is attempting to delete their user profile")
         confirmationMSG = "User profiles are **NOT** server specific. If you delete it, your points and progress will be lost **entirely**."
         embed: discord.Embed = ConfirmationEmbed(confirmationMSG)
         view: discord.View = ConfirmationView()
@@ -116,6 +122,7 @@ class UserCog(commands.Cog):
     
     def newUser(self, discID: int) -> User:
         # if the user doesnt exist, then make a blank slate
+        Clogger.info(f"Creating new user with Discord ID: {discID}")
         
         user = User(
             discordID=discID,
@@ -132,6 +139,7 @@ class UserCog(commands.Cog):
     @setusername.error
     @deluser.error
     async def errorHandler(self, interaction: discord.Interaction, error: app_commands.CommandInvokeError):
+        Clogger.error(f"Error in {interaction.command.name} command: {str(error)}")
         exception: SimpleException = error.original
         code: SimpleException = exception.code if isinstance(error.original, SimpleException) else "BACKEND FAILURE"
         msg = error.original.message if isinstance(error.original, SimpleException) else str(error.original)

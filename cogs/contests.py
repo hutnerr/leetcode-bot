@@ -9,11 +9,14 @@ from utils import datetime_helper as timeh
 from view.contest_embed import ContestEmbed
 from view.error_embed import ErrorEmbed
 
+from pyutils import Clogger
+
 
 class Contests(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client: commands.Bot = client
         self.app: App = client.app
+        Clogger.info("Contests cog loaded")
     
     @app_commands.command(name = "contests", description = "Gets information about the current LeetCode contests")
     async def contests(self, interaction: discord.Interaction):
@@ -34,6 +37,7 @@ class Contests(commands.Cog):
                 }
             if contests:
                 embed = ContestEmbed(contests)
+                Clogger.action("Contests requested", {"server": interaction.guild.name, "channel": interaction.channel.name})
                 await interaction.response.send_message(embed=embed)
         else:
             raise SimpleException("CONTSQS", "API Failure")
@@ -44,6 +48,7 @@ class Contests(commands.Cog):
         code: SimpleException = exception.code if isinstance(error.original, SimpleException) else "BACKEND FAILURE"
         msg = error.original.message if isinstance(error.original, SimpleException) else str(error.original)
         help = error.original.help if isinstance(error.original, SimpleException) else None
+        Clogger.error(f"Error in {interaction.command.name} command: {msg}. server: {interaction.guild.name}, channel: {interaction.channel.name}")
         await self.client.sendErrAlert(f"Error in {interaction.command.name} command: {msg}")
         await interaction.response.send_message(embed=ErrorEmbed(code, msg, help), ephemeral=True)
 
