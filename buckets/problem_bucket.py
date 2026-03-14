@@ -58,10 +58,11 @@ class ProblemBucket:
             key = prob.getKey() # the key is the serverID::problemID, used later to trace back
             if key in self.buckets[dow][index]:
                 self.buckets[dow][index].remove(key)
-                Clogger.info(f"Successfully removed problem {prob.problemID} from bucket.")
             else:
-                Clogger.warn(f"Could not remove problem {prob.problemID} from bucket. Not found.")
+                Clogger.warn(f"Could not remove problem {prob.problemID} from bucket: {key}")
                 return False
+            
+        Clogger.info(f"Successfully removed problem {prob.problemID} from buckets.")
         return True
 
 
