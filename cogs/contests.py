@@ -37,7 +37,7 @@ class Contests(commands.Cog):
                 }
             if contests:
                 embed = ContestEmbed(contests)
-                Clogger.action("Contests requested", {"server": interaction.guild.name, "channel": interaction.channel.name})
+                Clogger.action("Contests requested by {user} in {server}/{channel}".format(user=interaction.user.name, server=interaction.guild.name, channel=interaction.channel.name))
                 await interaction.response.send_message(embed=embed)
         else:
             raise SimpleException("CONTSQS", "API Failure")

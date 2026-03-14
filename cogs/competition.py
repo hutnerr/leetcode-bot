@@ -38,7 +38,7 @@ class CompetitionCog(commands.Cog):
         # posts an embed of the entire leaderboard
         boardData = self.buildLeaderboard(interaction.guild.members)
         embed = LeaderboardEmbed(boardData)
-        Clogger.action("Leaderboard requested", {"server": interaction.guild.name, "channel": interaction.channel.name})
+        Clogger.action("Leaderboard requested by {user} in {server}/{channel}".format(user=interaction.user.name, server=interaction.guild.name, channel=interaction.channel.name))
         await interaction.response.send_message(embed=embed)
 
     # rank. gets your rank on the leaderboard
@@ -61,7 +61,7 @@ class CompetitionCog(commands.Cog):
             tempPoints, member = data
             if member.id == userID:
                 points = tempPoints
-                Clogger.action("Rank requested", {"server": interaction.guild.name, "channel": interaction.channel.name, "user": member.name})
+                Clogger.action("Rank requested by {user} in {server}/{channel}".format(user=interaction.user.name, server=interaction.guild.name, channel=interaction.channel.name))
                 await interaction.response.send_message(embed=PositiveEmbed("Rank Information", f"**{member.name}** is ranked `{place}`/`{len(boardData)}` with **{points} pts**", thumbnail=member.display_avatar.url))
                 return # exit
         
@@ -94,7 +94,7 @@ class CompetitionCog(commands.Cog):
         if user.points == prevPoints:
             raise SimpleException("NOPOINTS", "You have not completed any new problems since your last submission.", "Make sure you have completed new problems that are active on the server (check using `/pactive`). If this persists, try `/deluser` to reset your user data.")
         else:
-            Clogger.action("Submission completed", {"server": interaction.guild.name, "channel": interaction.channel.name, "user": interaction.user.name, "points": user.points})
+            Clogger.action("Submission completed by {user} in {server}/{channel}".format(user=interaction.user.name, server=interaction.guild.name, channel=interaction.channel.name))
             await interaction.followup.send(embed=PositiveEmbed("Submission Completed", f"Successfully submitted your problems! You now have **{user.points} points**. You went up **{user.points - prevPoints} points**!"), ephemeral=True)
 
     @leaderboard.error

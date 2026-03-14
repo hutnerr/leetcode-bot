@@ -98,7 +98,7 @@ class Looper(commands.Cog):
             if len(alerts) == 0:
                 return
             
-            Clogger.info("Sending problem alerts", {"count": len(alerts), "dow": dow, "hour": hour, "minInterval": minInterval})
+            Clogger.info("Sending problem alerts to {count} channels".format(count=len(alerts)))
             
             for alert in alerts:
                 if not alert.info:
@@ -124,7 +124,7 @@ class Looper(commands.Cog):
 
                 channel = self.client.get_channel(channelID)
                 if channel is None:
-                    Clogger.warn(f"Channel not found for ID: {channelID}", {"server": server.id})
+                    Clogger.warn(f"Channel not found for ID: {channelID} in server {serverID}")
                     continue
                             
                 # FIXME: 
@@ -217,12 +217,12 @@ class Looper(commands.Cog):
                 alerts = await alertBuilder.buildContestAlerts(weeklyContestMinsAway, AlertType.CONTEST_TIME_AWAY, AlertType.WEEKLY_CONTEST)
                 for alert in alerts:
                     if alert.channelID is None:
-                        Clogger.warn(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.", {"server": alert.serverID})
+                        Clogger.warn(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.")
                         continue
                     
                     channel = self.client.get_channel(alert.channelID)
                     if channel is None:
-                        Clogger.warn(f"Channel not found for ID: {alert.channelID}", {"server": alert.serverID})
+                        Clogger.warn(f"Channel not found for ID: {alert.channelID} in server {alert.serverID}")
                         continue
                     
                     await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
@@ -232,12 +232,12 @@ class Looper(commands.Cog):
                 alerts = await alertBuilder.buildContestAlerts(biweeklyContestMinsAway, AlertType.CONTEST_TIME_AWAY, AlertType.BIWEEKLY_CONTEST)
                 for alert in alerts:
                     if alert.channelID is None:
-                        Clogger.warn(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.", {"server": alert.serverID})
+                        Clogger.warn(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.")
                         continue
                     
                     channel = self.client.get_channel(alert.channelID)
                     if channel is None:
-                        Clogger.warn(f"Channel not found for ID: {alert.channelID}", {"server": alert.serverID})
+                        Clogger.warn(f"Channel not found for ID: {alert.channelID} in server {alert.serverID}")
                         continue
                     
                     await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
@@ -249,12 +249,12 @@ class Looper(commands.Cog):
         async def sendStaticAlerts(alerts: list[Alert]):
             for alert in alerts:
                 if alert.channelID is None:
-                    Clogger.warn(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.", {"server": alert.serverID})
+                    Clogger.warn(f"Alert {alert.alertType} for server {alert.serverID} has no channel ID.")
                     continue
                 
                 channel = self.client.get_channel(alert.channelID)
                 if channel is None:
-                    Clogger.warn(f"Channel not found for ID: {alert.channelID}", {"server": alert.serverID})
+                    Clogger.warn(f"Channel not found for ID: {alert.channelID} in server {alert.serverID}")
                     continue
                 
                 await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
