@@ -26,6 +26,10 @@ class CacheService:
 
     # inserts a problem into the cache
     def cacheProblem(self, json):
+        if json is None:
+            Clogger.error("Attempted to cache a None problem.")
+            return
+        
         info = json["data"]["question"]
         slug = probHelper.titleToSlug(info["title"])
         path = os.path.join(self.CACHELOCATION, f"{slug}.json")
@@ -38,6 +42,7 @@ class CacheService:
 
     def getFromCache(self, slug: str) -> dict | None:
         if slug in self.cachedProblems:
+            Clogger.info(f"Problem {slug} found in cache.")
             return self.cachedProblems[slug]
         else:
             return None

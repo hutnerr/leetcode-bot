@@ -35,6 +35,8 @@ class QueryService:
             "Referer": "https://leetcode.com/",
             "User-Agent": "Mozilla/5.0 (compatible; LeetCodeBot/1.0; +https://github.com/hutnerr/leetcode-bot)"
         }
+        
+        Clogger.log("Query", f"Performing {query.value}")
 
         for attempt in range(self.MAX_RETRIES):
             try:

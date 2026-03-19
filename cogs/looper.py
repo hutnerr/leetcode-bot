@@ -136,7 +136,7 @@ class Looper(commands.Cog):
 
                 await channel.send(embed=ProblemEmbed(slug, problemInfo), content=buildAlertRoleNotification(server))  # send the problem embed
         except Exception as e:
-            Clogger.error(f"Error in Looper - problem sending: {str(e)} {server.id}")
+            Clogger.error(f"Error in Looper - problem sending: {str(e)} {serverID}")
             await self.client.sendErrAlert(f"Error in Looper - problem sending: {str(e)}")
 
 
