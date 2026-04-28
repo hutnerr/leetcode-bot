@@ -66,9 +66,9 @@ To set this up locally, you would need to provide your own Discord key. You woul
 ```
 
 ## Showcase
-<img src="https://www.hunter-baker.com/resources/images/projects/leetcode-bot.png">
-<img src="https://www.hunter-baker.com/resources/images/beastcode-walkthrough/bc-example.png">
-<img src="https://www.hunter-baker.com/resources/images/beastcode-walkthrough/bc-example2.png">
+<img src="https://www.hunter-baker.com/assets/projects/beast_code/leetcode-bot.png">
+<img src="https://www.hunter-baker.com/assets/projects/beast_code/bc-example.png">
+<img src="https://www.hunter-baker.com/assets/projects/beast_code/bc-example2.png">
 
 ## Support
 If you found this project helpful or enjoyable, and want to support future work, you can buy me a coffee on Ko-fi
