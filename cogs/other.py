@@ -152,6 +152,7 @@ class OtherCog(commands.Cog):
         )
         embed.add_field(name="Developer", value="> [My GitHub](https://github.com/hutnerr)\n> [My Website](https://hunter-baker.com)", inline=False)
         embed.add_field(name="GitHub", value="> [LeetCode Bot](https://github.com/hutnerr/leetcode-bot)", inline=False)
+        embed.add_field(name="Contact", value="> Need help or have a question? [Contact me here](https://hunter-baker.com/pages/nav/contact.html) — happy to help with anything.", inline=False)
         await interaction.response.send_message(embed=embed)
 
 

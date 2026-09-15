@@ -1,5 +1,6 @@
 import os
 
+from errors.simple_exception import SimpleException
 from models.app import App
 from models.problem import Problem
 from services.cache_service import CacheService
@@ -76,7 +77,7 @@ def testProblemService() -> bool:
     return True
 
 
-def testQueryService() -> bool:
+async def testQueryService() -> bool:
     USERNAME = "hutnerr"
     BADUSERNAME = "RANDOMTRASHTESTING123"
     PROBLEM_SLUG = "two-sum"
@@ -117,8 +118,21 @@ def testQueryService() -> bool:
     questionInfo = await queryService.getQuestionInfo(PROBLEM_SLUG)
     assert questionInfo["data"]["question"], "Good question slug got a bad result"
 
-    questionInfo = await queryService.getQuestionInfo("DONT EXIST")
+    questionInfo = await queryService.getQuestionInfo("this-slug-should-not-exist-on-leetcode")
     assert not questionInfo["data"]["question"], "Bad question slug got a valid result"
+
+    # malformed slugs/usernames should be rejected locally before ever hitting the api
+    try:
+        await queryService.getQuestionInfo("DONT EXIST")
+        assert False, "Malformed slug should have raised a SimpleException"
+    except SimpleException:
+        pass
+
+    try:
+        await queryService.getUserProfile("not a valid username")
+        assert False, "Malformed username should have raised a SimpleException"
+    except SimpleException:
+        pass
 
     # get upcoming contests
     upcomingContestInfo = await queryService.getUpcomingContests()
@@ -127,7 +141,7 @@ def testQueryService() -> bool:
     return True
 
 
-def lifecycleTest() -> bool:
+async def lifecycleTest() -> bool:
     app = makeApp()
     queryService = app.queryService
     problemService = app.problemService

@@ -7,6 +7,7 @@ from errors.simple_exception import SimpleException
 
 from pyutils import Clogger
 from pyutils import check_response
+from utils import validation_helper as validh
 
 # performs queries
 class QueryService:
@@ -86,38 +87,38 @@ class QueryService:
     # can define an amount to get only that many
     async def getUserRecentAcceptedSubmissions(self, username: str, amount: int = 10) -> dict:
         args = {
-            "username" : username,
-            "limit" : amount
+            "username" : validh.validateUsername(username),
+            "limit" : validh.validateLimit(amount)
         }
         return await self._performQuery(QueryStrings.RECENT_SUBMISSIONS, args)
 
     async def getUserProfile(self, username: str) -> dict:
         args = {
-            "username" : username
+            "username" : validh.validateUsername(username)
         }
         return await self._performQuery(QueryStrings.USER_PROFILE, args)
 
     def getUserProfileRequests(self, username: str) -> dict:
         args = {
-            "username" : username
+            "username" : validh.validateUsername(username)
         }
         return self._performRequestsQuery(QueryStrings.USER_PROFILE, args)
 
     async def getUserProblemsSolved(self, username: str) -> dict:
         args = {
-            "username" : username
+            "username" : validh.validateUsername(username)
         }
         return await self._performQuery(QueryStrings.USER_PROBLEMS_SOLVED, args)
 
     async def getQuestionInfo(self, slug: str) -> dict:
         args = {
-            "titleSlug" : slug
+            "titleSlug" : validh.validateSlug(slug)
         }
         return await self._performQuery(QueryStrings.QUESTION_INFO, args)
 
     def getQuestionInfoRequests(self, slug: str) -> dict:
         args = {
-            "titleSlug" : slug
+            "titleSlug" : validh.validateSlug(slug)
         }
         return self._performRequestsQuery(QueryStrings.QUESTION_INFO, args)
 
@@ -192,6 +193,7 @@ class QueryStrings(Enum):
             question(titleSlug: $titleSlug) {
                 questionFrontendId
                 title
+                titleSlug
                 difficulty
                 content
                 likes

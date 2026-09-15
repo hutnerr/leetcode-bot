@@ -85,7 +85,25 @@ class Looper(commands.Cog):
     async def before_loop(self) -> None:
         await self.client.wait_until_ready()
 
+    # without these, an exception that escapes the try/excepts above (e.g. a bug in
+    # mainloop's own dow/hour/minute setup, before handleProblemAlerts assigns serverID)
+    # would silently stop the loop from ever running again until the bot is restarted.
+    @mainloop.error
+    async def mainloop_error(self, error: Exception) -> None:
+        Clogger.error(f"Unhandled error in Looper mainloop, restarting loop: {str(error)}")
+        await self.client.sendErrAlert(f"Unhandled error in Looper mainloop, restarting loop: {str(error)}")
+        if not self.mainloop.is_being_cancelled():
+            self.mainloop.restart()
+
+    @updateProblemset.error
+    async def updateProblemset_error(self, error: Exception) -> None:
+        Clogger.error(f"Unhandled error in Looper updateProblemset, restarting loop: {str(error)}")
+        await self.client.sendErrAlert(f"Unhandled error in Looper updateProblemset, restarting loop: {str(error)}")
+        if not self.updateProblemset.is_being_cancelled():
+            self.updateProblemset.restart()
+
     async def handleProblemAlerts(self, dow: int, hour: int, minInterval: int | None):
+        serverID = None
         try:
             alertBuilder: AlertBuilder = self.app.alertBuilder 
             
@@ -113,9 +131,11 @@ class Looper(commands.Cog):
                 
                 server = self.app.servers.get(serverID)
 
+                problemInfo = None
                 if self.app.cacheService.existsInCache(slug):
                     problemInfo = self.app.cacheService.getFromCache(slug)
-                else:
+
+                if not problemInfo or "data" not in problemInfo or not problemInfo["data"]:
                     problemInfo = await self.app.queryService.getQuestionInfo(slug)
                     if not problemInfo or "data" not in problemInfo or not problemInfo["data"]:
                         raise Exception(f"Failed to fetch problem info for slug: {slug}")
@@ -127,10 +147,6 @@ class Looper(commands.Cog):
                     Clogger.warn(f"Channel not found for ID: {channelID} in server {serverID}")
                     continue
                             
-                # FIXME: 
-                # this might fail if the problem is already active or if the server doesn't exist
-                # in that case, we just don't add an active problem, which is not good
-                # the chance of this is very low though.
                 if not server.addActiveProblem(slug, difficulty, pid): # add the problem to the server's active problems. also adds to previous problems
                     raise Exception("Error adding active problem to server's active problems")
 

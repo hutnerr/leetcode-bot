@@ -65,7 +65,7 @@ class AlertBuilder:
             if not allowDuplicates:
                 limit = 25 # limit the number of attempts to find a non-duplicate problem
                 while server.isProblemDuplicate(slug) and limit > 0:
-                    slug = self.problemService.selectProblem(problem)
+                    slug, difficulty = self.problemService.selectProblem(problem)
                     limit -= 1
 
             if server.settings.postingChannelID is not None:

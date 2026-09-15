@@ -90,7 +90,7 @@ class Server:
 
     # adds a problem to the previous problems list
     def addPreviousProblem(self, slug: str) -> None:
-        if slug not in self.previousProblems:
+        if self.settings.duplicatesAllowed or slug not in self.previousProblems:
             self.previousProblems.append(slug)
             self.toJSON()
             return True

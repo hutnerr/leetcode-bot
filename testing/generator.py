@@ -89,7 +89,7 @@ class GeneratedServers:
             officialDailyAlerts=True,
             contestTimeIntervals=[15, 30],
             contestTimeAlerts=True,
-            duplicatesAllowed=True,
+            duplicatesAllowed=False,
             alertRoleID=11111,
             useAlertRole=True
         )

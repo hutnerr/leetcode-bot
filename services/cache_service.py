@@ -3,7 +3,6 @@ import os
 from pyutils import Clogger
 from utils import json_helper as jsonh
 from utils import file_helper as fh
-from utils import problem_helper as probHelper
 
 # service that handles operations related to caching
 class CacheService:
@@ -31,7 +30,7 @@ class CacheService:
             return
         
         info = json["data"]["question"]
-        slug = probHelper.titleToSlug(info["title"])
+        slug = info["titleSlug"]
         path = os.path.join(self.CACHELOCATION, f"{slug}.json")
         jsonh.writeJSON(path, json)
         self.cachedProblems[slug] = json
