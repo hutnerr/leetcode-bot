@@ -1,5 +1,6 @@
 import time
 
+import discord
 from discord.ext import commands, tasks
 
 from pyutils import Clogger
@@ -102,6 +103,18 @@ class Looper(commands.Cog):
         if not self.updateProblemset.is_being_cancelled():
             self.updateProblemset.restart()
 
+    # sends to a single channel. a missing-permissions error in one server is reported and
+    # swallowed so it doesn't abort the alert loop for every server after it.
+    async def safeSend(self, channel, serverID, alertKind: str, **kwargs) -> bool:
+        try:
+            await channel.send(**kwargs)
+            return True
+        except discord.Forbidden as e:
+            msg = f"Missing permissions sending {alertKind} alert to channel {channel.id} in server {serverID}: {str(e)}"
+            Clogger.warn(msg)
+            await self.client.sendErrAlert(msg)
+            return False
+
     async def handleProblemAlerts(self, dow: int, hour: int, minInterval: int | None):
         serverID = None
         try:
@@ -150,7 +163,7 @@ class Looper(commands.Cog):
                 if not server.addActiveProblem(slug, difficulty, pid): # add the problem to the server's active problems. also adds to previous problems
                     raise Exception("Error adding active problem to server's active problems")
 
-                await channel.send(embed=ProblemEmbed(slug, problemInfo), content=buildAlertRoleNotification(server))  # send the problem embed
+                await self.safeSend(channel, serverID, "problem", embed=ProblemEmbed(slug, problemInfo), content=buildAlertRoleNotification(server))  # send the problem embed
         except Exception as e:
             Clogger.error(f"Error in Looper - problem sending: {str(e)} {serverID}")
             await self.client.sendErrAlert(f"Error in Looper - problem sending: {str(e)}")
@@ -241,7 +254,7 @@ class Looper(commands.Cog):
                         Clogger.warn(f"Channel not found for ID: {alert.channelID} in server {alert.serverID}")
                         continue
                     
-                    await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
+                    await self.safeSend(channel, alert.serverID, "contest", embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
             
             if biweeklyExists and biweeklyContestMinsAway in intervals:
                 Clogger.info("Biweekly contest is within an alert interval.")
@@ -256,7 +269,7 @@ class Looper(commands.Cog):
                         Clogger.warn(f"Channel not found for ID: {alert.channelID} in server {alert.serverID}")
                         continue
                     
-                    await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
+                    await self.safeSend(channel, alert.serverID, "contest", embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
         except Exception as e:
             await self.client.sendErrAlert(f"Error in Looper - contest sending: {str(e)}")
 
@@ -273,7 +286,7 @@ class Looper(commands.Cog):
                     Clogger.warn(f"Channel not found for ID: {alert.channelID} in server {alert.serverID}")
                     continue
                 
-                await channel.send(embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
+                await self.safeSend(channel, alert.serverID, "static", embed=AlertEmbed(alert), content=buildAlertRoleNotification(self.app.servers.get(alert.serverID)))
     
         try:
             # alerts happen on either 0min or 30mins which are both intervals
